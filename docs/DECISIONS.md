@@ -90,3 +90,10 @@ Use this format for each decision:
 - **Context**: Need local persistence for catalog and run state without a server database. sqlx vs rusqlite were both viable.
 - **Decision**: Use `rusqlite` with the `bundled` feature for sync access from Tauri managed state.
 - **Consequences**: Simple setup, no separate system SQLite dependency. If we later need heavy async DB work, revisit sqlx.
+
+### Process identity via pid + pgid
+- **Date**: 2026-08-25
+- **Status**: Accepted
+- **Context**: PID reuse after reboot/exit can make “pid is alive” alone unsafe for rehydrate.
+- **Decision**: Persist pid and pgid; on rehydrate require `kill(pid,0)` success and `getpgid(pid) == stored_pgid`. Stop signals the process group.
+- **Consequences**: Safer reopen behavior on macOS. Windows will need a different identity strategy later.

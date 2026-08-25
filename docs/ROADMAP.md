@@ -23,14 +23,14 @@ V1 is "useful on Monday" when you can open the app, find a project, start/stop i
 - [x] Empty shell UI loads in a window
 - [x] README with how to run the app
 
-### M1 — Catalog + lifecycle `[ ]`
+### M1 — Catalog + lifecycle `[x]`
 > Remember projects and start/stop them
 
-- [ ] Register / scan / list / remove projects
-- [ ] Infer stack signals and default start command (overridable)
-- [ ] Start / stop / restart via user login shell
-- [ ] Process-group aware stop; PID persistence; reopen-safe status rehydration
-- [ ] Status: stopped / starting / running / failed
+- [x] Register / scan / list / remove projects
+- [x] Infer stack signals and default start command (overridable)
+- [x] Start / stop / restart via user login shell
+- [x] Process-group aware stop; PID persistence; reopen-safe status rehydration
+- [x] Status: stopped / starting / running / failed
 
 ### M2 — Docker/DB peek `[ ]`
 > Still part of v1 — glue, not a Docker GUI

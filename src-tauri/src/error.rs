@@ -14,11 +14,29 @@ pub enum AppError {
 
     #[error("not found: {0}")]
     NotFound(String),
+
+    #[error("conflict: {0}")]
+    Conflict(String),
+
+    #[error("invalid argument: {0}")]
+    InvalidArgument(String),
 }
 
 impl AppError {
     pub fn message(msg: impl Into<String>) -> Self {
         Self::Message(msg.into())
+    }
+
+    pub fn not_found(msg: impl Into<String>) -> Self {
+        Self::NotFound(msg.into())
+    }
+
+    pub fn conflict(msg: impl Into<String>) -> Self {
+        Self::Conflict(msg.into())
+    }
+
+    pub fn invalid(msg: impl Into<String>) -> Self {
+        Self::InvalidArgument(msg.into())
     }
 }
 
@@ -31,6 +49,12 @@ impl From<rusqlite::Error> for AppError {
 impl From<std::io::Error> for AppError {
     fn from(value: std::io::Error) -> Self {
         Self::Io(value.to_string())
+    }
+}
+
+impl From<serde_json::Error> for AppError {
+    fn from(value: serde_json::Error) -> Self {
+        Self::Message(format!("json error: {value}"))
     }
 }
 
@@ -48,6 +72,8 @@ impl From<AppError> for AppErrorDto {
             AppError::Database(_) => "database",
             AppError::Io(_) => "io",
             AppError::NotFound(_) => "not_found",
+            AppError::Conflict(_) => "conflict",
+            AppError::InvalidArgument(_) => "invalid_argument",
         };
         Self {
             code: code.to_string(),
@@ -72,6 +98,8 @@ impl AppError {
             Self::Database(v) => Self::Database(v.clone()),
             Self::Io(v) => Self::Io(v.clone()),
             Self::NotFound(v) => Self::NotFound(v.clone()),
+            Self::Conflict(v) => Self::Conflict(v.clone()),
+            Self::InvalidArgument(v) => Self::InvalidArgument(v.clone()),
         }
     }
 }

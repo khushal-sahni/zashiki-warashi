@@ -9,14 +9,18 @@ use std::sync::Arc;
 use tauri::Manager;
 use tracing::info;
 
-use commands::get_app_status;
-use repositories::Database;
-use services::AppService;
+use commands::{
+    add_project, get_app_status, get_settings, list_projects, remove_project, restart_project,
+    scan_projects, set_scan_roots, start_project, stop_project, update_project_commands,
+};
+use repositories::{Database, ProjectRepository};
+use services::{AppService, CatalogService, ProcessService};
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
     tauri::Builder::default()
         .plugin(tauri_plugin_opener::init())
+        .plugin(tauri_plugin_dialog::init())
         .plugin(
             tauri_plugin_log::Builder::new()
                 .level(log::LevelFilter::Info)
@@ -32,12 +36,34 @@ pub fn run() {
             info!(path = %app_data_dir.display(), "app data directory ready");
 
             let database = Arc::new(Database::open(&app_data_dir)?);
+            let project_repository = Arc::new(ProjectRepository::new(database.clone()));
+            let catalog_service = Arc::new(CatalogService::new(project_repository.clone()));
+            let process_service = Arc::new(ProcessService::new(
+                project_repository,
+                catalog_service.clone(),
+            ));
+            process_service.rehydrate_all()?;
+
             let app_service = AppService::new(database, app_data_dir.display().to_string());
             app.manage(app_service);
+            app.manage(catalog_service);
+            app.manage(process_service);
 
             Ok(())
         })
-        .invoke_handler(tauri::generate_handler![get_app_status])
+        .invoke_handler(tauri::generate_handler![
+            get_app_status,
+            list_projects,
+            add_project,
+            remove_project,
+            update_project_commands,
+            scan_projects,
+            get_settings,
+            set_scan_roots,
+            start_project,
+            stop_project,
+            restart_project,
+        ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }

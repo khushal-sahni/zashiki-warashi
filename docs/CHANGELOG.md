@@ -29,6 +29,33 @@
 
 ## Sessions
 
+## Session #2 — 2026-08-25
+
+### Built
+- Project catalog: add folder, scan roots, list/search, remove from catalog
+- Start-command inference (npm/compose/make/cargo/go) with unit tests
+- Command overrides in SQLite (not written into project repos)
+- Process lifecycle: login-shell spawn, process-group stop, PID/pgid persist + rehydrate
+- Schema v2: `pgid`, `last_error`, `started_at_unix` on `project_runs`
+- Catalog UI (sidebar, detail, scan results, scan-root settings)
+- `tauri-plugin-dialog` for native folder picker
+
+### Changed
+- Empty foundation shell replaced by catalog as the main screen
+- App footer shows lightweight foundation status
+
+### Fixed
+- Nothing notable beyond greenfield M1 work
+
+### Deferred / Not Done
+- Docker/DB peek (M2)
+- Open in Cursor / Finder / tray (M3)
+- Process log capture
+
+### New Tech Debt
+- Discarded stdout/stderr for started processes until a logs pane exists
+- Timestamp display is unix-seconds string (OK for rehydrate, not pretty)
+
 ## Session #1 — 2026-08-25
 
 ### Built

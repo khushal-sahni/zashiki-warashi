@@ -24,12 +24,19 @@ npm install
 npm run tauri:dev
 ```
 
-This starts Vite and opens the Tauri window. The empty shell loads app status from Rust and confirms SQLite is ready.
+This starts Vite and opens the Tauri window. You can add project folders, scan configured roots, override start/stop commands, and start/stop processes.
 
 ## Build
 
 ```bash
 npm run tauri:build
+```
+
+## Checks
+
+```bash
+npm run build
+cd src-tauri && cargo test
 ```
 
 ## Docs

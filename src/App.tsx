@@ -1,97 +1,257 @@
-import { useEffect, useState } from "react";
+import { open } from "@tauri-apps/plugin-dialog";
+import { useCallback, useEffect, useMemo, useState } from "react";
 
 import { ShellHeader } from "./components";
-import { getAppStatus } from "./lib";
-import type { AppStatus } from "./types";
+import {
+  ProjectDetail,
+  ProjectList,
+  ScanResults,
+  SettingsPanel,
+} from "./features/projects";
+import {
+  addProject,
+  formatInvokeError,
+  getAppStatus,
+  getSettings,
+  listProjects,
+  removeProject,
+  restartProject,
+  scanProjects,
+  setScanRoots,
+  startProject,
+  stopProject,
+  updateProjectCommands,
+} from "./lib";
+import type { AppStatus, Project, ScanCandidate } from "./types";
 import "./App.css";
 
-type LoadState =
-  | { readonly kind: "loading" }
-  | { readonly kind: "ready"; readonly status: AppStatus }
-  | { readonly kind: "error"; readonly message: string };
-
 function App() {
-  const [state, setState] = useState<LoadState>({ kind: "loading" });
+  const [projects, setProjects] = useState<Project[]>([]);
+  const [selectedId, setSelectedId] = useState<string | null>(null);
+  const [query, setQuery] = useState("");
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [status, setStatus] = useState<AppStatus | null>(null);
+  const [scanRoots, setScanRootsState] = useState<string[]>([]);
+  const [candidates, setCandidates] = useState<ScanCandidate[] | null>(null);
+  const [showSettings, setShowSettings] = useState(false);
+
+  const selected = useMemo(
+    () => projects.find((project) => project.id === selectedId) ?? null,
+    [projects, selectedId],
+  );
+
+  const refresh = useCallback(async (): Promise<void> => {
+    const [nextProjects, nextStatus, settings] = await Promise.all([
+      listProjects(),
+      getAppStatus(),
+      getSettings(),
+    ]);
+    setProjects(nextProjects);
+    setStatus(nextStatus);
+    setScanRootsState(settings.scanRoots);
+    setSelectedId((current) => {
+      if (current && nextProjects.some((project) => project.id === current)) {
+        return current;
+      }
+      return nextProjects[0]?.id ?? null;
+    });
+  }, []);
 
   useEffect(() => {
     let cancelled = false;
 
-    async function loadStatus(): Promise<void> {
+    async function boot(): Promise<void> {
       try {
-        const status = await getAppStatus();
+        await refresh();
+      } catch (err) {
         if (!cancelled) {
-          setState({ kind: "ready", status });
-        }
-      } catch (error) {
-        const message =
-          error instanceof Error
-            ? error.message
-            : typeof error === "object" &&
-                error !== null &&
-                "message" in error &&
-                typeof error.message === "string"
-              ? error.message
-              : "Failed to load app status";
-        if (!cancelled) {
-          setState({ kind: "error", message });
+          setError(formatInvokeError(err));
         }
       }
     }
 
-    void loadStatus();
-
+    void boot();
     return () => {
       cancelled = true;
     };
-  }, []);
+  }, [refresh]);
+
+  async function withBusy(action: () => Promise<void>): Promise<void> {
+    setBusy(true);
+    setError(null);
+    try {
+      await action();
+    } catch (err) {
+      setError(formatInvokeError(err));
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  async function handleAddFolder(): Promise<void> {
+    await withBusy(async () => {
+      const selectedPath = await open({
+        directory: true,
+        multiple: false,
+        title: "Add project folder",
+      });
+      if (typeof selectedPath !== "string" || selectedPath.length === 0) {
+        return;
+      }
+      const project = await addProject(selectedPath);
+      await refresh();
+      setSelectedId(project.id);
+    });
+  }
+
+  async function handleScan(): Promise<void> {
+    await withBusy(async () => {
+      const results = await scanProjects();
+      setCandidates(results);
+      setShowSettings(false);
+    });
+  }
 
   return (
-    <main className="shell">
+    <main className="shell app-shell">
       <ShellHeader
         title="Zashiki Warashi"
-        subtitle="A house spirit for your local projects — catalog, start/stop, and Docker peek."
+        subtitle="Catalog and start/stop your local projects."
       />
 
-      <section className="panel">
-        <h2>Foundation</h2>
-        {state.kind === "loading" && <p className="muted">Checking backend…</p>}
-        {state.kind === "error" && (
-          <p className="error" role="alert">
-            {state.message}
-          </p>
-        )}
-        {state.kind === "ready" && (
-          <dl className="status-grid">
-            <div>
-              <dt>App</dt>
-              <dd>
-                {state.status.name} v{state.status.version}
-              </dd>
-            </div>
-            <div>
-              <dt>Database</dt>
-              <dd>{state.status.databaseReady ? "Ready" : "Not ready"}</dd>
-            </div>
-            <div>
-              <dt>Schema</dt>
-              <dd>v{state.status.schemaVersion}</dd>
-            </div>
-            <div>
-              <dt>App data</dt>
-              <dd className="path">{state.status.appDataDir}</dd>
-            </div>
-          </dl>
-        )}
-      </section>
+      <div className="toolbar">
+        <button type="button" disabled={busy} onClick={() => void handleAddFolder()}>
+          Add folder
+        </button>
+        <button type="button" disabled={busy} onClick={() => void handleScan()}>
+          Scan
+        </button>
+        <button
+          type="button"
+          className="ghost"
+          disabled={busy}
+          onClick={() => {
+            setShowSettings((value) => !value);
+            setCandidates(null);
+          }}
+        >
+          Settings
+        </button>
+        <button
+          type="button"
+          className="ghost"
+          disabled={busy}
+          onClick={() => void withBusy(refresh)}
+        >
+          Refresh
+        </button>
+      </div>
 
-      <section className="panel muted-panel">
-        <h2>Coming next</h2>
-        <ul>
-          <li>Project catalog — register, scan, and find local repos</li>
-          <li>Lifecycle — one-button start / stop / status</li>
-          <li>Docker / DB peek — compose services and Compass deep-links</li>
-        </ul>
-      </section>
+      {error && (
+        <p className="error banner" role="alert">
+          {error}
+        </p>
+      )}
+
+      {showSettings && (
+        <SettingsPanel
+          roots={scanRoots}
+          busy={busy}
+          onClose={() => setShowSettings(false)}
+          onSave={async (roots) => {
+            await withBusy(async () => {
+              const settings = await setScanRoots(roots);
+              setScanRootsState(settings.scanRoots);
+              setShowSettings(false);
+            });
+          }}
+        />
+      )}
+
+      {candidates && (
+        <ScanResults
+          candidates={candidates}
+          busy={busy}
+          onClose={() => setCandidates(null)}
+          onAdd={async (path) => {
+            await withBusy(async () => {
+              const project = await addProject(path);
+              const results = await scanProjects();
+              setCandidates(results);
+              await refresh();
+              setSelectedId(project.id);
+            });
+          }}
+        />
+      )}
+
+      <div className="workspace">
+        <ProjectList
+          projects={projects}
+          selectedId={selectedId}
+          query={query}
+          onQueryChange={setQuery}
+          onSelect={setSelectedId}
+        />
+        <ProjectDetail
+          project={selected}
+          busy={busy}
+          onStart={async (id) => {
+            await withBusy(async () => {
+              const project = await startProject(id);
+              setProjects((current) =>
+                current.map((item) => (item.id === id ? project : item)),
+              );
+            });
+          }}
+          onStop={async (id) => {
+            await withBusy(async () => {
+              const project = await stopProject(id);
+              setProjects((current) =>
+                current.map((item) => (item.id === id ? project : item)),
+              );
+            });
+          }}
+          onRestart={async (id) => {
+            await withBusy(async () => {
+              const project = await restartProject(id);
+              setProjects((current) =>
+                current.map((item) => (item.id === id ? project : item)),
+              );
+            });
+          }}
+          onRemove={async (id) => {
+            await withBusy(async () => {
+              await removeProject(id);
+              await refresh();
+            });
+          }}
+          onSaveCommands={async (id, startCommand, stopCommand) => {
+            await withBusy(async () => {
+              const project = await updateProjectCommands(
+                id,
+                startCommand,
+                stopCommand,
+              );
+              setProjects((current) =>
+                current.map((item) => (item.id === id ? project : item)),
+              );
+            });
+          }}
+        />
+      </div>
+
+      <footer className="footer muted">
+        {status ? (
+          <span>
+            {status.name} v{status.version} · DB schema v{status.schemaVersion} ·{" "}
+            {projects.length} project{projects.length === 1 ? "" : "s"}
+          </span>
+        ) : (
+          <span>Loading…</span>
+        )}
+      </footer>
     </main>
   );
 }

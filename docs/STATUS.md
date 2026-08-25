@@ -1,36 +1,39 @@
 # STATUS.md
 > Your weekend dashboard. Read this first. Update this last.
-> Last updated: `2026-08-25` | Session: `#1`
+> Last updated: `2026-08-25` | Session: `#2`
 
 ---
 
 ## What Works Right Now
 
-- [x] Product vision and architecture locked in docs (`AGENTS.md`, roadmap, decisions)
+- [x] Product vision and architecture locked in docs
 - [x] Tauri 2 + React + Vite + TypeScript scaffold
-- [x] Rust layered backend (`commands` / `services` / `repositories` / `domain`)
-- [x] SQLite app-data DB with schema v1 (`projects`, `project_runs`, `meta`)
-- [x] Typed `AppError` + `tauri-plugin-log` / tracing
-- [x] Empty shell UI that loads `get_app_status` (DB ready + app data path)
-- [x] README with run instructions
+- [x] SQLite app-data DB (schema v2)
+- [x] Typed `AppError` + logging
+- [x] **Project catalog** — add folder, scan roots, list/search, remove (catalog only)
+- [x] **Start command inference** — package.json / compose / Makefile / cargo / go
+- [x] **Command overrides** stored in app DB (not written into repos)
+- [x] **Lifecycle** — start / stop / restart via login shell + process groups
+- [x] **PID + pgid persistence** and rehydrate on launch
+- [x] Catalog UI (sidebar + detail + scan results + scan-root settings)
 
 ---
 
 ## In Progress
 
-- Nothing in progress — M0 complete. Next is M1 (catalog + lifecycle).
+- Nothing in progress — M1 complete. Next is M2 (Docker/DB peek).
 
 ---
 
 ## Known Broken / Blocked
 
-- None known. `tauri:dev` launched successfully (Vite + Rust binary). Manual click-through of the shell UI not exhaustively exercised.
+- None known. Process stdout/stderr discarded (no logs pane until M4+).
 
 ---
 
 ## Where We Left Off
 
-M0 foundation is in place. Next session should start **M1 — Catalog + lifecycle**: register/scan projects, infer start commands, start/stop with login shell + process groups, PID persistence and status rehydration.
+M1 catalog + lifecycle is implemented and tested. Next session: **M2 — Docker/DB peek** (compose detect, container list, up/down, URI + Compass deep-link).
 
 ---
 
@@ -38,19 +41,19 @@ M0 foundation is in place. Next session should start **M1 — Catalog + lifecycl
 
 ```
 src/
-├── components/          ✅ ShellHeader
-├── features/projects/   ❌ placeholder
-├── features/docker/     ❌ placeholder
-├── lib/                 ✅ getAppStatus invoke wrapper
-└── types/               ✅ AppStatus
+├── components/              ✅ ShellHeader
+├── features/projects/       ✅ list, detail, scan, settings
+├── features/docker/         ❌ placeholder (M2)
+├── lib/                     ✅ typed invoke wrappers
+└── types/                   ✅ AppStatus, Project, …
 
 src-tauri/src/
-├── commands/            ✅ get_app_status
-├── services/            ✅ AppService
-├── repositories/        ✅ Database (rusqlite + migrate)
-├── domain/              ✅ AppStatus
-├── error.rs             ✅ AppError
-└── lib.rs               ✅ setup + plugins
+├── commands/                ✅ app + projects IPC
+├── services/                ✅ App, Catalog, Process, infer
+├── repositories/            ✅ Database + ProjectRepository
+├── domain/                  ✅ AppStatus, Project, RunState, …
+├── error.rs                 ✅ AppError (+ conflict/invalid)
+└── lib.rs                   ✅ setup, rehydrate, plugins
 ```
 
 ---
@@ -58,8 +61,9 @@ src-tauri/src/
 ## Environment & Config
 
 ```env
-# No app .env required for M0.
-# Runtime needs (later): Docker CLI available on PATH via login shell.
+# No app .env required.
+# Runtime: login shell PATH for npm/docker/etc when starting projects.
+# Optional later: Docker CLI for M2.
 ```
 
 ---
@@ -70,10 +74,8 @@ src-tauri/src/
 npm install
 npm run tauri:dev
 
-# Frontend only
-npm run dev
-
-# Rust checks
+# Checks
+npm run build
 cd src-tauri && cargo test && cargo check
 ```
 
@@ -81,8 +83,9 @@ cd src-tauri && cargo test && cargo check
 
 ## Tech Debt
 
-- Default Tauri icons still in place — replace with brand assets later
-- `projects` / `project_runs` tables exist but have no repository/service API yet (intentional for M1)
+- Default Tauri icons still in place
+- Start/stop discard process output (add log files when building logs pane)
+- `now_iso` stores unix seconds as string — fine for identity, not pretty for UI
 
 ---
 
@@ -96,7 +99,7 @@ cd src-tauri && cargo test && cargo check
 
 | Metric | Value |
 |---|---|
-| Total sessions | 1 |
-| Modules complete | M0 foundation |
-| Test coverage | DB migrate unit test |
+| Total sessions | 2 |
+| Modules complete | M0 + M1 |
+| Test coverage | 9 Rust unit tests |
 | Last deployed | Never |
