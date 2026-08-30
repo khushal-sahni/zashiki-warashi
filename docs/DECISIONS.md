@@ -97,3 +97,10 @@ Use this format for each decision:
 - **Context**: PID reuse after reboot/exit can make “pid is alive” alone unsafe for rehydrate.
 - **Decision**: Persist pid and pgid; on rehydrate require `kill(pid,0)` success and `getpgid(pid) == stored_pgid`. Stop signals the process group.
 - **Consequences**: Safer reopen behavior on macOS. Windows will need a different identity strategy later.
+
+### Daily driver via local `~/Applications` install (not auto on tauri:dev)
+- **Date**: 2026-08-26
+- **Status**: Accepted
+- **Context**: Want Zashiki available from Spotlight/Dock like a normal app, while keeping `tauri:dev` for coding. Hooking install into every `tauri:dev` would be slow and still would not reflect mid-session edits.
+- **Decision**: Separate `npm run tauri:install` builds a release `.app` and copies it to `~/Applications`. Dev and installed app share `com.zashiki.warashi` app data; do not run both at once.
+- **Consequences**: Fast coding loop unchanged. Daily driver is refreshed on demand. No Apple signing/notarization for personal local use yet.

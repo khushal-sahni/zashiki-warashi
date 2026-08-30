@@ -24,13 +24,25 @@ npm install
 npm run tauri:dev
 ```
 
-This starts Vite and opens the Tauri window. You can add project folders, scan configured roots, override start/stop commands, and start/stop processes.
+This starts Vite and opens the Tauri window (hot reload). Use this while coding. You can add project folders, scan configured roots, override start/stop commands, and start/stop processes.
+
+## Install (daily driver)
+
+To use Zashiki like any other Mac app (Spotlight / Dock / Launchpad):
+
+```bash
+npm run tauri:install
+```
+
+This builds a release `.app` and installs it to `~/Applications/Zashiki Warashi.app`. Re-run when you want the installed app to catch up with your latest changes. Do **not** run the installed app and `tauri:dev` at the same time — they share the same SQLite catalog.
 
 ## Build
 
 ```bash
 npm run tauri:build
 ```
+
+Produces the release bundle under `src-tauri/target/release/bundle/` without installing it.
 
 ## Checks
 

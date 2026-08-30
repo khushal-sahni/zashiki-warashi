@@ -29,6 +29,28 @@
 
 ## Sessions
 
+## Session #3 — 2026-08-26
+
+### Built
+- `scripts/install-macos.sh` — release build (`--bundles app`), safe replace into `~/Applications`, clear quarantine
+- `npm run tauri:install` for daily-driver install (Spotlight / Dock / Launchpad)
+
+### Changed
+- README: Develop vs Install (daily driver) vs Build sections
+- STATUS: how to run + session notes
+
+### Fixed
+- (none)
+
+### Deferred / Not Done
+- Auto-update installed app on `tauri:dev` (intentionally out of scope)
+- Apple signing / notarization (local personal use only)
+
+### New Tech Debt
+- Default Tauri icons still in place for the installed app
+
+---
+
 ## Session #2 — 2026-08-25
 
 ### Built

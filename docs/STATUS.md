@@ -1,6 +1,6 @@
 # STATUS.md
 > Your weekend dashboard. Read this first. Update this last.
-> Last updated: `2026-08-25` | Session: `#2`
+> Last updated: `2026-08-26` | Session: `#3`
 
 ---
 
@@ -16,6 +16,7 @@
 - [x] **Lifecycle** — start / stop / restart via login shell + process groups
 - [x] **PID + pgid persistence** and rehydrate on launch
 - [x] Catalog UI (sidebar + detail + scan results + scan-root settings)
+- [x] **Local install** — `npm run tauri:install` → `~/Applications/Zashiki Warashi.app`
 
 ---
 
@@ -33,7 +34,7 @@
 
 ## Where We Left Off
 
-M1 catalog + lifecycle is implemented and tested. Next session: **M2 — Docker/DB peek** (compose detect, container list, up/down, URI + Compass deep-link).
+Added local daily-driver install (`npm run tauri:install` → `~/Applications`). Next product work: **M2 — Docker/DB peek** (compose detect, container list, up/down, URI + Compass deep-link).
 
 ---
 
@@ -74,6 +75,9 @@ src-tauri/src/
 npm install
 npm run tauri:dev
 
+# Daily driver (Spotlight / Dock) — re-run when you want the installed app updated
+npm run tauri:install
+
 # Checks
 npm run build
 cd src-tauri && cargo test && cargo check
@@ -99,7 +103,7 @@ cd src-tauri && cargo test && cargo check
 
 | Metric | Value |
 |---|---|
-| Total sessions | 2 |
+| Total sessions | 3 |
 | Modules complete | M0 + M1 |
 | Test coverage | 9 Rust unit tests |
-| Last deployed | Never |
+| Last deployed | Local `~/Applications` via `tauri:install` |
