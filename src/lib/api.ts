@@ -3,12 +3,23 @@ import { invoke } from "@tauri-apps/api/core";
 import type {
   AppSettings,
   AppStatus,
+  KeepAwakeStatus,
   Project,
   ScanCandidate,
 } from "../types";
 
 export async function getAppStatus(): Promise<AppStatus> {
   return invoke<AppStatus>("get_app_status");
+}
+
+export async function getKeepAwakeStatus(): Promise<KeepAwakeStatus> {
+  return invoke<KeepAwakeStatus>("get_keep_awake_status");
+}
+
+export async function setKeepAwakeEnabled(
+  enabled: boolean,
+): Promise<KeepAwakeStatus> {
+  return invoke<KeepAwakeStatus>("set_keep_awake_enabled", { enabled });
 }
 
 export async function listProjects(): Promise<Project[]> {

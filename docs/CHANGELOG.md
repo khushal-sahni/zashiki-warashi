@@ -29,6 +29,32 @@
 
 ## Sessions
 
+## Session #4 — 2026-08-30
+
+### Built
+- **Coffee toggle** — toolbar keep-awake control for macOS
+- `KeepAwakeService` — spawns `caffeinate -ims`, runs `pmset disablesleep` via osascript admin prompt
+- `KeepAwakeToggle` component with full/partial armed states and heat warning
+- Meta persistence: `keep_awake_enabled`, `keep_awake_caffeinate_pid`
+- 5 unit tests for keep-awake service (fake runner)
+
+### Changed
+- `App.tsx` toolbar — Coffee button between Scan and Settings
+- IPC: `get_keep_awake_status`, `set_keep_awake_enabled`
+- Rehydrate keep-awake on app launch (same pattern as project PIDs)
+
+### Fixed
+- N/A
+
+### Deferred / Not Done
+- Battery-floor auto-off, timed Coffee sessions
+- Amphetamine / third-party keep-awake integration (using native tools instead)
+- Changing `tcpkeepalive` / `networkoversleep` pmset knobs
+
+### New Tech Debt
+- Admin password prompt on every Coffee enable/disable unless user adds a scoped sudoers rule manually
+- Wi-Fi in closed lid is hardware-limited; Ethernet/dock is the fallback for flaky RF
+
 ## Session #3 — 2026-08-26
 
 ### Built

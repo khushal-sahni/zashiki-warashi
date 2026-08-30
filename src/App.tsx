@@ -1,7 +1,7 @@
 import { open } from "@tauri-apps/plugin-dialog";
 import { useCallback, useEffect, useMemo, useState } from "react";
 
-import { ShellHeader } from "./components";
+import { KeepAwakeToggle, ShellHeader } from "./components";
 import {
   ProjectDetail,
   ProjectList,
@@ -12,17 +12,19 @@ import {
   addProject,
   formatInvokeError,
   getAppStatus,
+  getKeepAwakeStatus,
   getSettings,
   listProjects,
   removeProject,
   restartProject,
   scanProjects,
+  setKeepAwakeEnabled,
   setScanRoots,
   startProject,
   stopProject,
   updateProjectCommands,
 } from "./lib";
-import type { AppStatus, Project, ScanCandidate } from "./types";
+import type { AppStatus, KeepAwakeStatus, Project, ScanCandidate } from "./types";
 import "./App.css";
 
 function App() {
@@ -35,6 +37,7 @@ function App() {
   const [scanRoots, setScanRootsState] = useState<string[]>([]);
   const [candidates, setCandidates] = useState<ScanCandidate[] | null>(null);
   const [showSettings, setShowSettings] = useState(false);
+  const [keepAwake, setKeepAwake] = useState<KeepAwakeStatus | null>(null);
 
   const selected = useMemo(
     () => projects.find((project) => project.id === selectedId) ?? null,
@@ -42,14 +45,16 @@ function App() {
   );
 
   const refresh = useCallback(async (): Promise<void> => {
-    const [nextProjects, nextStatus, settings] = await Promise.all([
+    const [nextProjects, nextStatus, settings, nextKeepAwake] = await Promise.all([
       listProjects(),
       getAppStatus(),
       getSettings(),
+      getKeepAwakeStatus(),
     ]);
     setProjects(nextProjects);
     setStatus(nextStatus);
     setScanRootsState(settings.scanRoots);
+    setKeepAwake(nextKeepAwake);
     setSelectedId((current) => {
       if (current && nextProjects.some((project) => project.id === current)) {
         return current;
@@ -105,6 +110,25 @@ function App() {
     });
   }
 
+  async function handleToggleKeepAwake(): Promise<void> {
+    const nextEnabled = !(keepAwake?.enabled ?? false);
+    setBusy(true);
+    setError(null);
+    try {
+      const status = await setKeepAwakeEnabled(nextEnabled);
+      setKeepAwake(status);
+    } catch (err) {
+      setError(formatInvokeError(err));
+      try {
+        setKeepAwake(await getKeepAwakeStatus());
+      } catch {
+        // Keep the last known status if refresh fails.
+      }
+    } finally {
+      setBusy(false);
+    }
+  }
+
   async function handleScan(): Promise<void> {
     await withBusy(async () => {
       const results = await scanProjects();
@@ -127,6 +151,11 @@ function App() {
         <button type="button" disabled={busy} onClick={() => void handleScan()}>
           Scan
         </button>
+        <KeepAwakeToggle
+          status={keepAwake}
+          busy={busy}
+          onToggle={() => void handleToggleKeepAwake()}
+        />
         <button
           type="button"
           className="ghost"

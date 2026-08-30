@@ -92,6 +92,35 @@ button.ghost {
   background: transparent;
 }
 
+button.ghost.active {
+  border-color: rgba(143, 191, 168, 0.55);
+  background: rgba(88, 140, 120, 0.22);
+  color: #d7f0e4;
+}
+
+button.ghost.active.partial {
+  border-color: rgba(240, 196, 120, 0.55);
+  background: rgba(160, 120, 60, 0.18);
+  color: #f0ddb0;
+}
+
+.keep-awake-control {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.keep-awake-note {
+  margin: 0;
+  font-size: 0.78rem;
+  color: #8fbfa8;
+  max-width: 22rem;
+}
+
+.keep-awake-note.warn {
+  color: #f0c478;
+}
+
 button.danger {
   border-color: rgba(240, 168, 160, 0.35);
   color: #f0a8a0;

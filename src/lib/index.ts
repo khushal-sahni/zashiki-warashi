@@ -1,11 +1,13 @@
 export {
   addProject,
   getAppStatus,
+  getKeepAwakeStatus,
   getSettings,
   listProjects,
   removeProject,
   restartProject,
   scanProjects,
+  setKeepAwakeEnabled,
   setScanRoots,
   startProject,
   stopProject,

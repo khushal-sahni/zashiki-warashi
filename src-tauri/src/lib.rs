@@ -10,11 +10,12 @@ use tauri::Manager;
 use tracing::info;
 
 use commands::{
-    add_project, get_app_status, get_settings, list_projects, remove_project, restart_project,
-    scan_projects, set_scan_roots, start_project, stop_project, update_project_commands,
+    add_project, get_app_status, get_keep_awake_status, get_settings, list_projects,
+    remove_project, restart_project, scan_projects, set_keep_awake_enabled, set_scan_roots,
+    start_project, stop_project, update_project_commands,
 };
 use repositories::{Database, ProjectRepository};
-use services::{AppService, CatalogService, ProcessService};
+use services::{AppService, CatalogService, KeepAwakeService, ProcessService};
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
@@ -39,20 +40,26 @@ pub fn run() {
             let project_repository = Arc::new(ProjectRepository::new(database.clone()));
             let catalog_service = Arc::new(CatalogService::new(project_repository.clone()));
             let process_service = Arc::new(ProcessService::new(
-                project_repository,
+                project_repository.clone(),
                 catalog_service.clone(),
             ));
             process_service.rehydrate_all()?;
+
+            let keep_awake_service = Arc::new(KeepAwakeService::new(project_repository.clone()));
+            keep_awake_service.rehydrate()?;
 
             let app_service = AppService::new(database, app_data_dir.display().to_string());
             app.manage(app_service);
             app.manage(catalog_service);
             app.manage(process_service);
+            app.manage(keep_awake_service);
 
             Ok(())
         })
         .invoke_handler(tauri::generate_handler![
             get_app_status,
+            get_keep_awake_status,
+            set_keep_awake_enabled,
             list_projects,
             add_project,
             remove_project,

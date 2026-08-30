@@ -84,6 +84,13 @@ Use this format for each decision:
 - **Decision**: V1 = catalog + start/stop/status + compose/DB peek + deep-links. Provisioning, logs pane, and port maps are later.
 - **Consequences**: Clear scope cut. Users still need Docker/Compose already set up for DB projects.
 
+### Coffee keep-awake wraps macOS native tools (no third-party app)
+- **Date**: 2026-08-30
+- **Status**: Accepted
+- **Context**: Local projects must keep running when the MacBook lid closes; network drops on sleep. Amphetamine/StayAwake/etc. all use the same public levers (`caffeinate`, `pmset disablesleep`).
+- **Decision**: Add a toolbar Coffee toggle backed by `KeepAwakeService`: `caffeinate -ims` for idle sleep + `osascript`/`pmset -a disablesleep` for lid-close. Persist preference in SQLite meta; rehydrate caffeinate on launch. Coffee outlives the app (like project processes).
+- **Consequences**: No external dependency. Lid-close requires admin approval per toggle (unless user adds their own sudoers rule). Heat/battery risk when lid closed — UI warns user. Does not fix Wi-Fi antenna-in-lid hardware limits.
+
 ### SQLite via rusqlite (bundled)
 - **Date**: 2026-08-25
 - **Status**: Accepted

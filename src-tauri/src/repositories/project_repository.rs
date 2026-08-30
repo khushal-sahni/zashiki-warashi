@@ -7,6 +7,8 @@ use crate::error::AppError;
 use crate::repositories::Database;
 
 const SCAN_ROOTS_KEY: &str = "scan_roots";
+const KEEP_AWAKE_ENABLED_KEY: &str = "keep_awake_enabled";
+const KEEP_AWAKE_CAFFEINATE_PID_KEY: &str = "keep_awake_caffeinate_pid";
 
 pub struct ProjectRepository {
     database: Arc<Database>,
@@ -307,18 +309,77 @@ impl ProjectRepository {
 
     pub fn set_scan_roots(&self, roots: &[String]) -> Result<AppSettings, AppError> {
         let encoded = serde_json::to_string(roots)?;
+        self.set_meta_value(SCAN_ROOTS_KEY, &encoded)?;
+        Ok(AppSettings {
+            scan_roots: roots.to_vec(),
+        })
+    }
+
+    pub fn get_keep_awake_enabled(&self) -> Result<bool, AppError> {
+        match self.get_meta_value(KEEP_AWAKE_ENABLED_KEY)? {
+            Some(raw) => parse_bool_meta(&raw),
+            None => Ok(false),
+        }
+    }
+
+    pub fn set_keep_awake_enabled(&self, enabled: bool) -> Result<(), AppError> {
+        self.set_meta_value(KEEP_AWAKE_ENABLED_KEY, if enabled { "true" } else { "false" })
+    }
+
+    pub fn get_keep_awake_caffeinate_pid(&self) -> Result<Option<i32>, AppError> {
+        match self.get_meta_value(KEEP_AWAKE_CAFFEINATE_PID_KEY)? {
+            Some(raw) => raw
+                .parse::<i32>()
+                .map(Some)
+                .map_err(|err| AppError::Database(format!("invalid caffeinate pid: {err}"))),
+            None => Ok(None),
+        }
+    }
+
+    pub fn set_keep_awake_caffeinate_pid(&self, pid: Option<i32>) -> Result<(), AppError> {
+        match pid {
+            Some(value) => self.set_meta_value(KEEP_AWAKE_CAFFEINATE_PID_KEY, &value.to_string()),
+            None => self.delete_meta_value(KEEP_AWAKE_CAFFEINATE_PID_KEY),
+        }
+    }
+
+    fn get_meta_value(&self, key: &str) -> Result<Option<String>, AppError> {
+        self.database.with_conn(|conn| {
+            conn.query_row(
+                "SELECT value FROM meta WHERE key = ?1",
+                params![key],
+                |row| row.get(0),
+            )
+            .optional()
+            .map_err(AppError::from)
+        })
+    }
+
+    fn set_meta_value(&self, key: &str, value: &str) -> Result<(), AppError> {
         self.database.with_conn(|conn| {
             conn.execute(
                 "
                 INSERT INTO meta (key, value) VALUES (?1, ?2)
                 ON CONFLICT(key) DO UPDATE SET value = excluded.value
                 ",
-                params![SCAN_ROOTS_KEY, encoded],
+                params![key, value],
             )?;
             Ok(())
-        })?;
-        Ok(AppSettings {
-            scan_roots: roots.to_vec(),
         })
+    }
+
+    fn delete_meta_value(&self, key: &str) -> Result<(), AppError> {
+        self.database.with_conn(|conn| {
+            conn.execute("DELETE FROM meta WHERE key = ?1", params![key])?;
+            Ok(())
+        })
+    }
+}
+
+fn parse_bool_meta(raw: &str) -> Result<bool, AppError> {
+    match raw {
+        "true" | "1" => Ok(true),
+        "false" | "0" => Ok(false),
+        _ => Err(AppError::Database(format!("invalid boolean meta value: {raw}"))),
     }
 }

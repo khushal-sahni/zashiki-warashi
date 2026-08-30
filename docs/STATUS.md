@@ -1,6 +1,6 @@
 # STATUS.md
 > Your weekend dashboard. Read this first. Update this last.
-> Last updated: `2026-08-26` | Session: `#3`
+> Last updated: `2026-08-30` | Session: `#4`
 
 ---
 
@@ -17,24 +17,26 @@
 - [x] **PID + pgid persistence** and rehydrate on launch
 - [x] Catalog UI (sidebar + detail + scan results + scan-root settings)
 - [x] **Local install** — `npm run tauri:install` → `~/Applications/Zashiki Warashi.app`
+- [x] **Coffee toggle** — toolbar keep-awake via `caffeinate` + `pmset disablesleep` (lid-close; admin prompt)
 
 ---
 
 ## In Progress
 
-- Nothing in progress — M1 complete. Next is M2 (Docker/DB peek).
+- Nothing in progress. Next product work: **M2 — Docker/DB peek**.
 
 ---
 
 ## Known Broken / Blocked
 
 - None known. Process stdout/stderr discarded (no logs pane until M4+).
+- Coffee lid-close mode requires one-time administrator approval per enable/disable (osascript + `pmset`).
 
 ---
 
 ## Where We Left Off
 
-Added local daily-driver install (`npm run tauri:install` → `~/Applications`). Next product work: **M2 — Docker/DB peek** (compose detect, container list, up/down, URI + Compass deep-link).
+Added **Coffee** toolbar toggle: wraps macOS `caffeinate -ims` (idle sleep) and `pmset disablesleep` (lid close). Preference + caffeinate PID persist in SQLite; rehydrates on launch. Next: **M2 — Docker/DB peek**.
 
 ---
 
@@ -42,17 +44,17 @@ Added local daily-driver install (`npm run tauri:install` → `~/Applications`).
 
 ```
 src/
-├── components/              ✅ ShellHeader
+├── components/              ✅ ShellHeader, KeepAwakeToggle
 ├── features/projects/       ✅ list, detail, scan, settings
 ├── features/docker/         ❌ placeholder (M2)
-├── lib/                     ✅ typed invoke wrappers
-└── types/                   ✅ AppStatus, Project, …
+├── lib/                     ✅ typed invoke wrappers (+ keep-awake)
+└── types/                   ✅ AppStatus, KeepAwakeStatus, Project, …
 
 src-tauri/src/
-├── commands/                ✅ app + projects IPC
-├── services/                ✅ App, Catalog, Process, infer
-├── repositories/            ✅ Database + ProjectRepository
-├── domain/                  ✅ AppStatus, Project, RunState, …
+├── commands/                ✅ app (+ keep-awake) + projects IPC
+├── services/                ✅ App, Catalog, Process, KeepAwake, infer
+├── repositories/            ✅ Database + ProjectRepository (+ meta keys)
+├── domain/                  ✅ AppStatus, KeepAwakeStatus, Project, …
 ├── error.rs                 ✅ AppError (+ conflict/invalid)
 └── lib.rs                   ✅ setup, rehydrate, plugins
 ```
@@ -90,6 +92,7 @@ cd src-tauri && cargo test && cargo check
 - Default Tauri icons still in place
 - Start/stop discard process output (add log files when building logs pane)
 - `now_iso` stores unix seconds as string — fine for identity, not pretty for UI
+- Coffee: no battery-floor auto-off or timed sessions yet; `pmset disablesleep` is sticky until toggled off
 
 ---
 
@@ -103,7 +106,7 @@ cd src-tauri && cargo test && cargo check
 
 | Metric | Value |
 |---|---|
-| Total sessions | 3 |
-| Modules complete | M0 + M1 |
-| Test coverage | 9 Rust unit tests |
+| Total sessions | 4 |
+| Modules complete | M0 + M1 (+ Coffee) |
+| Test coverage | 14 Rust unit tests |
 | Last deployed | Local `~/Applications` via `tauri:install` |
