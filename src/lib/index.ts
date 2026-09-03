@@ -13,6 +13,12 @@ export {
   stopProject,
   updateProjectCommands,
 } from "./api";
+export {
+  clearProjectLogs,
+  getProjectLogs,
+  listenProjectLogs,
+  projectHasCompose,
+} from "./logs";
 
 export function formatInvokeError(error: unknown): string {
   if (error instanceof Error) {

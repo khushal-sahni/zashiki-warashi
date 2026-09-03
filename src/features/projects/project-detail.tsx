@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 
 import type { Project } from "../../types";
+import { ProjectLogViewer } from "./project-log-viewer";
 
 interface ProjectDetailProps {
   readonly project: Project | null;
@@ -154,6 +155,11 @@ export function ProjectDetail({
           Save commands
         </button>
       </form>
+
+      <ProjectLogViewer
+        projectId={project.id}
+        running={project.run.status === "running"}
+      />
     </section>
   );
 }

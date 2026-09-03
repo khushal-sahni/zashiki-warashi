@@ -1,0 +1,42 @@
+use std::sync::Arc;
+
+use tauri::State;
+
+use crate::domain::{LogChunk, LogSource};
+use crate::error::AppError;
+use crate::services::infer::has_compose;
+use crate::services::{CatalogService, LogService};
+
+#[tauri::command]
+pub fn get_project_logs(
+    project_id: String,
+    source: LogSource,
+    tail: Option<u32>,
+    logs: State<'_, Arc<LogService>>,
+    catalog: State<'_, Arc<CatalogService>>,
+) -> Result<LogChunk, AppError> {
+    match source {
+        LogSource::Process => logs.read_tail(&project_id, tail),
+        LogSource::Compose => {
+            let project = catalog.get_project(&project_id)?;
+            logs.compose_logs(&project_id, &project.path, tail)
+        }
+    }
+}
+
+#[tauri::command]
+pub fn clear_project_logs(
+    project_id: String,
+    logs: State<'_, Arc<LogService>>,
+) -> Result<(), AppError> {
+    logs.clear(&project_id)
+}
+
+#[tauri::command]
+pub fn project_has_compose(
+    project_id: String,
+    catalog: State<'_, Arc<CatalogService>>,
+) -> Result<bool, AppError> {
+    let project = catalog.get_project(&project_id)?;
+    Ok(has_compose(std::path::Path::new(&project.path)))
+}

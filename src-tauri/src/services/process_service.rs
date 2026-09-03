@@ -1,3 +1,5 @@
+use std::fs::OpenOptions;
+use std::path::Path;
 use std::process::{Command, Stdio};
 use std::sync::Arc;
 use std::thread;
@@ -10,6 +12,7 @@ use crate::error::AppError;
 use crate::repositories::ProjectRepository;
 use crate::services::catalog_service::CatalogService;
 use crate::services::infer::infer_start_command;
+use crate::services::log_service::LogService;
 
 #[cfg(unix)]
 use std::os::unix::process::CommandExt;
@@ -19,13 +22,19 @@ const STOP_GRACE_MS: u64 = 2_000;
 pub struct ProcessService {
     repository: Arc<ProjectRepository>,
     catalog: Arc<CatalogService>,
+    logs: Arc<LogService>,
 }
 
 impl ProcessService {
-    pub fn new(repository: Arc<ProjectRepository>, catalog: Arc<CatalogService>) -> Self {
+    pub fn new(
+        repository: Arc<ProjectRepository>,
+        catalog: Arc<CatalogService>,
+        logs: Arc<LogService>,
+    ) -> Self {
         Self {
             repository,
             catalog,
+            logs,
         }
     }
 
@@ -67,6 +76,7 @@ impl ProcessService {
         }
 
         let command = resolve_start_command(&project)?;
+        let log_path = self.logs.prepare_session(id)?;
         self.repository.upsert_run(&ProjectRun {
             project_id: id.to_string(),
             pid: None,
@@ -77,7 +87,7 @@ impl ProcessService {
             last_error: None,
         })?;
 
-        match spawn_login_shell(&project.path, &command) {
+        match spawn_login_shell(&project.path, &command, Some(&log_path)) {
             Ok((pid, pgid)) => {
                 info!(project_id = id, pid, pgid, command = %command, "started project");
                 self.repository.upsert_run(&ProjectRun {
@@ -172,15 +182,15 @@ fn resolve_start_command(project: &Project) -> Result<String, AppError> {
     ))
 }
 
-fn spawn_login_shell(cwd: &str, command: &str) -> Result<(i32, i32), AppError> {
+fn spawn_login_shell(
+    cwd: &str,
+    command: &str,
+    log_path: Option<&Path>,
+) -> Result<(i32, i32), AppError> {
     let shell = std::env::var("SHELL").unwrap_or_else(|_| "/bin/zsh".to_string());
     let mut child = Command::new(&shell);
-    child
-        .args(["-lc", command])
-        .current_dir(cwd)
-        .stdin(Stdio::null())
-        .stdout(Stdio::null())
-        .stderr(Stdio::null());
+    child.args(["-lc", command]).current_dir(cwd).stdin(Stdio::null());
+    apply_log_stdio(&mut child, log_path)?;
 
     #[cfg(unix)]
     unsafe {
@@ -202,6 +212,24 @@ fn spawn_login_shell(cwd: &str, command: &str) -> Result<(i32, i32), AppError> {
     // Detach so Drop does not wait — process must outlive the app.
     std::mem::forget(child);
     Ok((pid, pgid))
+}
+
+fn apply_log_stdio(child: &mut Command, log_path: Option<&Path>) -> Result<(), AppError> {
+    let Some(path) = log_path else {
+        child.stdout(Stdio::null()).stderr(Stdio::null());
+        return Ok(());
+    };
+    let file = OpenOptions::new()
+        .create(true)
+        .write(true)
+        .append(true)
+        .open(path)
+        .map_err(|err| AppError::Io(format!("failed to open log file: {err}")))?;
+    let err_file = file
+        .try_clone()
+        .map_err(|err| AppError::Io(format!("failed to clone log file: {err}")))?;
+    child.stdout(Stdio::from(file)).stderr(Stdio::from(err_file));
+    Ok(())
 }
 
 fn run_login_shell_wait(cwd: &str, command: &str) -> Result<(), AppError> {
@@ -272,8 +300,23 @@ fn now_iso() -> String {
 mod tests {
     use super::*;
     use crate::repositories::Database;
-    use crate::services::CatalogService;
+    use crate::services::{CatalogService, LogService};
     use std::fs;
+
+    fn wait_for_log_line(
+        logs: &LogService,
+        project_id: &str,
+        needle: &str,
+    ) -> crate::domain::LogChunk {
+        for _ in 0..20 {
+            thread::sleep(Duration::from_millis(100));
+            let chunk = logs.read_tail(project_id, Some(50)).expect("log tail");
+            if chunk.lines.iter().any(|line| line.contains(needle)) {
+                return chunk;
+            }
+        }
+        logs.read_tail(project_id, Some(50)).expect("log tail")
+    }
 
     #[test]
     fn start_stop_and_rehydrate_sleep_process() {
@@ -294,17 +337,28 @@ mod tests {
         let db = Arc::new(Database::open(&db_dir).unwrap());
         let repo = Arc::new(ProjectRepository::new(db));
         let catalog = Arc::new(CatalogService::new(repo.clone()));
-        let process = ProcessService::new(repo, catalog.clone());
+        let logs = Arc::new(LogService::new(db_dir.join("logs")));
+        let process = ProcessService::new(repo, catalog.clone(), logs.clone());
 
         let project = catalog
             .add_project(project_dir.to_str().unwrap())
             .expect("add");
         let project = catalog
-            .update_commands(&project.id, Some(Some("sleep 30".to_string())), None)
+            .update_commands(
+                &project.id,
+                Some(Some("/bin/echo hello-log; sleep 30".to_string())),
+                None,
+            )
             .expect("override start");
         let started = process.start_project(&project.id).expect("start");
         assert_eq!(started.run.status, RunState::Running);
         assert!(started.run.pid.is_some());
+        let chunk = wait_for_log_line(&logs, &project.id, "hello-log");
+        assert!(
+            chunk.lines.iter().any(|line| line.contains("hello-log")),
+            "expected captured stdout, got {:?}",
+            chunk.lines
+        );
 
         process.rehydrate_all().expect("rehydrate");
         let after = catalog.get_project(&project.id).unwrap();

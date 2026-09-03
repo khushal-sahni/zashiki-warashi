@@ -39,7 +39,7 @@ pub fn is_project_candidate(path: &Path) -> bool {
         || path.join(".git").exists()
 }
 
-fn has_compose(project_path: &Path) -> bool {
+pub fn has_compose(project_path: &Path) -> bool {
     project_path.join("docker-compose.yml").is_file()
         || project_path.join("docker-compose.yaml").is_file()
         || project_path.join("compose.yml").is_file()
@@ -134,6 +134,15 @@ mod tests {
             Some("docker compose up")
         );
         assert!(is_project_candidate(&dir));
+        assert!(has_compose(&dir));
+        let _ = fs::remove_dir_all(dir);
+    }
+
+    #[test]
+    fn has_compose_is_false_without_compose_file() {
+        let dir = temp_project("no-compose");
+        fs::write(dir.join("README.md"), "hi").unwrap();
+        assert!(!has_compose(&dir));
         let _ = fs::remove_dir_all(dir);
     }
 

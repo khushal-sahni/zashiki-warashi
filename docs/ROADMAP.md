@@ -31,6 +31,7 @@ V1 is "useful on Monday" when you can open the app, find a project, start/stop i
 - [x] Start / stop / restart via user login shell
 - [x] Process-group aware stop; PID persistence; reopen-safe status rehydration
 - [x] Status: stopped / starting / running / failed
+- [x] Logs pane (pulled forward from M4+) — process capture + compose snapshots
 
 ### M2 — Docker/DB peek `[ ]`
 > Still part of v1 — glue, not a Docker GUI
@@ -55,7 +56,7 @@ V1 is "useful on Monday" when you can open the app, find a project, start/stop i
 > Nice-to-haves; not blocking v1
 
 - [ ] Provision local databases from scratch
-- [ ] Logs pane / lightweight log tail
+- [x] Logs pane / lightweight log tail (pulled into M1+ as of 2026-09-03)
 - [ ] Port map / conflict hints
 - [ ] Optional per-project `zashiki.toml` export (opt-in; not required)
 - [ ] Linux / Windows support

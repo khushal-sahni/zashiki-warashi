@@ -10,12 +10,13 @@ use tauri::Manager;
 use tracing::info;
 
 use commands::{
-    add_project, get_app_status, get_keep_awake_status, get_settings, list_projects,
-    remove_project, restart_project, scan_projects, set_keep_awake_enabled, set_scan_roots,
-    start_project, stop_project, update_project_commands,
+    add_project, clear_project_logs, get_app_status, get_keep_awake_status, get_project_logs,
+    get_settings, list_projects, project_has_compose, remove_project, restart_project,
+    scan_projects, set_keep_awake_enabled, set_scan_roots, start_project, stop_project,
+    update_project_commands,
 };
 use repositories::{Database, ProjectRepository};
-use services::{AppService, CatalogService, KeepAwakeService, ProcessService};
+use services::{AppService, CatalogService, KeepAwakeService, LogService, ProcessService};
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
@@ -39,9 +40,12 @@ pub fn run() {
             let database = Arc::new(Database::open(&app_data_dir)?);
             let project_repository = Arc::new(ProjectRepository::new(database.clone()));
             let catalog_service = Arc::new(CatalogService::new(project_repository.clone()));
+            let log_service = Arc::new(LogService::new(app_data_dir.join("logs")));
+            log_service.start_tailer(app.handle().clone());
             let process_service = Arc::new(ProcessService::new(
                 project_repository.clone(),
                 catalog_service.clone(),
+                log_service.clone(),
             ));
             process_service.rehydrate_all()?;
 
@@ -53,6 +57,7 @@ pub fn run() {
             app.manage(catalog_service);
             app.manage(process_service);
             app.manage(keep_awake_service);
+            app.manage(log_service);
 
             Ok(())
         })
@@ -70,6 +75,9 @@ pub fn run() {
             start_project,
             stop_project,
             restart_project,
+            get_project_logs,
+            clear_project_logs,
+            project_has_compose,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

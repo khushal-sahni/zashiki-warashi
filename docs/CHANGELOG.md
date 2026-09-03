@@ -29,7 +29,36 @@
 
 ## Sessions
 
+## Session #5 — 2026-09-03
+
+### Built
+- **Logs pane** on project detail — follow, filter, wrap, copy, clear, ANSI color
+- `LogService` — app-data log files, rotate on start, tail, clear, compose CLI snapshot
+- Background file tailer emitting `project-log` events
+- Process/Compose log sources (Compose only when compose files exist)
+
+### Changed
+- `ProcessService` redirects child stdout/stderr to `{app_data}/logs/{id}/current.log`
+- Window default 1180×800; shell fills the viewport so the log pane can grow
+- Coffee toggle: fixed "Coffee" label, status pip, hover popover (no toolbar reflow)
+- CSS variables for sage/amber/ink used by logs + Coffee
+
+### Fixed
+- Coffee control expanding the toolbar with inline warning copy
+
+### Deferred / Not Done
+- M2 Docker/DB peek (bollard, compose up/down, service list)
+- Log archive browser, download, stdin
+- Live `docker compose logs -f` sidecar (snapshots + poll instead)
+
+### New Tech Debt
+- Log files are unbounded between starts
+- Compose polling is 1s, not event-streamed
+
+---
+
 ## Session #4 — 2026-08-30
+
 
 ### Built
 - **Coffee toggle** — toolbar keep-awake control for macOS

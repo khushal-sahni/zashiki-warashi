@@ -81,7 +81,7 @@ Use this format for each decision:
 - **Date**: 2026-08-25
 - **Status**: Accepted
 - **Context**: Provisioning local DBs is desirable but large; the painful daily loop is remembering projects and peeking into existing containers.
-- **Decision**: V1 = catalog + start/stop/status + compose/DB peek + deep-links. Provisioning, logs pane, and port maps are later.
+- **Decision**: V1 = catalog + start/stop/status + compose/DB peek + deep-links. Provisioning and port maps are later. Logs pane was later pulled forward (see 2026-09-03).
 - **Consequences**: Clear scope cut. Users still need Docker/Compose already set up for DB projects.
 
 ### Coffee keep-awake wraps macOS native tools (no third-party app)
@@ -111,3 +111,17 @@ Use this format for each decision:
 - **Context**: Want Zashiki available from Spotlight/Dock like a normal app, while keeping `tauri:dev` for coding. Hooking install into every `tauri:dev` would be slow and still would not reflect mid-session edits.
 - **Decision**: Separate `npm run tauri:install` builds a release `.app` and copies it to `~/Applications`. Dev and installed app share `com.zashiki.warashi` app data; do not run both at once.
 - **Consequences**: Fast coding loop unchanged. Daily driver is refreshed on demand. No Apple signing/notarization for personal local use yet.
+
+### Project logs via app-data files + Tauri events
+- **Date**: 2026-09-03
+- **Status**: Accepted
+- **Context**: Started processes discarded stdout/stderr. Pipes die when the app closes, but processes must outlive the app.
+- **Decision**: Redirect child stdio to `{app_data_dir}/logs/{project_id}/current.log`. Rotate that file on each start. An in-app tailer emits `project-log` events. Never write logs into project repos.
+- **Consequences**: Output survives app restart for still-running processes. Failed boots are visible in the last session file. Files can grow until the next start.
+
+### Compose logs are CLI snapshots, not Docker peek
+- **Date**: 2026-09-03
+- **Status**: Accepted
+- **Context**: Want compose output in the log pane without building M2 (bollard, service list, up/down).
+- **Decision**: If compose files exist, a Compose tab runs `docker compose logs --no-color --tail N` via the login shell and the UI may poll while Follow is on. Process capture still covers `docker compose up` stdout.
+- **Consequences**: No extra follow process to leak. Depends on Docker CLI. Not a substitute for M2 inspect/peek.
