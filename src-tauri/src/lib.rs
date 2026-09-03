@@ -11,12 +11,15 @@ use tracing::info;
 
 use commands::{
     add_project, clear_project_logs, get_app_status, get_keep_awake_status, get_project_logs,
-    get_settings, list_projects, project_has_compose, remove_project, restart_project,
-    scan_projects, set_keep_awake_enabled, set_scan_roots, start_project, stop_project,
-    update_project_commands,
+    get_project_stack, get_settings, list_projects, project_has_compose, remove_project,
+    resolve_port_conflict, restart_project, scan_projects, set_keep_awake_enabled, set_scan_roots,
+    start_project, start_project_stack, stop_project, stop_project_stack, update_project_commands,
 };
 use repositories::{Database, ProjectRepository};
-use services::{AppService, CatalogService, KeepAwakeService, LogService, ProcessService};
+use services::{
+    AppService, CatalogService, ComposeService, KeepAwakeService, LogService, PortOccupancyService,
+    ProcessService, StackService,
+};
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
@@ -42,10 +45,19 @@ pub fn run() {
             let catalog_service = Arc::new(CatalogService::new(project_repository.clone()));
             let log_service = Arc::new(LogService::new(app_data_dir.join("logs")));
             log_service.start_tailer(app.handle().clone());
+            let occupancy_service = Arc::new(PortOccupancyService::new(project_repository.clone()));
+            let compose_service = Arc::new(ComposeService::new(app_data_dir.join("compose-overrides")));
+            let stack_service = Arc::new(StackService::new(
+                catalog_service.clone(),
+                project_repository.clone(),
+                occupancy_service,
+                compose_service,
+            ));
             let process_service = Arc::new(ProcessService::new(
                 project_repository.clone(),
                 catalog_service.clone(),
                 log_service.clone(),
+                stack_service.clone(),
             ));
             process_service.rehydrate_all()?;
 
@@ -58,6 +70,7 @@ pub fn run() {
             app.manage(process_service);
             app.manage(keep_awake_service);
             app.manage(log_service);
+            app.manage(stack_service);
 
             Ok(())
         })
@@ -78,6 +91,10 @@ pub fn run() {
             get_project_logs,
             clear_project_logs,
             project_has_compose,
+            get_project_stack,
+            start_project_stack,
+            stop_project_stack,
+            resolve_port_conflict,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

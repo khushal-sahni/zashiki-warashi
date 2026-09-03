@@ -343,6 +343,56 @@ impl ProjectRepository {
         }
     }
 
+    pub fn list_port_overrides(
+        &self,
+        project_id: &str,
+    ) -> Result<Vec<(String, u16, u16)>, AppError> {
+        self.database.with_conn(|conn| {
+            let mut stmt = conn.prepare(
+                "
+                SELECT service, host_port, container_port
+                FROM port_overrides
+                WHERE project_id = ?1
+                ",
+            )?;
+            let rows = stmt.query_map(params![project_id], |row| {
+                Ok((
+                    row.get::<_, String>(0)?,
+                    row.get::<_, i64>(1)?,
+                    row.get::<_, i64>(2)?,
+                ))
+            })?;
+            let mut out = Vec::new();
+            for row in rows {
+                let (service, host, container) = row?;
+                out.push((service, host as u16, container as u16));
+            }
+            Ok(out)
+        })
+    }
+
+    pub fn upsert_port_override(
+        &self,
+        project_id: &str,
+        service: &str,
+        host_port: u16,
+        container_port: u16,
+    ) -> Result<(), AppError> {
+        self.database.with_conn(|conn| {
+            conn.execute(
+                "
+                INSERT INTO port_overrides (project_id, service, host_port, container_port)
+                VALUES (?1, ?2, ?3, ?4)
+                ON CONFLICT(project_id, service) DO UPDATE SET
+                    host_port = excluded.host_port,
+                    container_port = excluded.container_port
+                ",
+                params![project_id, service, host_port as i64, container_port as i64],
+            )?;
+            Ok(())
+        })
+    }
+
     fn get_meta_value(&self, key: &str) -> Result<Option<String>, AppError> {
         self.database.with_conn(|conn| {
             conn.query_row(

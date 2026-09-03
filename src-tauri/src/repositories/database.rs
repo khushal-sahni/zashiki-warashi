@@ -6,7 +6,7 @@ use tracing::info;
 
 use crate::error::AppError;
 
-const SCHEMA_VERSION: i64 = 2;
+const SCHEMA_VERSION: i64 = 3;
 
 pub struct Database {
     connection: Mutex<Connection>,
@@ -94,6 +94,24 @@ impl Database {
                 PRAGMA user_version = 2;
                 ",
             )?;
+            info!(from = version, to = 2, "applied database migration");
+        }
+
+        let version: i64 = conn.query_row("PRAGMA user_version", [], |row| row.get(0))?;
+        if version < 3 {
+            conn.execute_batch(
+                "
+                CREATE TABLE IF NOT EXISTS port_overrides (
+                    project_id TEXT NOT NULL,
+                    service TEXT NOT NULL,
+                    host_port INTEGER NOT NULL,
+                    container_port INTEGER NOT NULL,
+                    PRIMARY KEY (project_id, service),
+                    FOREIGN KEY (project_id) REFERENCES projects(id) ON DELETE CASCADE
+                );
+                PRAGMA user_version = 3;
+                ",
+            )?;
             info!(from = version, to = SCHEMA_VERSION, "applied database migration");
         }
 
@@ -126,7 +144,7 @@ mod tests {
     fn opens_and_migrates_fresh_database() {
         let dir = temp_dir();
         let db = Database::open(&dir).expect("open database");
-        assert_eq!(db.schema_version().expect("schema"), 2);
+        assert_eq!(db.schema_version().expect("schema"), 3);
         db.ping().expect("ping");
         let _ = std::fs::remove_dir_all(&dir);
     }

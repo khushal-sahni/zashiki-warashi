@@ -33,15 +33,16 @@ V1 is "useful on Monday" when you can open the app, find a project, start/stop i
 - [x] Status: stopped / starting / running / failed
 - [x] Logs pane (pulled forward from M4+) — process capture + compose snapshots
 
-### M2 — Docker/DB peek `[ ]`
+### M2 — Docker/DB peek `[x]`
 > Still part of v1 — glue, not a Docker GUI
 
-- [ ] Detect compose files for a project
-- [ ] List services/containers (bollard + compose CLI)
-- [ ] Compose up/down (or per-service start/stop)
-- [ ] Detect common DB images; show host/port/user/db from compose/env
-- [ ] Copy URI; open Compass / connection deep-link
-- [ ] No query GUI; no DB provisioning
+- [x] Detect compose files for a project (root + depth 2)
+- [x] List DB services / running state (`docker compose ps`)
+- [x] Compose up/stop for DB-like services
+- [x] Detect common DB images; show host/port/user/db from compose/env
+- [x] Copy URI; open Compass for mongo
+- [x] Port conflict reconciliation (stop occupant or remap)
+- [x] No query GUI; no DB provisioning
 
 ### M3 — Glue polish `[ ]`
 > Someone else (or you next month) could actually use this
@@ -57,7 +58,7 @@ V1 is "useful on Monday" when you can open the app, find a project, start/stop i
 
 - [ ] Provision local databases from scratch
 - [x] Logs pane / lightweight log tail (pulled into M1+ as of 2026-09-03)
-- [ ] Port map / conflict hints
+- [x] Port map / conflict hints (pulled into M2 as of 2026-09-03)
 - [ ] Optional per-project `zashiki.toml` export (opt-in; not required)
 - [ ] Linux / Windows support
 - [ ] Env-file awareness beyond peek

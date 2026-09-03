@@ -1,6 +1,8 @@
 use serde::Serialize;
 use thiserror::Error;
 
+use crate::domain::PortConflict;
+
 #[derive(Debug, Error)]
 pub enum AppError {
     #[error("{0}")]
@@ -20,6 +22,9 @@ pub enum AppError {
 
     #[error("invalid argument: {0}")]
     InvalidArgument(String),
+
+    #[error("port {} is already in use", .0.host_port)]
+    PortConflict(PortConflict),
 }
 
 impl AppError {
@@ -37,6 +42,10 @@ impl AppError {
 
     pub fn invalid(msg: impl Into<String>) -> Self {
         Self::InvalidArgument(msg.into())
+    }
+
+    pub fn port_conflict(conflict: PortConflict) -> Self {
+        Self::PortConflict(conflict)
     }
 }
 
@@ -63,21 +72,35 @@ impl From<serde_json::Error> for AppError {
 pub struct AppErrorDto {
     pub code: String,
     pub message: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub port_conflict: Option<PortConflict>,
 }
 
 impl From<AppError> for AppErrorDto {
     fn from(value: AppError) -> Self {
-        let code = match &value {
-            AppError::Message(_) => "message",
-            AppError::Database(_) => "database",
-            AppError::Io(_) => "io",
-            AppError::NotFound(_) => "not_found",
-            AppError::Conflict(_) => "conflict",
-            AppError::InvalidArgument(_) => "invalid_argument",
+        let (code, message, port_conflict) = match &value {
+            AppError::Message(v) => ("message", v.clone(), None),
+            AppError::Database(v) => ("database", format!("database error: {v}"), None),
+            AppError::Io(v) => ("io", format!("io error: {v}"), None),
+            AppError::NotFound(v) => ("not_found", format!("not found: {v}"), None),
+            AppError::Conflict(v) => ("conflict", format!("conflict: {v}"), None),
+            AppError::InvalidArgument(v) => {
+                ("invalid_argument", format!("invalid argument: {v}"), None)
+            }
+            AppError::PortConflict(conflict) => (
+                "port_conflict",
+                format!(
+                    "port {} is already in use by {}",
+                    conflict.host_port,
+                    conflict.occupant.label()
+                ),
+                Some(conflict.clone()),
+            ),
         };
         Self {
             code: code.to_string(),
-            message: value.to_string(),
+            message,
+            port_conflict,
         }
     }
 }
@@ -100,6 +123,7 @@ impl AppError {
             Self::NotFound(v) => Self::NotFound(v.clone()),
             Self::Conflict(v) => Self::Conflict(v.clone()),
             Self::InvalidArgument(v) => Self::InvalidArgument(v.clone()),
+            Self::PortConflict(v) => Self::PortConflict(v.clone()),
         }
     }
 }

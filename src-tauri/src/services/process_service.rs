@@ -13,6 +13,7 @@ use crate::repositories::ProjectRepository;
 use crate::services::catalog_service::CatalogService;
 use crate::services::infer::infer_start_command;
 use crate::services::log_service::LogService;
+use crate::services::stack_service::StackService;
 
 #[cfg(unix)]
 use std::os::unix::process::CommandExt;
@@ -23,6 +24,7 @@ pub struct ProcessService {
     repository: Arc<ProjectRepository>,
     catalog: Arc<CatalogService>,
     logs: Arc<LogService>,
+    stack: Arc<StackService>,
 }
 
 impl ProcessService {
@@ -30,11 +32,13 @@ impl ProcessService {
         repository: Arc<ProjectRepository>,
         catalog: Arc<CatalogService>,
         logs: Arc<LogService>,
+        stack: Arc<StackService>,
     ) -> Self {
         Self {
             repository,
             catalog,
             logs,
+            stack,
         }
     }
 
@@ -76,6 +80,13 @@ impl ProcessService {
         }
 
         let command = resolve_start_command(&project)?;
+        self.stack.ensure_databases(id)?;
+        let export_prefix = self.stack.spawn_export_prefix(id)?;
+        let command = if export_prefix.is_empty() {
+            command
+        } else {
+            format!("{export_prefix}; {command}")
+        };
         let log_path = self.logs.prepare_session(id)?;
         self.repository.upsert_run(&ProjectRun {
             project_id: id.to_string(),
@@ -338,7 +349,17 @@ mod tests {
         let repo = Arc::new(ProjectRepository::new(db));
         let catalog = Arc::new(CatalogService::new(repo.clone()));
         let logs = Arc::new(LogService::new(db_dir.join("logs")));
-        let process = ProcessService::new(repo, catalog.clone(), logs.clone());
+        let occupancy = Arc::new(crate::services::PortOccupancyService::new(repo.clone()));
+        let compose = Arc::new(crate::services::ComposeService::new(
+            db_dir.join("overrides"),
+        ));
+        let stack = Arc::new(crate::services::StackService::new(
+            catalog.clone(),
+            repo.clone(),
+            occupancy,
+            compose,
+        ));
+        let process = ProcessService::new(repo, catalog.clone(), logs.clone(), stack);
 
         let project = catalog
             .add_project(project_dir.to_str().unwrap())

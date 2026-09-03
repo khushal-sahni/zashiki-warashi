@@ -125,3 +125,17 @@ Use this format for each decision:
 - **Context**: Want compose output in the log pane without building M2 (bollard, service list, up/down).
 - **Decision**: If compose files exist, a Compose tab runs `docker compose logs --no-color --tail N` via the login shell and the UI may poll while Follow is on. Process capture still covers `docker compose up` stdout.
 - **Consequences**: No extra follow process to leak. Depends on Docker CLI. Not a substitute for M2 inspect/peek.
+
+### Nested compose + DB lifecycle on Start
+- **Date**: 2026-09-03
+- **Status**: Accepted
+- **Context**: Repos like aurum keep compose under `local/`; starting Nest without Postgres yields confusing auth errors against whoever owns 5432.
+- **Decision**: Discover compose at root and depth 2. On Start, `docker compose -f … up -d --wait` only DB-like services. Stop app does not stop DBs. Stack panel offers explicit Up/Stop.
+- **Consequences**: Monday start path includes databases. Non-DB compose services are not auto-started.
+
+### Port remaps live in Zashiki by default
+- **Date**: 2026-09-03
+- **Status**: Accepted
+- **Context**: AI-generated compose files collide on 5432/27017/6379 across catalog projects.
+- **Decision**: On conflict, UI offers stop-occupant or remap. Remap writes `{app_data}/compose-overrides/{id}.yml` + SQLite `port_overrides`, and injects rewritten `DATABASE_URL` (etc.) at spawn. Optional checkbox writes into the repo `.env`/compose.
+- **Consequences**: Terminal may still see stale ports unless the user opts into repo writes. Occupancy uses `lsof` + `docker ps` (login-shell PATH) rather than bollard for v1.

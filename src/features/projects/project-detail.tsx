@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 
+import { StackPanel } from "../docker";
 import type { Project } from "../../types";
 import { ProjectLogViewer } from "./project-log-viewer";
 
@@ -15,6 +16,7 @@ interface ProjectDetailProps {
     startCommand: string,
     stopCommand: string,
   ) => Promise<void>;
+  readonly onError: (message: string | null) => void;
 }
 
 export function ProjectDetail({
@@ -25,6 +27,7 @@ export function ProjectDetail({
   onRestart,
   onRemove,
   onSaveCommands,
+  onError,
 }: ProjectDetailProps) {
   const [startCommand, setStartCommand] = useState("");
   const [stopCommand, setStopCommand] = useState("");
@@ -155,6 +158,8 @@ export function ProjectDetail({
           Save commands
         </button>
       </form>
+
+      <StackPanel projectId={project.id} busy={busy} onBusyError={onError} />
 
       <ProjectLogViewer
         projectId={project.id}

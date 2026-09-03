@@ -29,6 +29,37 @@
 
 ## Sessions
 
+## Session #6 — 2026-09-03
+
+### Built
+- **Compose DB stack** — nested compose discovery, Up/Stop DB services (`up -d --wait`), peek/copy URI, Compass for mongo
+- **Port reconciliation** — conflict dialog: stop occupant or remap to next free host port
+- App-data compose overrides + SQLite `port_overrides` + spawn `DATABASE_URL` injection
+- Optional opt-in write into project `.env` / compose published port
+- Stack panel + modal UI (no toolbar expansion)
+
+### Changed
+- Schema v3 (`port_overrides`)
+- `ProcessService::start_project` ensures DBs (and resolves ports) before spawn
+- Compose log tab uses discovered `-f` file (+ overlay)
+- `AppError` carries `port_conflict` payload
+
+### Fixed
+- Nested compose (e.g. aurum `local/docker-compose.yml`) was invisible to Zashiki
+- Same-default-port collisions (aurum vs job-radar on 5432) now surface as a reconcile choice
+- Remap still binding 5432 — Compose merges `ports` by append; overlays now use `ports: !override` and `--force-recreate`
+
+### Deferred / Not Done
+- bollard Engine client (used docker CLI + lsof instead for PATH)
+- Auto volume reset / password repair
+- Killing Homebrew Postgres without confirm
+
+### New Tech Debt
+- Occupant matching depends on compose working_dir labels
+- Remap without “write into repo” means Terminal still sees stale `.env` ports
+
+---
+
 ## Session #5 — 2026-09-03
 
 ### Built

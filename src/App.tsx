@@ -2,6 +2,7 @@ import { open } from "@tauri-apps/plugin-dialog";
 import { useCallback, useEffect, useMemo, useState } from "react";
 
 import { KeepAwakeToggle, ShellHeader } from "./components";
+import { PortConflictDialog } from "./features/docker";
 import {
   ProjectDetail,
   ProjectList,
@@ -15,7 +16,9 @@ import {
   getKeepAwakeStatus,
   getSettings,
   listProjects,
+  parsePortConflict,
   removeProject,
+  resolvePortConflict,
   restartProject,
   scanProjects,
   setKeepAwakeEnabled,
@@ -24,7 +27,13 @@ import {
   stopProject,
   updateProjectCommands,
 } from "./lib";
-import type { AppStatus, KeepAwakeStatus, Project, ScanCandidate } from "./types";
+import type {
+  AppStatus,
+  KeepAwakeStatus,
+  PortConflict,
+  Project,
+  ScanCandidate,
+} from "./types";
 import "./App.css";
 
 function App() {
@@ -38,6 +47,7 @@ function App() {
   const [candidates, setCandidates] = useState<ScanCandidate[] | null>(null);
   const [showSettings, setShowSettings] = useState(false);
   const [keepAwake, setKeepAwake] = useState<KeepAwakeStatus | null>(null);
+  const [portConflict, setPortConflict] = useState<PortConflict | null>(null);
 
   const selected = useMemo(
     () => projects.find((project) => project.id === selectedId) ?? null,
@@ -129,6 +139,66 @@ function App() {
     }
   }
 
+  async function handleStart(id: string): Promise<void> {
+    setBusy(true);
+    setError(null);
+    setPortConflict(null);
+    try {
+      const project = await startProject(id);
+      setProjects((current) =>
+        current.map((item) => (item.id === id ? project : item)),
+      );
+    } catch (err) {
+      const conflict = parsePortConflict(err);
+      if (conflict) {
+        setPortConflict(conflict);
+      } else {
+        setError(formatInvokeError(err));
+      }
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  async function handleResolve(
+    action: "stopOccupant" | "remap",
+    writeToRepo: boolean,
+    confirmNative: boolean,
+  ): Promise<void> {
+    if (!portConflict) {
+      return;
+    }
+    const projectId = portConflict.projectId;
+    const conflict = portConflict;
+    setBusy(true);
+    setError(null);
+    try {
+      await resolvePortConflict(
+        projectId,
+        action,
+        writeToRepo,
+        confirmNative,
+        conflict,
+      );
+      setPortConflict(null);
+      // resolve already brought DBs up; start the app process next
+      const project = await startProject(projectId);
+      setProjects((current) =>
+        current.map((item) => (item.id === projectId ? project : item)),
+      );
+    } catch (err) {
+      const next = parsePortConflict(err);
+      if (next) {
+        setPortConflict(next);
+      } else {
+        setError(formatInvokeError(err));
+        setPortConflict(null);
+      }
+    } finally {
+      setBusy(false);
+    }
+  }
+
   async function handleScan(): Promise<void> {
     await withBusy(async () => {
       const results = await scanProjects();
@@ -143,6 +213,20 @@ function App() {
         title="Zashiki Warashi"
         subtitle="Catalog and start/stop your local projects."
       />
+
+      {portConflict && (
+        <PortConflictDialog
+          conflict={portConflict}
+          busy={busy}
+          onDismiss={() => setPortConflict(null)}
+          onStopOccupant={(confirmNative) => {
+            void handleResolve("stopOccupant", false, confirmNative);
+          }}
+          onRemap={(writeToRepo) => {
+            void handleResolve("remap", writeToRepo, false);
+          }}
+        />
+      )}
 
       <div className="toolbar">
         <button type="button" disabled={busy} onClick={() => void handleAddFolder()}>
@@ -226,13 +310,9 @@ function App() {
         <ProjectDetail
           project={selected}
           busy={busy}
+          onError={setError}
           onStart={async (id) => {
-            await withBusy(async () => {
-              const project = await startProject(id);
-              setProjects((current) =>
-                current.map((item) => (item.id === id ? project : item)),
-              );
-            });
+            await handleStart(id);
           }}
           onStop={async (id) => {
             await withBusy(async () => {
@@ -243,12 +323,24 @@ function App() {
             });
           }}
           onRestart={async (id) => {
-            await withBusy(async () => {
+            setBusy(true);
+            setError(null);
+            setPortConflict(null);
+            try {
               const project = await restartProject(id);
               setProjects((current) =>
                 current.map((item) => (item.id === id ? project : item)),
               );
-            });
+            } catch (err) {
+              const conflict = parsePortConflict(err);
+              if (conflict) {
+                setPortConflict(conflict);
+              } else {
+                setError(formatInvokeError(err));
+              }
+            } finally {
+              setBusy(false);
+            }
           }}
           onRemove={async (id) => {
             await withBusy(async () => {

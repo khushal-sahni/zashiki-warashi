@@ -1,6 +1,10 @@
 use std::fs;
 use std::path::Path;
 
+use crate::services::compose_detect::primary_compose_file;
+
+pub use crate::services::compose_detect::has_compose;
+
 /// Infer a default start command from project files.
 /// Prefer package.json scripts `dev` then `start`; else docker compose;
 /// else make targets; else cargo/go.
@@ -8,7 +12,7 @@ pub fn infer_start_command(project_path: &Path) -> Option<String> {
     if let Some(cmd) = infer_from_package_json(project_path) {
         return Some(cmd);
     }
-    if has_compose(project_path) {
+    if primary_compose_file(project_path).is_some() {
         return Some("docker compose up".to_string());
     }
     if let Some(cmd) = infer_from_makefile(project_path) {
@@ -28,22 +32,12 @@ pub fn is_project_candidate(path: &Path) -> bool {
         return false;
     }
     path.join("package.json").is_file()
-        || path.join("docker-compose.yml").is_file()
-        || path.join("docker-compose.yaml").is_file()
-        || path.join("compose.yml").is_file()
-        || path.join("compose.yaml").is_file()
+        || has_compose(path)
         || path.join("Cargo.toml").is_file()
         || path.join("go.mod").is_file()
         || path.join("Makefile").is_file()
         || path.join("makefile").is_file()
         || path.join(".git").exists()
-}
-
-pub fn has_compose(project_path: &Path) -> bool {
-    project_path.join("docker-compose.yml").is_file()
-        || project_path.join("docker-compose.yaml").is_file()
-        || project_path.join("compose.yml").is_file()
-        || project_path.join("compose.yaml").is_file()
 }
 
 fn infer_from_package_json(project_path: &Path) -> Option<String> {

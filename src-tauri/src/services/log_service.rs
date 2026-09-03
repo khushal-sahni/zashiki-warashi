@@ -78,11 +78,11 @@ impl LogService {
         &self,
         project_id: &str,
         project_path: &str,
+        command: &str,
         max_lines: Option<u32>,
     ) -> Result<LogChunk, AppError> {
         let limit = max_lines.unwrap_or(DEFAULT_TAIL_LINES as u32).max(1);
-        let command = format!("docker compose logs --no-color --tail {limit}");
-        let output = run_login_shell_capture(project_path, &command)?;
+        let output = run_login_shell_capture(project_path, command)?;
         let (lines, truncated) = last_n_lines(&output, limit as usize);
         Ok(LogChunk {
             project_id: project_id.to_string(),

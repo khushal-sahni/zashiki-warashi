@@ -1,3 +1,5 @@
+import type { PortConflict } from "./stack";
+
 export interface AppStatus {
   readonly name: string;
   readonly version: string;
@@ -15,4 +17,5 @@ export interface KeepAwakeStatus {
 export interface AppErrorPayload {
   readonly code: string;
   readonly message: string;
+  readonly portConflict?: PortConflict;
 }

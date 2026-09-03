@@ -19,6 +19,14 @@ export {
   listenProjectLogs,
   projectHasCompose,
 } from "./logs";
+export {
+  getProjectStack,
+  openCompass,
+  resolvePortConflict,
+  startProjectStack,
+  stopProjectStack,
+} from "./docker";
+import type { AppErrorPayload, PortConflict } from "../types";
 
 export function formatInvokeError(error: unknown): string {
   if (error instanceof Error) {
@@ -36,4 +44,15 @@ export function formatInvokeError(error: unknown): string {
     return error.message;
   }
   return "Something went wrong";
+}
+
+export function parsePortConflict(error: unknown): PortConflict | null {
+  if (typeof error !== "object" || error === null) {
+    return null;
+  }
+  const payload = error as AppErrorPayload;
+  if (payload.code !== "port_conflict" || !payload.portConflict) {
+    return null;
+  }
+  return payload.portConflict;
 }
