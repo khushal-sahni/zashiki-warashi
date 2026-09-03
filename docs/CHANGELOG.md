@@ -29,6 +29,30 @@
 
 ## Sessions
 
+## Session #7 — 2026-09-03
+
+### Built
+- **Resizable pane system** — `react-resizable-panels` wrappers in `src/components/panes/`
+- `WorkspaceLayout` (sidebar | main) and `DetailSplit` (inspector | logs)
+- Collapse rails/strips, toolbar toggles, keyboard shortcuts (⌘B sidebar, ⌘J logs)
+- `.cursor/rules/ui-panes.mdc` — always-on pane layout contract for future UI
+
+### Changed
+- Compact titlebar (replaces large header + separate toolbar row)
+- Settings and scan results render as modal overlays (no longer push workspace down)
+- Layout sizes persist in `localStorage` via `useDefaultLayout`
+- `AGENTS.md` UI layout section; `DECISIONS.md` pane decision
+
+### Fixed
+- Inspector crushed by fixed `max-height: 48%` and greedy log `min-height`
+- Sidebar and logs not resizable or collapsible
+
+### Deferred / Not Done
+- M3 glue polish (Cursor/Finder deep-links, tray, README) — unchanged scope
+
+### New Tech Debt
+- None added this session
+
 ## Session #6 — 2026-09-03
 
 ### Built

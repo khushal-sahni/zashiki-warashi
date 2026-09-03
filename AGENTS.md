@@ -105,6 +105,16 @@ src-tauri/src/
 - Use **bollard** for Engine API listing/inspect
 - Use **`docker compose` CLI** for up/down/ps — do not reimplement Compose
 
+### UI layout (panes)
+- Major regions are **resizable, collapsible panes** — not fixed CSS grids or competing `max-height` / `min-height` fights
+- Use shared primitives in `src/components/panes/` (`WorkspaceLayout`, `DetailSplit`, `usePaneCollapse`, `PaneControlsProvider`)
+- Built on `react-resizable-panels` (`Group` / `Panel` / `Separator`) — do not hand-roll drag math
+- Each pane needs: **default size**, **min size**, and **collapse/restore** when it is a first-class region
+- Persist layout in **`localStorage`** via `useDefaultLayout` with a stable group `id` (e.g. `zw-workspace`, `zw-detail`) — not SQLite
+- New surfaces (terminal, env editor, etc.) join an existing `PanelGroup` as a new `Panel`, not a fixed block wedged into flex
+- Transient UI (settings, scan results, dialogs) uses **overlays** so it does not steal pane height
+- Pane content wrappers use `height: 100%; min-height: 0; overflow: auto` inside the panel fill div
+
 ---
 
 ## What NOT to Do
@@ -120,6 +130,7 @@ src-tauri/src/
 - ❌ Do not invent a Docker GUI, Mongo query editor, AI coding agent, or required per-repo YAML
 - ❌ Do not provision databases in v1 (peek + deep-link only)
 - ❌ Do not write into managed project repos unless the user explicitly opts into an export format later
+- ❌ No hard-coded pane heights (`max-height: 48%`, fixed log `min-height`, etc.) — use the pane system in `src/components/panes/`
 
 ---
 

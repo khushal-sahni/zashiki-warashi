@@ -1,0 +1,41 @@
+---
+description: Resizable, collapsible pane layout for all major UI regions
+alwaysApply: true
+---
+
+# UI pane layout
+
+Zashiki Warashi uses a Cursor-style pane system. Follow this for every UI change.
+
+## Rules
+
+1. **No fixed pane fights** — never use competing `max-height`, `min-height`, or CSS grid columns for major regions (sidebar, inspector, logs).
+2. **Use shared primitives** in `src/components/panes/`:
+   - `WorkspaceLayout` — horizontal sidebar | main
+   - `DetailSplit` — vertical inspector | logs
+   - `usePaneCollapse` — collapse/expand + toolbar sync
+   - `PaneControlsProvider` — cross-pane controls (keyboard, toolbar toggles)
+3. **Library** — `react-resizable-panels` only (`Group`, `Panel`, `Separator`). No custom splitter math.
+4. **Every major region** must have:
+   - sensible `defaultSize`
+   - `minSize` (pixels or %)
+   - collapse + restore when it is a first-class pane
+5. **Persistence** — `useDefaultLayout({ id, storage: localStorage })` per group. Stable ids (e.g. `zw-workspace`, `zw-detail`). Not SQLite.
+6. **New features** — add a `Panel` to the nearest `PanelGroup`; do not bolt on a fixed-height div.
+7. **Transient UI** — settings, scan, dialogs → modal overlays, not inline blocks above the workspace.
+8. **Pane content** — wrap in `.pane-fill` with `min-height: 0` and scroll inside the pane.
+
+## Current layout
+
+```
+titlebar (compact) + toolbar toggles
+├── WorkspaceLayout (horizontal, zw-workspace)
+│   ├── sidebar (collapsible, ~24% default)
+│   └── main
+│       └── DetailSplit (vertical, zw-detail)
+│           ├── inspector (project info + stack)
+│           └── logs (collapsible, ~58% default)
+└── footer status bar
+```
+
+Keyboard: `⌘B` sidebar, `⌘J` logs (skip when focus is in an input).

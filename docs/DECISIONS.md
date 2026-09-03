@@ -139,3 +139,10 @@ Use this format for each decision:
 - **Context**: AI-generated compose files collide on 5432/27017/6379 across catalog projects.
 - **Decision**: On conflict, UI offers stop-occupant or remap. Remap writes `{app_data}/compose-overrides/{id}.yml` + SQLite `port_overrides`, and injects rewritten `DATABASE_URL` (etc.) at spawn. Optional checkbox writes into the repo `.env`/compose.
 - **Consequences**: Terminal may still see stale ports unless the user opts into repo writes. Occupancy uses `lsof` + `docker ps` (login-shell PATH) rather than bollard for v1.
+
+### Resizable panes via react-resizable-panels + localStorage
+- **Date**: 2026-09-03
+- **Status**: Accepted
+- **Context**: Fixed CSS grid and `max-height: 48%` on the inspector crushed project info while logs greedily consumed space; no collapse or drag resize.
+- **Decision**: Adopt `react-resizable-panels` with shared wrappers in `src/components/panes/`. Horizontal workspace (sidebar | main) and vertical detail (inspector | logs). Collapsible sidebar and logs; compact titlebar; settings/scan as overlays. Layout persisted in `localStorage` via `useDefaultLayout`, not SQLite.
+- **Consequences**: IDE-like UX with sensible defaults (sidebar ~24%, inspector ~42%, logs ~58%). Future UI regions must join `PanelGroup`s per AGENTS.md / `.cursor/rules/ui-panes.mdc`. Adds one frontend dependency; no backend changes.

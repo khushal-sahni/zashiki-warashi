@@ -1,5 +1,10 @@
 import { useEffect, useState } from "react";
 
+import {
+  DetailSplit,
+  usePaneCollapse,
+  usePaneControls,
+} from "../../components";
 import { StackPanel } from "../docker";
 import type { Project } from "../../types";
 import { ProjectLogViewer } from "./project-log-viewer";
@@ -31,6 +36,26 @@ export function ProjectDetail({
 }: ProjectDetailProps) {
   const [startCommand, setStartCommand] = useState("");
   const [stopCommand, setStopCommand] = useState("");
+  const logs = usePaneCollapse();
+  const { registerLogs } = usePaneControls();
+
+  useEffect(() => {
+    if (!project) {
+      registerLogs(null);
+      return;
+    }
+    registerLogs({
+      collapsed: logs.collapsed,
+      toggle: logs.toggle,
+      expand: logs.expand,
+    });
+  }, [logs.collapsed, logs.expand, logs.toggle, project, registerLogs]);
+
+  useEffect(() => {
+    return () => {
+      registerLogs(null);
+    };
+  }, [registerLogs]);
 
   useEffect(() => {
     if (!project) {
@@ -64,106 +89,125 @@ export function ProjectDetail({
 
   return (
     <section className="panel detail-panel">
-      <div className="detail-header">
-        <div>
-          <h2>{project.name}</h2>
-          <p className="path">{project.path}</p>
-        </div>
-        <span className={`badge badge-${project.run.status}`}>
-          {project.run.status}
-        </span>
-      </div>
+      <DetailSplit
+        logs={logs}
+        inspector={
+          <>
+            <div className="detail-header">
+              <div>
+                <h2>{project.name}</h2>
+                <p className="path">{project.path}</p>
+              </div>
+              <span className={`badge badge-${project.run.status}`}>
+                {project.run.status}
+              </span>
+            </div>
 
-      <div className="action-row">
-        <button
-          type="button"
-          disabled={!canStart || project.run.status === "running"}
-          onClick={() => void onStart(project.id)}
-        >
-          Start
-        </button>
-        <button
-          type="button"
-          disabled={busy || project.run.status === "stopped"}
-          onClick={() => void onStop(project.id)}
-        >
-          Stop
-        </button>
-        <button
-          type="button"
-          disabled={!canStart}
-          onClick={() => void onRestart(project.id)}
-        >
-          Restart
-        </button>
-        <button
-          type="button"
-          className="danger"
-          disabled={busy}
-          onClick={() => void onRemove(project.id)}
-        >
-          Remove
-        </button>
-      </div>
+            <div className="action-row">
+              <button
+                type="button"
+                disabled={!canStart || project.run.status === "running"}
+                onClick={() => void onStart(project.id)}
+              >
+                Start
+              </button>
+              <button
+                type="button"
+                disabled={busy || project.run.status === "stopped"}
+                onClick={() => void onStop(project.id)}
+              >
+                Stop
+              </button>
+              <button
+                type="button"
+                disabled={!canStart}
+                onClick={() => void onRestart(project.id)}
+              >
+                Restart
+              </button>
+              <button
+                type="button"
+                className="danger"
+                disabled={busy}
+                onClick={() => void onRemove(project.id)}
+              >
+                Remove
+              </button>
+            </div>
 
-      {project.run.lastError && (
-        <p className="error" role="alert">
-          {project.run.lastError}
-        </p>
-      )}
+            {project.run.lastError && (
+              <p className="error" role="alert">
+                {project.run.lastError}
+              </p>
+            )}
 
-      <dl className="status-grid">
-        <div>
-          <dt>Effective start</dt>
-          <dd>
-            <code>{effectiveStart}</code>
-          </dd>
-        </div>
-        <div>
-          <dt>Inferred</dt>
-          <dd>
-            <code>{project.inferredStartCommand ?? "—"}</code>
-          </dd>
-        </div>
-        <div>
-          <dt>PID</dt>
-          <dd>{project.run.pid ?? "—"}</dd>
-        </div>
-      </dl>
+            <dl className="status-grid">
+              <div>
+                <dt>Effective start</dt>
+                <dd>
+                  <code>{effectiveStart}</code>
+                </dd>
+              </div>
+              <div>
+                <dt>Inferred</dt>
+                <dd>
+                  <code>{project.inferredStartCommand ?? "—"}</code>
+                </dd>
+              </div>
+              <div>
+                <dt>PID</dt>
+                <dd>{project.run.pid ?? "—"}</dd>
+              </div>
+            </dl>
 
-      <form
-        className="command-form"
-        onSubmit={(event) => {
-          event.preventDefault();
-          void onSaveCommands(project.id, startCommand, stopCommand);
-        }}
-      >
-        <label>
-          Start command override
-          <input
-            value={startCommand}
-            onChange={(event) => setStartCommand(event.target.value)}
-            placeholder={project.inferredStartCommand ?? "e.g. npm run dev"}
+            <details className="command-details">
+              <summary>Commands</summary>
+              <form
+                className="command-form"
+                onSubmit={(event) => {
+                  event.preventDefault();
+                  void onSaveCommands(project.id, startCommand, stopCommand);
+                }}
+              >
+                <label>
+                  Start command override
+                  <input
+                    value={startCommand}
+                    onChange={(event) => setStartCommand(event.target.value)}
+                    placeholder={
+                      project.inferredStartCommand ?? "e.g. npm run dev"
+                    }
+                  />
+                </label>
+                <label>
+                  Stop command override
+                  <input
+                    value={stopCommand}
+                    onChange={(event) => setStopCommand(event.target.value)}
+                    placeholder="optional — default is SIGTERM to process group"
+                  />
+                </label>
+                <button type="submit" disabled={busy}>
+                  Save commands
+                </button>
+              </form>
+            </details>
+
+            <StackPanel
+              projectId={project.id}
+              busy={busy}
+              onBusyError={onError}
+            />
+          </>
+        }
+        logsPane={
+          <ProjectLogViewer
+            projectId={project.id}
+            running={project.run.status === "running"}
+            collapsed={logs.collapsed}
+            onExpand={logs.expand}
           />
-        </label>
-        <label>
-          Stop command override
-          <input
-            value={stopCommand}
-            onChange={(event) => setStopCommand(event.target.value)}
-            placeholder="optional — default is SIGTERM to process group"
-          />
-        </label>
-        <button type="submit" disabled={busy}>
-          Save commands
-        </button>
-      </form>
-
-      <StackPanel projectId={project.id} busy={busy} onBusyError={onError} />
-
-      <ProjectLogViewer
-        projectId={project.id}
-        running={project.run.status === "running"}
+        }
       />
     </section>
   );

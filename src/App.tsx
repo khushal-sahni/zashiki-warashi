@@ -1,7 +1,15 @@
 import { open } from "@tauri-apps/plugin-dialog";
 import { useCallback, useEffect, useMemo, useState } from "react";
 
-import { KeepAwakeToggle, ShellHeader } from "./components";
+import {
+  KeepAwakeToggle,
+  PaneControlsProvider,
+  ShellHeader,
+  SidebarRail,
+  usePaneCollapse,
+  usePaneControls,
+  WorkspaceLayout,
+} from "./components";
 import { PortConflictDialog } from "./features/docker";
 import {
   ProjectDetail,
@@ -48,6 +56,7 @@ function App() {
   const [showSettings, setShowSettings] = useState(false);
   const [keepAwake, setKeepAwake] = useState<KeepAwakeStatus | null>(null);
   const [portConflict, setPortConflict] = useState<PortConflict | null>(null);
+  const sidebar = usePaneCollapse();
 
   const selected = useMemo(
     () => projects.find((project) => project.id === selectedId) ?? null,
@@ -181,7 +190,6 @@ function App() {
         conflict,
       );
       setPortConflict(null);
-      // resolve already brought DBs up; start the app process next
       const project = await startProject(projectId);
       setProjects((current) =>
         current.map((item) => (item.id === projectId ? project : item)),
@@ -208,172 +216,334 @@ function App() {
   }
 
   return (
-    <main className="shell app-shell">
-      <ShellHeader
-        title="Zashiki Warashi"
-        subtitle="Catalog and start/stop your local projects."
+    <PaneControlsProvider sidebar={sidebar}>
+      <AppShell
+        projects={projects}
+        selected={selected}
+        selectedId={selectedId}
+        query={query}
+        busy={busy}
+        error={error}
+        status={status}
+        scanRoots={scanRoots}
+        candidates={candidates}
+        showSettings={showSettings}
+        keepAwake={keepAwake}
+        portConflict={portConflict}
+        onQueryChange={setQuery}
+        onSelect={setSelectedId}
+        onError={setError}
+        onDismissPortConflict={() => setPortConflict(null)}
+        onAddFolder={() => void handleAddFolder()}
+        onScan={() => void handleScan()}
+        onToggleKeepAwake={() => void handleToggleKeepAwake()}
+        onToggleSettings={() => {
+          setShowSettings((value) => !value);
+          setCandidates(null);
+        }}
+        onCloseSettings={() => setShowSettings(false)}
+        onCloseScan={() => setCandidates(null)}
+        onRefresh={() => void withBusy(refresh)}
+        onSaveRoots={async (roots) => {
+          await withBusy(async () => {
+            const settings = await setScanRoots(roots);
+            setScanRootsState(settings.scanRoots);
+            setShowSettings(false);
+          });
+        }}
+        onAddCandidate={async (path) => {
+          await withBusy(async () => {
+            const project = await addProject(path);
+            const results = await scanProjects();
+            setCandidates(results);
+            await refresh();
+            setSelectedId(project.id);
+          });
+        }}
+        onResolve={(action, writeToRepo, confirmNative) => {
+          void handleResolve(action, writeToRepo, confirmNative);
+        }}
+        onStart={async (id) => {
+          await handleStart(id);
+        }}
+        onStop={async (id) => {
+          await withBusy(async () => {
+            const project = await stopProject(id);
+            setProjects((current) =>
+              current.map((item) => (item.id === id ? project : item)),
+            );
+          });
+        }}
+        onRestart={async (id) => {
+          setBusy(true);
+          setError(null);
+          setPortConflict(null);
+          try {
+            const project = await restartProject(id);
+            setProjects((current) =>
+              current.map((item) => (item.id === id ? project : item)),
+            );
+          } catch (err) {
+            const conflict = parsePortConflict(err);
+            if (conflict) {
+              setPortConflict(conflict);
+            } else {
+              setError(formatInvokeError(err));
+            }
+          } finally {
+            setBusy(false);
+          }
+        }}
+        onRemove={async (id) => {
+          await withBusy(async () => {
+            await removeProject(id);
+            await refresh();
+          });
+        }}
+        onSaveCommands={async (id, startCommand, stopCommand) => {
+          await withBusy(async () => {
+            const project = await updateProjectCommands(
+              id,
+              startCommand,
+              stopCommand,
+            );
+            setProjects((current) =>
+              current.map((item) => (item.id === id ? project : item)),
+            );
+          });
+        }}
       />
+    </PaneControlsProvider>
+  );
+}
 
-      {portConflict && (
+interface AppShellProps {
+  readonly projects: readonly Project[];
+  readonly selected: Project | null;
+  readonly selectedId: string | null;
+  readonly query: string;
+  readonly busy: boolean;
+  readonly error: string | null;
+  readonly status: AppStatus | null;
+  readonly scanRoots: readonly string[];
+  readonly candidates: ScanCandidate[] | null;
+  readonly showSettings: boolean;
+  readonly keepAwake: KeepAwakeStatus | null;
+  readonly portConflict: PortConflict | null;
+  readonly onQueryChange: (query: string) => void;
+  readonly onSelect: (id: string) => void;
+  readonly onError: (message: string | null) => void;
+  readonly onDismissPortConflict: () => void;
+  readonly onAddFolder: () => void;
+  readonly onScan: () => void;
+  readonly onToggleKeepAwake: () => void;
+  readonly onToggleSettings: () => void;
+  readonly onCloseSettings: () => void;
+  readonly onCloseScan: () => void;
+  readonly onRefresh: () => void;
+  readonly onSaveRoots: (roots: string[]) => Promise<void>;
+  readonly onAddCandidate: (path: string) => Promise<void>;
+  readonly onResolve: (
+    action: "stopOccupant" | "remap",
+    writeToRepo: boolean,
+    confirmNative: boolean,
+  ) => void;
+  readonly onStart: (id: string) => Promise<void>;
+  readonly onStop: (id: string) => Promise<void>;
+  readonly onRestart: (id: string) => Promise<void>;
+  readonly onRemove: (id: string) => Promise<void>;
+  readonly onSaveCommands: (
+    id: string,
+    startCommand: string,
+    stopCommand: string,
+  ) => Promise<void>;
+}
+
+function AppShell(props: AppShellProps) {
+  const { sidebar, logsCollapsed, toggleLogs } = usePaneControls();
+
+  useEffect(() => {
+    function onKeyDown(event: KeyboardEvent): void {
+      if (!(event.metaKey || event.ctrlKey) || event.altKey || event.shiftKey) {
+        return;
+      }
+      if (isEditableTarget(event.target)) {
+        return;
+      }
+      const key = event.key.toLowerCase();
+      if (key === "b") {
+        event.preventDefault();
+        sidebar.toggle();
+        return;
+      }
+      if (key === "j") {
+        event.preventDefault();
+        toggleLogs();
+      }
+    }
+
+    window.addEventListener("keydown", onKeyDown);
+    return () => {
+      window.removeEventListener("keydown", onKeyDown);
+    };
+  }, [sidebar, toggleLogs]);
+
+  return (
+    <main className="shell app-shell">
+      <div className="titlebar">
+        <ShellHeader title="Zashiki Warashi" subtitle="LOCALHOST CONTROL PLANE" />
+        <div className="toolbar">
+          <button type="button" disabled={props.busy} onClick={props.onAddFolder}>
+            Add folder
+          </button>
+          <button type="button" disabled={props.busy} onClick={props.onScan}>
+            Scan
+          </button>
+          <KeepAwakeToggle
+            status={props.keepAwake}
+            busy={props.busy}
+            onToggle={props.onToggleKeepAwake}
+          />
+          <button
+            type="button"
+            className={sidebar.collapsed ? "ghost" : "ghost active"}
+            title="Toggle sidebar (⌘B)"
+            onClick={sidebar.toggle}
+          >
+            Sidebar
+          </button>
+          <button
+            type="button"
+            className={logsCollapsed ? "ghost" : "ghost active"}
+            title="Toggle logs (⌘J)"
+            onClick={toggleLogs}
+          >
+            Logs
+          </button>
+          <button
+            type="button"
+            className={props.showSettings ? "ghost active" : "ghost"}
+            disabled={props.busy}
+            onClick={props.onToggleSettings}
+          >
+            Settings
+          </button>
+          <button
+            type="button"
+            className="ghost"
+            disabled={props.busy}
+            onClick={props.onRefresh}
+          >
+            Refresh
+          </button>
+        </div>
+      </div>
+
+      {props.portConflict && (
         <PortConflictDialog
-          conflict={portConflict}
-          busy={busy}
-          onDismiss={() => setPortConflict(null)}
+          conflict={props.portConflict}
+          busy={props.busy}
+          onDismiss={props.onDismissPortConflict}
           onStopOccupant={(confirmNative) => {
-            void handleResolve("stopOccupant", false, confirmNative);
+            props.onResolve("stopOccupant", false, confirmNative);
           }}
           onRemap={(writeToRepo) => {
-            void handleResolve("remap", writeToRepo, false);
+            props.onResolve("remap", writeToRepo, false);
           }}
         />
       )}
 
-      <div className="toolbar">
-        <button type="button" disabled={busy} onClick={() => void handleAddFolder()}>
-          Add folder
-        </button>
-        <button type="button" disabled={busy} onClick={() => void handleScan()}>
-          Scan
-        </button>
-        <KeepAwakeToggle
-          status={keepAwake}
-          busy={busy}
-          onToggle={() => void handleToggleKeepAwake()}
-        />
-        <button
-          type="button"
-          className="ghost"
-          disabled={busy}
-          onClick={() => {
-            setShowSettings((value) => !value);
-            setCandidates(null);
-          }}
-        >
-          Settings
-        </button>
-        <button
-          type="button"
-          className="ghost"
-          disabled={busy}
-          onClick={() => void withBusy(refresh)}
-        >
-          Refresh
-        </button>
-      </div>
-
-      {error && (
+      {props.error && (
         <p className="error banner" role="alert">
-          {error}
+          {props.error}
         </p>
       )}
 
-      {showSettings && (
-        <SettingsPanel
-          roots={scanRoots}
-          busy={busy}
-          onClose={() => setShowSettings(false)}
-          onSave={async (roots) => {
-            await withBusy(async () => {
-              const settings = await setScanRoots(roots);
-              setScanRootsState(settings.scanRoots);
-              setShowSettings(false);
-            });
-          }}
-        />
+      {props.showSettings && (
+        <div className="modal-backdrop" role="presentation">
+          <div
+            className="modal-card overlay-panel"
+            role="dialog"
+            aria-label="Scan roots"
+          >
+            <SettingsPanel
+              roots={props.scanRoots}
+              busy={props.busy}
+              onClose={props.onCloseSettings}
+              onSave={props.onSaveRoots}
+            />
+          </div>
+        </div>
       )}
 
-      {candidates && (
-        <ScanResults
-          candidates={candidates}
-          busy={busy}
-          onClose={() => setCandidates(null)}
-          onAdd={async (path) => {
-            await withBusy(async () => {
-              const project = await addProject(path);
-              const results = await scanProjects();
-              setCandidates(results);
-              await refresh();
-              setSelectedId(project.id);
-            });
-          }}
-        />
+      {props.candidates && (
+        <div className="modal-backdrop" role="presentation">
+          <div
+            className="modal-card overlay-panel overlay-panel-wide"
+            role="dialog"
+            aria-label="Scan results"
+          >
+            <ScanResults
+              candidates={props.candidates}
+              busy={props.busy}
+              onClose={props.onCloseScan}
+              onAdd={props.onAddCandidate}
+            />
+          </div>
+        </div>
       )}
 
-      <div className="workspace">
-        <ProjectList
-          projects={projects}
-          selectedId={selectedId}
-          query={query}
-          onQueryChange={setQuery}
-          onSelect={setSelectedId}
-        />
-        <ProjectDetail
-          project={selected}
-          busy={busy}
-          onError={setError}
-          onStart={async (id) => {
-            await handleStart(id);
-          }}
-          onStop={async (id) => {
-            await withBusy(async () => {
-              const project = await stopProject(id);
-              setProjects((current) =>
-                current.map((item) => (item.id === id ? project : item)),
-              );
-            });
-          }}
-          onRestart={async (id) => {
-            setBusy(true);
-            setError(null);
-            setPortConflict(null);
-            try {
-              const project = await restartProject(id);
-              setProjects((current) =>
-                current.map((item) => (item.id === id ? project : item)),
-              );
-            } catch (err) {
-              const conflict = parsePortConflict(err);
-              if (conflict) {
-                setPortConflict(conflict);
-              } else {
-                setError(formatInvokeError(err));
-              }
-            } finally {
-              setBusy(false);
-            }
-          }}
-          onRemove={async (id) => {
-            await withBusy(async () => {
-              await removeProject(id);
-              await refresh();
-            });
-          }}
-          onSaveCommands={async (id, startCommand, stopCommand) => {
-            await withBusy(async () => {
-              const project = await updateProjectCommands(
-                id,
-                startCommand,
-                stopCommand,
-              );
-              setProjects((current) =>
-                current.map((item) => (item.id === id ? project : item)),
-              );
-            });
-          }}
-        />
-      </div>
+      <WorkspaceLayout
+        sidebar={sidebar}
+        sidebarContent={
+          <ProjectList
+            projects={props.projects}
+            selectedId={props.selectedId}
+            query={props.query}
+            onQueryChange={props.onQueryChange}
+            onSelect={props.onSelect}
+          />
+        }
+        sidebarRail={<SidebarRail onExpand={sidebar.expand} />}
+        main={
+          <ProjectDetail
+            project={props.selected}
+            busy={props.busy}
+            onError={props.onError}
+            onStart={props.onStart}
+            onStop={props.onStop}
+            onRestart={props.onRestart}
+            onRemove={props.onRemove}
+            onSaveCommands={props.onSaveCommands}
+          />
+        }
+      />
 
       <footer className="footer muted">
-        {status ? (
+        {props.status ? (
           <span>
-            {status.name} v{status.version} · DB schema v{status.schemaVersion} ·{" "}
-            {projects.length} project{projects.length === 1 ? "" : "s"}
+            {props.status.name} v{props.status.version} · DB schema v
+            {props.status.schemaVersion} · {props.projects.length} project
+            {props.projects.length === 1 ? "" : "s"}
           </span>
         ) : (
           <span>Loading…</span>
         )}
       </footer>
     </main>
+  );
+}
+
+function isEditableTarget(target: EventTarget | null): boolean {
+  if (!(target instanceof HTMLElement)) {
+    return false;
+  }
+  const tag = target.tagName;
+  return (
+    tag === "INPUT" ||
+    tag === "TEXTAREA" ||
+    tag === "SELECT" ||
+    target.isContentEditable
   );
 }
 

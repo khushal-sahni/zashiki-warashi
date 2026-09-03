@@ -16,9 +16,16 @@ const COMPOSE_POLL_MS = 1_000;
 interface ProjectLogViewerProps {
   readonly projectId: string;
   readonly running: boolean;
+  readonly collapsed?: boolean;
+  readonly onExpand?: () => void;
 }
 
-export function ProjectLogViewer({ projectId, running }: ProjectLogViewerProps) {
+export function ProjectLogViewer({
+  projectId,
+  running,
+  collapsed = false,
+  onExpand,
+}: ProjectLogViewerProps) {
   const [source, setSource] = useState<LogSource>("process");
   const [hasCompose, setHasCompose] = useState(false);
   const [lines, setLines] = useState<string[]>([]);
@@ -95,6 +102,37 @@ export function ProjectLogViewer({ projectId, running }: ProjectLogViewerProps) 
   }, [filtered, follow]);
 
   const html = useMemo(() => renderAnsiHtml(filtered), [filtered]);
+
+  if (collapsed) {
+    return (
+      <button
+        type="button"
+        className="log-viewer log-collapse-strip"
+        title="Show logs (⌘J)"
+        onClick={onExpand}
+      >
+        <span className="log-sources" aria-hidden>
+          <span className={source === "process" ? "ghost active" : "ghost"}>
+            Process
+          </span>
+          {hasCompose ? (
+            <span className={source === "compose" ? "ghost active" : "ghost"}>
+              Compose
+            </span>
+          ) : null}
+        </span>
+        <span className="log-meta">
+          <span
+            className={["log-pip", running ? "live" : ""].filter(Boolean).join(" ")}
+            aria-hidden
+          />
+          {filtered.length}
+          {truncated ? "+" : ""} lines
+        </span>
+        <span className="muted">Expand logs</span>
+      </button>
+    );
+  }
 
   return (
     <div className="log-viewer">

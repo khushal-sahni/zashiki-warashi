@@ -1,16 +1,14 @@
 interface ShellHeaderProps {
   readonly title: string;
-  readonly subtitle: string;
+  readonly subtitle?: string;
 }
 
 export function ShellHeader({ title, subtitle }: ShellHeaderProps) {
   return (
-    <header className="shell-header">
-      <div>
-        <p className="eyebrow">localhost control plane</p>
-        <h1>{title}</h1>
-        <p className="subtitle">{subtitle}</p>
-      </div>
-    </header>
+    <div className="titlebar-brand">
+      <p className="eyebrow">localhost control plane</p>
+      <h1 className="titlebar-title">{title}</h1>
+      {subtitle ? <span className="sr-only">{subtitle}</span> : null}
+    </div>
   );
 }
