@@ -1,6 +1,6 @@
 # STATUS.md
 > Your weekend dashboard. Read this first. Update this last.
-> Last updated: `2026-09-09` | Session: `#11`
+> Last updated: `2026-09-09` | Session: `#13`
 
 ---
 
@@ -48,7 +48,7 @@
 
 ## Where We Left Off
 
-Landing hero glue fixed (real lintel nav, no orange hotspot rings, no stuck screenshot overlay). Deploy still manual: `cd site && npx wrangler deploy` + DNS when ready.
+UI craft floor lives in user-level `~/.cursor/rules/ui-craft.mdc` (not in this repo). Landing hero glue fixed. Deploy still manual: `cd site && npx wrangler deploy` + DNS when ready.
 
 ---
 
@@ -60,7 +60,7 @@ src-tauri/                   ✅ backend (unchanged this session)
 site/                        ✅ redesigned landing (Noren Threshold)
 PRODUCT.md                   ✅ product truth
 DESIGN.md                    ✅ visual system from shipped site
-.impeccable/                 ✅ surfaces, mocks, build, design.json
+.impeccable/                 leftover design.json / surface brief (skill uninstalled)
 ```
 
 ---
@@ -112,7 +112,7 @@ cd site && npx wrangler deploy
 
 | Metric | Value |
 |---|---|
-| Total sessions | 10 |
+| Total sessions | 13 |
 | Modules complete | M0 + M1 + M2 + M3 (+ Coffee + logs + panes + snappy + OSS path + landing redesign) |
 | Test coverage | 44 Rust unit tests |
 | Last deployed | Local `~/Applications` via `tauri:install`; site redesign not yet wrangler-deployed |

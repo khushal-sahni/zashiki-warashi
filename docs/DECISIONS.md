@@ -174,3 +174,10 @@ Use this format for each decision:
 - **Context**: Public site at zashiki.anireco.app needed a redesign after Impeccable install. Old look (dark sage SaaS column) was treated as anti-reference.
 - **Decision**: Replace the visual world with **Noren Threshold** (seed `c9f145db`, composition B asymmetric reveal). Ship desktop first viewport as the approved composition raster plus Download/GitHub hotspots and an inset real app screenshot; mobile uses an indigo text lockup + labeled Download. Capture product truth in `PRODUCT.md` and the shipped system in `DESIGN.md`.
 - **Consequences**: Distinct folklore/threshold identity instead of generic dark-dev landing. Hero is not a fully semantic CSS reconstruction of every region; future polish can re-layer plates without changing the world.
+
+### Uninstall Impeccable; time-box UI craft
+- **Date**: 2026-09-09
+- **Status**: Accepted
+- **Context**: Impeccable’s new-work path took ~1hr on the landing (direction tournament, comps, pixel gates) and produced a photo-hero with fake hotspots. Good UI is still required; that ceremony is not. A project-scoped craft rule showed up in git; the floor should apply in every Cursor project.
+- **Decision**: Uninstall the Impeccable skill and its agents. Do not install a replacement design-director skill. Put the positive UI quality floor in the **user-level** rule `~/.cursor/rules/ui-craft.mdc` (`alwaysApply: true`) — spacing, both widths, hierarchy, contrast, states, taste — not in the zashiki repo. This project keeps pane + snappy rules and `DESIGN.md` for product-specific look.
+- **Consequences**: UI craft applies across Cursor. Zashiki git stays free of the global rule. Reinstall Impeccable only for an explicit, one-shot `/impeccable` session.

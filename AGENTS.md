@@ -142,6 +142,7 @@ src-tauri/src/
 - ❌ No hard-coded pane heights (`max-height: 48%`, fixed log `min-height`, etc.) — use the pane system in `src/components/panes/`
 - ❌ No Docker / login-shell / compose `ps` on project select — peek from files; refresh running state in the background
 - ❌ Never leave previous project's stack or logs visible under a newly selected project
+- ❌ Do not invent a new visual world or ship a photo-hero with invisible hotspots — landing follows `DESIGN.md`; app matches existing chrome
 
 ---
 

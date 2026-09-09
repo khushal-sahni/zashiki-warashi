@@ -29,6 +29,47 @@
 
 ## Sessions
 
+## Session #13 — 2026-09-09
+
+### Built
+- (none in-repo)
+
+### Changed
+- UI craft floor moved to user-level `~/.cursor/rules/ui-craft.mdc` (`alwaysApply: true`): spacing, both widths, hierarchy, contrast, states, taste — no Impeccable
+- Removed project `.cursor/rules/ui-craft.mdc` so it is not git-scoped
+- `AGENTS.md` no longer points at a project craft rule; landing still follows `DESIGN.md`
+
+### Fixed
+- (none)
+
+### Deferred / Not Done
+- `wrangler deploy` still manual
+
+### New Tech Debt
+- (none this session)
+
+---
+
+## Session #12 — 2026-09-09
+
+### Built
+- `.cursor/rules/ui-craft.mdc` — always-on, time-boxed UI: follow existing language, one pass, no design-director ceremony
+
+### Changed
+- Uninstalled Impeccable skill (`~/.cursor/skills/impeccable`) and its four agents
+- `AGENTS.md` forbids loading Impeccable / generating comps
+
+### Fixed
+- (none)
+
+### Deferred / Not Done
+- `wrangler deploy` still manual
+
+### New Tech Debt
+- (none this session)
+
+---
+
 ## Session #11 — 2026-09-09
 
 ### Built
