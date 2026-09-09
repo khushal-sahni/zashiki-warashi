@@ -8,86 +8,101 @@
       name="description"
       content="macOS control plane for the localhost pile — especially AI-generated repos. Start/stop projects, peek Compose/DB endpoints, open Cursor, Finder, and Compass."
     />
+    <link rel="stylesheet" href="./fonts.css" />
     <link rel="stylesheet" href="./styles.css" />
     <link rel="icon" href="./favicon.svg" type="image/svg+xml" />
   </head>
   <body>
-    <main class="shell">
-      <p class="eyebrow">localhost control plane · macOS</p>
-      <h1>Zashiki Warashi</h1>
-      <p class="lede">
-        A macOS control plane for the localhost pile — especially AI-generated
-        repos. It remembers projects, one-button start/stop, peeks Compose/DB
-        endpoints, and deep-links into Cursor / Finder / Compass. It is not a
-        Docker GUI, not Portainer/Dockge, not a Raycast launcher, and not a
-        folder bookmark.
-      </p>
+    <section class="hero" id="hero">
+      <img
+        class="hero-art"
+        src="./assets/hero-comp.png"
+        width="1280"
+        height="720"
+        alt="Zashiki Warashi: indigo noren parted to reveal the app keeping localhost projects tidy"
+      />
+      <img
+        class="app-proof"
+        src="./assets/screenshot.png"
+        width="1180"
+        height="800"
+        alt="Real Zashiki Warashi window: project catalog, inspector, and logs"
+      />
 
-      <div class="actions">
+      <div class="mobile-lockup">
+        <p class="mobile-title">Zashiki Warashi</p>
+        <p class="mobile-sub">
+          座敷童子 — a house spirit that looks after the place.
+        </p>
+      </div>
+
+      <a
+        class="hotspot download"
+        href="https://github.com/khushal-sahni/zashiki-warashi/releases/latest"
+        >Download for macOS</a
+      >
+      <a
+        class="hotspot github"
+        href="https://github.com/khushal-sahni/zashiki-warashi"
+        ><span class="sr-only">GitHub</span></a
+      >
+      <a class="hotspot brand" href="#offer"
+        ><span class="sr-only">Zashiki Warashi</span></a
+      >
+    </section>
+
+    <main class="below">
+      <section id="offer" class="fold">
+        <h2>What it keeps</h2>
+        <p>
+          A machine-local catalog of your projects, one-button start/stop via
+          your login shell, Compose/DB peek, and deep-links into Cursor, Finder,
+          and Compass. Glue for tools you already have — not a Docker GUI, not
+          Portainer, not a folder bookmark.
+        </p>
+      </section>
+
+      <section id="proof" class="fold">
+        <h2>How it works</h2>
+        <ol>
+          <li>Add a folder or scan roots.</li>
+          <li>Select a project → Start / Stop / Restart.</li>
+          <li>Peek the Stack, copy a URI, open Compass for mongo.</li>
+        </ol>
+      </section>
+
+      <section id="needs" class="fold">
+        <h2>What you need</h2>
+        <p>
+          macOS. Docker Desktop or OrbStack for Compose stacks. Builds are
+          unsigned for now — first open may need right-click → Open, or
+          <code>xattr -dr com.apple.quarantine</code> on the app.
+        </p>
+      </section>
+
+      <section id="spirit" class="fold">
+        <h2>座敷童子</h2>
+        <p>
+          Named after the house spirit that looks after the place. Observe
+          existing repos. Keep overrides in app data. Do not require per-repo
+          YAML.
+        </p>
+      </section>
+
+      <p class="closing">
         <a
-          class="btn primary"
+          class="download-inline"
           href="https://github.com/khushal-sahni/zashiki-warashi/releases/latest"
           >Download for macOS</a
         >
         <a
-          class="btn ghost"
+          class="ghost-inline"
           href="https://github.com/khushal-sahni/zashiki-warashi"
           >GitHub</a
         >
-      </div>
-
-      <p class="note">
-        Unsigned builds for now — first open may need right-click → Open, or
-        <code>xattr -dr com.apple.quarantine</code> on the app. Requires Docker
-        Desktop or OrbStack for Compose stacks.
       </p>
 
-      <figure class="shot">
-        <img
-          id="app-shot"
-          src="./assets/screenshot.png"
-          alt="Zashiki Warashi: sidebar project catalog, inspector with start/stop and stack peek, logs pane"
-          width="1180"
-          height="800"
-          hidden
-        />
-        <div class="preview" id="app-preview">
-          <div class="preview-titlebar">Zashiki Warashi</div>
-          <div class="preview-body">
-            <aside>
-              <span class="dot"></span> aurum<br />
-              <span class="dot muted"></span> nest-api<br />
-              <span class="dot"></span> local-rag
-            </aside>
-            <section>
-              <strong>aurum</strong>
-              <div class="chips">
-                <span>Start</span><span>Stop</span><span>Finder</span
-                ><span>Cursor</span>
-              </div>
-              <p>Stack · postgres :5433 · mongodb · copy URI</p>
-              <div class="logs">logs · compose</div>
-            </section>
-          </div>
-        </div>
-        <figcaption>
-          Catalog · lifecycle · Compose/DB peek · Cursor / Finder / Compass
-        </figcaption>
-      </figure>
-
-      <script>
-        (function () {
-          var img = document.getElementById("app-shot");
-          var preview = document.getElementById("app-preview");
-          if (!img || !preview) return;
-          img.addEventListener("load", function () {
-            img.hidden = false;
-            preview.hidden = true;
-          });
-        })();
-      </script>
-
-      <footer>
+      <footer class="site-footer">
         <span>座敷童子 — a house spirit that looks after the place.</span>
         <span>
           <a href="https://github.com/sponsors/khushal-sahni">Sponsors</a>

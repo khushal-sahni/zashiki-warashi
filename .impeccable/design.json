@@ -1,0 +1,302 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-09-09T13:23:00.000Z",
+  "title": "Design System: Zashiki Warashi",
+  "extensions": {
+    "colorMeta": {
+      "ink": {
+        "role": "neutral",
+        "displayName": "Sumi Ink",
+        "canonical": "#101822",
+        "tonalRamp": [
+          "#060a10",
+          "#101822",
+          "#1a2744",
+          "#2a3d5c",
+          "#4a5f7a",
+          "#7a8fa3",
+          "#b0bdc9",
+          "#e8eef4"
+        ]
+      },
+      "indigo": {
+        "role": "secondary",
+        "displayName": "Indigo Dye",
+        "canonical": "#1a2744",
+        "tonalRamp": [
+          "#0a1220",
+          "#0d172a",
+          "#1a2744",
+          "#2f5d8c",
+          "#4a7aad",
+          "#7a9fc4",
+          "#b0c8dc",
+          "#e4eef6"
+        ]
+      },
+      "indigo-deep": {
+        "role": "secondary",
+        "displayName": "Indigo Deep",
+        "canonical": "#0d172a",
+        "tonalRamp": [
+          "#050910",
+          "#0d172a",
+          "#152038",
+          "#243552",
+          "#3d5474",
+          "#6a8099",
+          "#a3b4c6",
+          "#e0e8f0"
+        ]
+      },
+      "paper": {
+        "role": "neutral",
+        "displayName": "Warm Paper",
+        "canonical": "#e8e0d4",
+        "tonalRamp": [
+          "#3a342c",
+          "#5c5348",
+          "#8a7e6e",
+          "#b0a290",
+          "#cdb69f",
+          "#d9cfc0",
+          "#e8e0d4",
+          "#f5f0e8"
+        ]
+      },
+      "muted": {
+        "role": "neutral",
+        "displayName": "Muted Paper",
+        "canonical": "#cdb69f",
+        "tonalRamp": [
+          "#3a2e22",
+          "#5c4a38",
+          "#826852",
+          "#a89078",
+          "#cdb69f",
+          "#d9c8b4",
+          "#e8dcc8",
+          "#f4ebe0"
+        ]
+      },
+      "wood": {
+        "role": "tertiary",
+        "displayName": "Cedar Wood",
+        "canonical": "#3a200c",
+        "tonalRamp": [
+          "#1a0e06",
+          "#3a200c",
+          "#5a3418",
+          "#7a4a28",
+          "#9a6840",
+          "#b89068",
+          "#d4b898",
+          "#f0e4d4"
+        ]
+      },
+      "persimmon": {
+        "role": "primary",
+        "displayName": "Persimmon",
+        "canonical": "#d9671c",
+        "tonalRamp": [
+          "#3a1a08",
+          "#6a3010",
+          "#9a4814",
+          "#c05818",
+          "#d9671c",
+          "#e8904a",
+          "#f0b888",
+          "#f8e0c8"
+        ]
+      },
+      "cta-ink": {
+        "role": "neutral",
+        "displayName": "CTA Ink",
+        "canonical": "#1a120c",
+        "tonalRamp": [
+          "#0a0806",
+          "#1a120c",
+          "#2e2218",
+          "#4a3a2c",
+          "#6e5844",
+          "#9a8268",
+          "#c8b49a",
+          "#f0e8dc"
+        ]
+      }
+    },
+    "typographyMeta": {
+      "display": {
+        "displayName": "Display",
+        "purpose": "Product name on mobile lockup; desktop name is baked into the noren composition."
+      },
+      "headline": {
+        "displayName": "Headline",
+        "purpose": "Fold section titles below the threshold."
+      },
+      "body": {
+        "displayName": "Body",
+        "purpose": "Fold copy and lists; Reddit Sans Condensed on ink/indigo."
+      },
+      "label": {
+        "displayName": "Folklore label",
+        "purpose": "座敷童子 / house-spirit line (Kosugi)."
+      },
+      "footer": {
+        "displayName": "Footer",
+        "purpose": "Footer meta and muted spirit line."
+      }
+    },
+    "shadows": [
+      {
+        "name": "app-interior",
+        "value": "drop-shadow(0 18px 40px rgba(0, 0, 0, 0.4))",
+        "purpose": "Real screenshot sitting in the revealed room."
+      },
+      {
+        "name": "fold-panel",
+        "value": "0 12px 36px rgba(0, 0, 0, 0.22)",
+        "purpose": "Quiet depth under below-fold rooms."
+      },
+      {
+        "name": "mobile-cta",
+        "value": "0 10px 28px rgba(0, 0, 0, 0.35)",
+        "purpose": "Grounds the labeled Download on indigo mobile hero."
+      },
+      {
+        "name": "hotspot-hover",
+        "value": "inset 0 0 0 2px color-mix(in srgb, #d9671c 65%, #fff)",
+        "purpose": "Hover ring on transparent desktop hotspots."
+      }
+    ],
+    "motion": [
+      {
+        "name": "ease-reveal",
+        "value": "cubic-bezier(0.16, 1, 0.3, 1)",
+        "purpose": "Hero settle and proof reveal easing."
+      },
+      {
+        "name": "hero-settle",
+        "value": "900ms cubic-bezier(0.16, 1, 0.3, 1)",
+        "purpose": "Composition fades from slight scale/blur into place."
+      },
+      {
+        "name": "proof-reveal",
+        "value": "1100ms cubic-bezier(0.16, 1, 0.3, 1) 180ms",
+        "purpose": "Screenshot slides in from the right after the curtain settles."
+      }
+    ],
+    "breakpoints": [
+      {
+        "name": "mobile-recompose",
+        "value": "820px",
+        "purpose": "Hide composition raster and hotspots; show indigo lockup + labeled Download."
+      }
+    ]
+  },
+  "components": [
+    {
+      "name": "Primary Download",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "Persimmon pill — the slit through the noren (inline and mobile labeled CTA).",
+      "html": "<a class=\"ds-btn-primary\" href=\"#\">Download for macOS</a>",
+      "css": ".ds-btn-primary { display: inline-flex; align-items: center; justify-content: center; min-height: 2.75rem; padding: 0.7rem 1.25rem; border-radius: 999px; text-decoration: none; font-family: \"Reddit Sans Condensed\", \"Segoe UI\", system-ui, sans-serif; font-weight: 600; background: #d9671c; color: #1a120c; transition: filter 0.2s ease; } .ds-btn-primary:hover { filter: brightness(1.06); } .ds-btn-primary:focus-visible { outline: 2px solid #d9671c; outline-offset: 3px; }"
+    },
+    {
+      "name": "Ghost GitHub",
+      "kind": "button",
+      "refersTo": "button-ghost",
+      "description": "Secondary outline pill for quiet GitHub / secondary links below the fold.",
+      "html": "<a class=\"ds-btn-ghost\" href=\"#\">GitHub</a>",
+      "css": ".ds-btn-ghost { display: inline-flex; align-items: center; justify-content: center; min-height: 2.75rem; padding: 0.7rem 1.25rem; border-radius: 999px; text-decoration: none; font-family: \"Reddit Sans Condensed\", \"Segoe UI\", system-ui, sans-serif; font-weight: 600; background: transparent; color: #e8e0d4; border: 1px solid color-mix(in srgb, #e8e0d4 22%, transparent); transition: border-color 0.2s ease, color 0.2s ease; } .ds-btn-ghost:hover { border-color: color-mix(in srgb, #e8e0d4 40%, transparent); } .ds-btn-ghost:focus-visible { outline: 2px solid #d9671c; outline-offset: 3px; }"
+    },
+    {
+      "name": "Desktop Download Hotspot",
+      "kind": "custom",
+      "refersTo": "hotspot-download",
+      "description": "Transparent hit target over the baked CTA in hero-comp.png; hover shows inset persimmon ring.",
+      "html": "<a class=\"ds-hotspot-download\" href=\"#\">Download for macOS</a>",
+      "css": ".ds-hotspot-download { display: flex; align-items: center; justify-content: center; width: 12rem; height: 3rem; border-radius: 999px; text-decoration: none; color: transparent; font-weight: 600; background: transparent; transition: box-shadow 0.15s ease; } .ds-hotspot-download:hover { box-shadow: inset 0 0 0 2px color-mix(in srgb, #d9671c 65%, #fff); } .ds-hotspot-download:focus-visible { outline: 2px solid #d9671c; outline-offset: 3px; color: transparent; }"
+    },
+    {
+      "name": "Fold Panel",
+      "kind": "card",
+      "refersTo": "fold-panel",
+      "description": "Sequential below-fold room: one headline, one supporting block on indigo wash.",
+      "html": "<section class=\"ds-fold\"><h2 class=\"ds-fold-title\">What it keeps</h2><p class=\"ds-fold-body\">A machine-local catalog of your projects — glue for tools you already have.</p></section>",
+      "css": ".ds-fold { margin: 0 0 2.75rem; padding: 1.25rem 1.35rem; border: 1px solid color-mix(in srgb, #e8e0d4 14%, transparent); border-radius: 0.75rem; background: linear-gradient(180deg, color-mix(in srgb, #1a2744 35%, transparent), color-mix(in srgb, #101822 88%, #1a2744)); box-shadow: 0 12px 36px rgba(0, 0, 0, 0.22); } .ds-fold-title { margin: 0 0 0.65rem; font-family: Fresca, \"Protest Revolution\", sans-serif; font-size: 1.75rem; font-weight: 400; letter-spacing: 0.03em; color: #e8e0d4; } .ds-fold-body { margin: 0; color: #cdb69f; font-family: \"Reddit Sans Condensed\", \"Segoe UI\", system-ui, sans-serif; font-size: 1.05rem; line-height: 1.65; }"
+    },
+    {
+      "name": "Mobile Lockup",
+      "kind": "custom",
+      "refersTo": null,
+      "description": "Narrow-width brand stack when the noren composition is hidden.",
+      "html": "<div class=\"ds-mobile-lockup\"><p class=\"ds-mobile-title\">Zashiki Warashi</p><p class=\"ds-mobile-sub\">座敷童子 — a house spirit that looks after the place.</p></div>",
+      "css": ".ds-mobile-lockup { padding: 1.25rem 1.25rem 0.5rem; background: linear-gradient(180deg, #0d172a, #101822); } .ds-mobile-title { margin: 0; font-family: Fresca, \"Protest Revolution\", sans-serif; font-size: clamp(2.4rem, 11vw, 3.25rem); line-height: 0.95; color: #e8e0d4; } .ds-mobile-sub { margin: 0.75rem 0 0; font-family: Kosugi, \"Reddit Sans Condensed\", sans-serif; font-size: 0.95rem; line-height: 1.4; color: color-mix(in srgb, #e8e0d4 88%, #fff); }"
+    },
+    {
+      "name": "Footer Link",
+      "kind": "nav",
+      "refersTo": null,
+      "description": "Muted footer with persimmon text links (Sponsors).",
+      "html": "<footer class=\"ds-footer\"><span>座敷童子 — a house spirit that looks after the place.</span><span><a class=\"ds-footer-link\" href=\"#\">Sponsors</a> · MIT</span></footer>",
+      "css": ".ds-footer { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 0.75rem; padding-top: 1.5rem; border-top: 1px solid color-mix(in srgb, #e8e0d4 14%, transparent); color: #cdb69f; font-family: \"Reddit Sans Condensed\", \"Segoe UI\", system-ui, sans-serif; font-size: 0.9rem; } .ds-footer-link { color: #d9671c; text-decoration: none; } .ds-footer-link:hover { filter: brightness(1.08); } .ds-footer-link:focus-visible { outline: 2px solid #d9671c; outline-offset: 3px; }"
+    }
+  ],
+  "narrative": {
+    "northStar": "Noren Threshold",
+    "overview": "The public face of Zashiki Warashi is a machiya shop curtain, not a SaaS dashboard. Desktop first viewport is an approved composition raster (site/assets/hero-comp.png): indigo-dyed noren parted left, cedar lintel across the top, warm paper interior glow on the right, and a real app screenshot inset in the revealed room. Download sits on the parted edge; GitHub stays quiet on the lintel. The visitor parts the curtain into a house that already keeps localhost tidy.\n\nBelow the fold, content is numbered sequential rooms — offer, how it works, what you need, spirit — in indigo-washed panels on sumi-ink ground. Persimmon is reserved for the primary action. Voice stays plain and anti-hype; folklore meaning (座敷童子) is brand, not decoration. Rejected: dark purple SaaS heroes, bolted-on screenshot cards, fake social proof, eyebrow kickers, and system display faces.",
+    "keyCharacteristics": [
+      "Asymmetric noren reveal as the hero grammar (comp-b)",
+      "Indigo cloth / cedar wood / warm paper / sumi ink / persimmon accent",
+      "Fresca display + Reddit Sans Condensed body; Kosugi for Japanese/folklore line",
+      "Composition raster + hotspot links on desktop; labeled CTA lockup on mobile",
+      "Real screenshot as interior proof, never a floating marketing card"
+    ],
+    "rules": [
+      {
+        "name": "The One Slit Rule",
+        "body": "Persimmon appears on primary Download actions only. Do not sprinkle it across decorative accents, icons, or secondary links beyond the existing footer Sponsors treatment.",
+        "section": "colors"
+      },
+      {
+        "name": "The Cloth-Not-Chrome Rule",
+        "body": "Large surfaces read as dyed cloth, timber, or paper — not glassmorphism, purple gradients, or neon glow.",
+        "section": "colors"
+      },
+      {
+        "name": "The Sumi Type Rule",
+        "body": "Light type on ink/indigo; never invert to dark-on-cream marketing blocks for marketing sections. Display stays Fresca/Protest — no Inter, Roboto, or system UI as hero face.",
+        "section": "typography"
+      },
+      {
+        "name": "The Parted Edge Rule",
+        "body": "Download lives on the curtain slit (desktop hotspot) or as an explicit labeled pill (mobile) — never as a floating badge on top of the app screenshot.",
+        "section": "layout"
+      },
+      {
+        "name": "The Reveal-Not-Lift Rule",
+        "body": "Prefer reveal animations and material shadows over multi-layer drop shadows or glow. Honor prefers-reduced-motion: reduce by disabling hero animations.",
+        "section": "elevation"
+      },
+      {
+        "name": "The Room-Not-Card Rule",
+        "body": "If removing a fold’s border/shadow would still leave a clear section with one job, keep the treatment restrained. Never put cards in the hero.",
+        "section": "shapes"
+      }
+    ],
+    "dos": [
+      "Do treat Download as parting the noren — primary persimmon action on the slit or as a labeled mobile pill.",
+      "Do keep the real app screenshot inside the revealed interior; update screenshot.png when the product UI changes.",
+      "Do use Fresca for display/fold titles, Reddit Sans Condensed for body, Kosugi for the folklore line.",
+      "Do recompose below 820px: hide hero-art and show labeled Download."
+    ],
+    "donts": [
+      "Don't ship another dark SaaS hero with a bolted-on screenshot card, purple gradients, or glow stacks.",
+      "Don't invent testimonials, star counts, or benchmarks — evidence is the real window and GitHub Releases only.",
+      "Don't crop or scale the desktop composition on mobile in a way that hides the baked CTA; use the lockup path instead.",
+      "Don't promote unused loaded faces (e.g. Finger Paint) or system UI fonts into the display role."
+    ]
+  }
+}

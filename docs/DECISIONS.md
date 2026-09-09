@@ -167,3 +167,10 @@ Use this format for each decision:
 - **Context**: Deep-links are part of the glue story; Compass already uses `plugin-opener` for URIs.
 - **Decision**: `OpenService` shells out to `/usr/bin/open` (Finder) and `open -a Cursor` without `$SHELL -lc`. Missing Cursor maps to an actionable error.
 - **Consequences**: Works with default macOS installs. Does not launch arbitrary editors yet.
+
+### Landing visual world: Noren Threshold (Impeccable)
+- **Date**: 2026-09-09
+- **Status**: Accepted
+- **Context**: Public site at zashiki.anireco.app needed a redesign after Impeccable install. Old look (dark sage SaaS column) was treated as anti-reference.
+- **Decision**: Replace the visual world with **Noren Threshold** (seed `c9f145db`, composition B asymmetric reveal). Ship desktop first viewport as the approved composition raster plus Download/GitHub hotspots and an inset real app screenshot; mobile uses an indigo text lockup + labeled Download. Capture product truth in `PRODUCT.md` and the shipped system in `DESIGN.md`.
+- **Consequences**: Distinct folklore/threshold identity instead of generic dark-dev landing. Hero is not a fully semantic CSS reconstruction of every region; future polish can re-layer plates without changing the world.

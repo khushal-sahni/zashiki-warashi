@@ -1,6 +1,6 @@
 # STATUS.md
 > Your weekend dashboard. Read this first. Update this last.
-> Last updated: `2026-09-09` | Session: `#9`
+> Last updated: `2026-09-09` | Session: `#10`
 
 ---
 
@@ -27,12 +27,13 @@
 - [x] **Actionable errors** — `AppError::user_message()` for IPC + `last_error`
 - [x] **Menu-bar tray** — show window / quit
 - [x] **Public OSS path** — MIT, FUNDING.yml, stranger README, unsigned Release workflow, `site/` for zashiki.anireco.app
+- [x] **Landing redesign** — Noren Threshold world (PRODUCT.md + DESIGN.md); static `site/` ready to deploy
 
 ---
 
 ## In Progress
 
-- Nothing in progress. Manual follow-ups: `wrangler deploy` + DNS for `zashiki.anireco.app`, push a `v*` tag for the first Release draft.
+- Nothing in progress. Manual follow-ups: `cd site && npx wrangler deploy` + DNS for `zashiki.anireco.app`, push a `v*` tag for the first Release draft.
 
 ---
 
@@ -47,31 +48,19 @@
 
 ## Where We Left Off
 
-Shipped **M3 glue + OSS launch path**: Finder/Cursor open, user-facing errors, tray, MIT, GitHub Release workflow, Cloudflare Workers site folder. Landing screenshot is in `site/assets/screenshot.png`. Next: deploy site + DNS, tag a release.
+Redesigned the public landing (`site/`) under Impeccable: Noren Threshold / asymmetric reveal. Finish review disposition **ship**. Deploy with `wrangler deploy` when ready.
 
 ---
 
 ## Current Architecture State
 
 ```
-src/
-├── components/              ✅ ShellHeader, KeepAwakeToggle, panes/
-├── features/projects/       ✅ list, detail (+ Finder/Cursor), scan, settings, log viewer
-├── features/docker/         ✅ StackPanel, PortConflictDialog
-├── lib/                     ✅ api (+ open), logs, docker wrappers
-└── types/
-
-src-tauri/src/
-├── commands/                ✅ app + projects (+ open) + logs + docker
-├── services/                ✅ Catalog, Process, Log, Compose, docker_bin, Open, Occupancy, Stack
-├── tray.rs                  ✅ menu-bar show / quit
-├── repositories/            ✅ Database v3 + port_overrides
-├── domain/                  ✅ Project, Log, Stack types
-├── error.rs                 ✅ AppError + user_message mapper
-└── lib.rs                   ✅ setup, rehydrate, warm docker bin, tray, manage stack
-
-site/                        ✅ Workers static assets landing page
-.github/workflows/release.yml ✅ unsigned macOS app+dmg on v* tags
+src/                         ✅ app UI (unchanged this session)
+src-tauri/                   ✅ backend (unchanged this session)
+site/                        ✅ redesigned landing (Noren Threshold)
+PRODUCT.md                   ✅ product truth
+DESIGN.md                    ✅ visual system from shipped site
+.impeccable/                 ✅ surfaces, mocks, build, design.json
 ```
 
 ---
@@ -80,9 +69,7 @@ site/                        ✅ Workers static assets landing page
 
 ```env
 # No app .env required.
-# Runtime: login shell PATH for npm/docker/etc.
-# Docker Desktop / OrbStack required for stack Up and port reconcile via docker ps.
-# docker binary is resolved once at startup via login shell, then invoked directly.
+# Landing: cd site && npx wrangler deploy
 ```
 
 ---
@@ -93,12 +80,9 @@ site/                        ✅ Workers static assets landing page
 npm install
 npm run tauri:dev
 
-npm run tauri:install
-
-npm run build
-cd src-tauri && cargo test && cargo check
-
-# Landing page
+# Landing page preview
+cd site && python3 -m http.server 8765
+# Deploy
 cd site && npx wrangler deploy
 ```
 
@@ -113,6 +97,8 @@ cd site && npx wrangler deploy
 - Native occupant stop requires an explicit confirm; still sharp-edged
 - ANSI log paint caps at last 400 lines for first paint; full virtualizer not yet needed
 - Apple notarization / Homebrew cask deferred
+- Landing hero is approved-comp raster + hotspots (not a fully semantic CSS reconstruction of every region)
+- Unused intermediate plates under `site/assets/plates/` from the comp-led path
 
 ---
 
@@ -126,7 +112,7 @@ cd site && npx wrangler deploy
 
 | Metric | Value |
 |---|---|
-| Total sessions | 9 |
-| Modules complete | M0 + M1 + M2 + M3 (+ Coffee + logs + panes + snappy + OSS path) |
+| Total sessions | 10 |
+| Modules complete | M0 + M1 + M2 + M3 (+ Coffee + logs + panes + snappy + OSS path + landing redesign) |
 | Test coverage | 44 Rust unit tests |
-| Last deployed | Local `~/Applications` via `tauri:install` (rebuild to pick up M3) |
+| Last deployed | Local `~/Applications` via `tauri:install`; site redesign not yet wrangler-deployed |

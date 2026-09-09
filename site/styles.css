@@ -1,200 +1,314 @@
+@import url("./scaffold-layout.css");
+
 :root {
-  --ink: #12141a;
-  --text: #e8e6df;
-  --muted: #9b978c;
-  --sage: #8fbfa8;
-  --sage-strong: #7dcea0;
-  --panel: rgba(24, 27, 34, 0.92);
-  --line: rgba(232, 230, 223, 0.12);
-  font-family: "IBM Plex Sans", "Segoe UI", system-ui, -apple-system, sans-serif;
-  color: var(--text);
-  background: var(--ink);
+  --ink: #101822;
+  --indigo: #1a2744;
+  --paper: #e8e0d4;
+  --persimmon: #d9671c;
+  --wood: #3a200c;
+  --muted: #cdb69f;
+  color-scheme: dark;
+  font-family: "Reddit Sans Condensed", "Segoe UI", system-ui, sans-serif;
+  color: var(--paper);
+  background:
+    radial-gradient(ellipse 70% 40% at 20% 0%, rgba(47, 93, 140, 0.22), transparent),
+    var(--ink);
 }
 
 * {
   box-sizing: border-box;
 }
 
+html,
 body {
   margin: 0;
-  min-height: 100vh;
-  background:
-    radial-gradient(ellipse 80% 50% at 50% -10%, rgba(143, 191, 168, 0.18), transparent),
-    var(--ink);
+  min-height: 100%;
 }
 
-.shell {
-  max-width: 720px;
-  margin: 0 auto;
-  padding: 4.5rem 1.5rem 3rem;
+::selection {
+  background: color-mix(in srgb, var(--persimmon) 55%, #000);
+  color: var(--paper);
 }
 
-.eyebrow {
-  margin: 0 0 0.5rem;
-  color: var(--sage);
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  font-size: 0.75rem;
+a:focus-visible {
+  outline: 2px solid var(--persimmon);
+  outline-offset: 3px;
 }
 
-h1 {
-  margin: 0 0 1rem;
-  font-size: clamp(2rem, 5vw, 2.75rem);
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.hero {
+  position: relative;
+  width: 100%;
+  margin: 0;
+  aspect-ratio: 1280 / 720;
+  overflow: hidden;
+  background: #101822;
+}
+
+.hero-art {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: fill;
+  animation: hero-settle 900ms cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+/* Inset real screenshot inside the window region — keep clear of Download (ends ~50%). */
+.app-proof {
+  position: absolute;
+  left: 52%;
+  top: 18%;
+  width: 44%;
+  height: 72%;
+  z-index: 1;
+  object-fit: contain;
+  object-position: center center;
+  border-radius: 0.55rem;
+  filter: drop-shadow(0 18px 40px rgba(0, 0, 0, 0.4));
+  pointer-events: none;
+  animation: proof-reveal 1100ms cubic-bezier(0.16, 1, 0.3, 1) 180ms both;
+}
+
+@keyframes hero-settle {
+  from {
+    opacity: 0.72;
+    transform: scale(1.02);
+    filter: blur(2px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+    filter: none;
+  }
+}
+
+@keyframes proof-reveal {
+  from {
+    opacity: 0;
+    transform: translateX(1.25rem);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero-art,
+  .app-proof {
+    animation: none;
+  }
+}
+
+.hotspot {
+  position: absolute;
+  z-index: 3;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
+  text-decoration: none;
+}
+
+.hotspot.download {
+  left: var(--r-download-x);
+  top: var(--r-download-y);
+  width: var(--r-download-w);
+  height: var(--r-download-h);
+  color: transparent;
+  font-size: 0.95rem;
   font-weight: 600;
-  letter-spacing: -0.02em;
 }
 
-.lede {
-  margin: 0 0 1.75rem;
+.hotspot.github {
+  left: var(--r-github-btn-x);
+  top: var(--r-github-btn-y);
+  width: var(--r-github-btn-w);
+  height: var(--r-github-btn-h);
+}
+
+.hotspot.brand {
+  left: var(--r-brand-mark-x);
+  top: var(--r-brand-mark-y);
+  width: var(--r-brand-mark-w);
+  height: var(--r-brand-mark-h);
+}
+
+.hotspot:hover {
+  box-shadow: inset 0 0 0 2px color-mix(in srgb, var(--persimmon) 65%, #fff);
+}
+
+.below {
+  max-width: 42rem;
+  margin: 0 auto;
+  padding: 3.5rem 1.5rem 3rem;
+}
+
+.fold {
+  margin: 0 0 2.75rem;
+  padding: 1.25rem 1.35rem;
+  border: 1px solid color-mix(in srgb, var(--paper) 14%, transparent);
+  border-radius: 0.75rem;
+  background:
+    linear-gradient(
+      180deg,
+      color-mix(in srgb, var(--indigo) 35%, transparent),
+      color-mix(in srgb, var(--ink) 88%, #1a2744)
+    );
+  box-shadow: 0 12px 36px rgba(0, 0, 0, 0.22);
+}
+
+.fold h2 {
+  margin: 0 0 0.65rem;
+  font-family: Fresca, "Protest Revolution", sans-serif;
+  font-size: 1.75rem;
+  font-weight: 400;
+  letter-spacing: 0.03em;
+  color: var(--paper);
+}
+
+.fold p,
+.fold li {
+  margin: 0;
   color: var(--muted);
   font-size: 1.05rem;
   line-height: 1.65;
 }
 
-.actions {
+.fold ol {
+  margin: 0;
+  padding-left: 1.2rem;
+}
+
+.fold li + li {
+  margin-top: 0.45rem;
+}
+
+.fold code {
+  font-size: 0.9em;
+  color: var(--paper);
+}
+
+.closing {
   display: flex;
   flex-wrap: wrap;
   gap: 0.75rem;
-  margin-bottom: 1rem;
+  margin: 0 0 2.5rem;
 }
 
-.btn {
+.download-inline,
+.ghost-inline {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  padding: 0.7rem 1.15rem;
-  border-radius: 0.55rem;
+  min-height: 2.75rem;
+  padding: 0.7rem 1.25rem;
+  border-radius: 999px;
   text-decoration: none;
-  font-weight: 560;
-  border: 1px solid var(--line);
+  font-weight: 600;
 }
 
-.btn.primary {
-  background: var(--sage-strong);
-  color: #102018;
-  border-color: transparent;
+.download-inline {
+  background: var(--persimmon);
+  color: #1a120c;
 }
 
-.btn.ghost {
-  color: var(--text);
-  background: transparent;
+.ghost-inline {
+  border: 1px solid color-mix(in srgb, var(--paper) 22%, transparent);
+  color: var(--paper);
 }
 
-.btn.ghost:hover {
-  border-color: var(--sage);
+.download-inline:hover {
+  filter: brightness(1.06);
 }
 
-.note {
-  margin: 0 0 2rem;
-  color: var(--muted);
-  font-size: 0.9rem;
-  line-height: 1.5;
-}
-
-.note code {
-  font-size: 0.82em;
-  color: var(--text);
-}
-
-.shot {
-  margin: 0 0 2.5rem;
-  padding: 0;
-}
-
-.shot img,
-.preview {
-  width: 100%;
-  border-radius: 0.75rem;
-  border: 1px solid var(--line);
-  background: var(--panel);
-  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.35);
-}
-
-.shot img {
-  display: block;
-  height: auto;
-}
-
-.preview-titlebar {
-  padding: 0.55rem 0.85rem;
-  border-bottom: 1px solid var(--line);
-  font-size: 0.85rem;
-  color: var(--muted);
-}
-
-.preview-body {
-  display: grid;
-  grid-template-columns: 28% 1fr;
-  min-height: 220px;
-}
-
-.preview aside {
-  padding: 1rem;
-  border-right: 1px solid var(--line);
-  color: var(--muted);
-  font-size: 0.9rem;
-  line-height: 1.9;
-}
-
-.preview section {
-  padding: 1rem 1.1rem 1.2rem;
-}
-
-.preview .dot {
-  display: inline-block;
-  width: 0.45rem;
-  height: 0.45rem;
-  border-radius: 50%;
-  background: var(--sage-strong);
-  margin-right: 0.35rem;
-}
-
-.preview .dot.muted {
-  background: var(--muted);
-}
-
-.chips {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.4rem;
-  margin: 0.75rem 0 1rem;
-}
-
-.chips span {
-  border: 1px solid var(--line);
-  border-radius: 0.35rem;
-  padding: 0.2rem 0.5rem;
-  font-size: 0.78rem;
-  color: var(--muted);
-}
-
-.logs {
-  margin-top: 1rem;
-  padding: 0.75rem;
-  border-radius: 0.45rem;
-  background: #0c0e12;
-  color: var(--muted);
-  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
-  font-size: 0.8rem;
-}
-
-figcaption {
-  margin-top: 0.75rem;
-  color: var(--muted);
-  font-size: 0.88rem;
-}
-
-footer {
+.site-footer {
   display: flex;
   flex-wrap: wrap;
   justify-content: space-between;
   gap: 0.75rem;
-  padding-top: 1.25rem;
-  border-top: 1px solid var(--line);
+  padding-top: 1.5rem;
+  border-top: 1px solid color-mix(in srgb, var(--paper) 14%, transparent);
   color: var(--muted);
-  font-size: 0.85rem;
+  font-size: 0.9rem;
 }
 
-footer a {
-  color: var(--sage);
+.site-footer a {
+  color: var(--persimmon);
+}
+
+.mobile-lockup {
+  display: none;
+}
+
+@media (max-width: 820px) {
+  .hero {
+    aspect-ratio: auto;
+    min-height: auto;
+    display: flex;
+    flex-direction: column;
+    background:
+      radial-gradient(ellipse 80% 60% at 20% 0%, rgba(47, 93, 140, 0.35), transparent),
+      #0d172a;
+    padding-top: 1.25rem;
+  }
+
+  .hero-art {
+    display: none;
+  }
+
+  .app-proof {
+    display: none;
+  }
+
+  .hotspot.github,
+  .hotspot.brand {
+    display: none;
+  }
+
+  .mobile-lockup {
+    display: block;
+    padding: 1.25rem 1.25rem 0.5rem;
+    background: linear-gradient(180deg, #0d172a, #101822);
+  }
+
+  .mobile-title {
+    margin: 0;
+    font-family: Fresca, "Protest Revolution", sans-serif;
+    font-size: clamp(2.4rem, 11vw, 3.25rem);
+    line-height: 0.95;
+    color: var(--paper);
+  }
+
+  .mobile-sub {
+    margin: 0.75rem 0 0;
+    font-family: "Kosugi", "Reddit Sans Condensed", sans-serif;
+    font-size: 0.95rem;
+    line-height: 1.4;
+    color: color-mix(in srgb, var(--paper) 88%, #fff);
+    overflow-wrap: anywhere;
+  }
+
+  .hotspot.download {
+    position: relative;
+    left: auto;
+    top: auto;
+    width: calc(100% - 2rem);
+    height: 3rem;
+    margin: 1rem 1rem 1.5rem;
+    background: var(--persimmon);
+    color: #1a120c;
+    box-shadow: 0 10px 28px rgba(0, 0, 0, 0.35);
+  }
 }

@@ -29,7 +29,34 @@
 
 ## Sessions
 
+## Session #10 — 2026-09-09
+
+### Built
+- **PRODUCT.md** — product truth for Impeccable (landing + desktop product)
+- **Landing redesign (Noren Threshold)** — `site/` replaced for zashiki.anireco.app; direction seed `c9f145db`, composition B (asymmetric reveal)
+- **DESIGN.md** + `.impeccable/design.json` — documented shipped visual system
+- Self-hosted fonts under `site/fonts/` (Fresca, Kosugi, Reddit Sans Condensed, Protest Revolution)
+
+### Changed
+- Hero ships approved composition raster (`site/assets/hero-comp.png`) with Download/GitHub hotspots; real `screenshot.png` inset over the app window
+- Mobile uses indigo lockup + labeled Download (hero art hidden) so the CTA stays clear
+- Below-fold sections restyled in indigo/paper panels
+
+### Fixed
+- Finish-review CTA overlap / mobile lockup / orphan baked Download remnant
+
+### Deferred / Not Done
+- `wrangler deploy` + DNS still manual
+- Layered CSS reconstruction of every hero region without the approved raster remains unfinished (hero gate cleared via composition plate + hotspots)
+
+### New Tech Debt
+- Desktop hero still paints in-image “Features / Star on GitHub” labels from the approved comp; interactive hotspot goes to the repo
+- Intermediate plate assets under `site/assets/plates/` and root `assets/plates/` are unused in the final markup but retained from the comp-led build
+
+---
+
 ## Session #9 — 2026-09-09
+
 
 ### Built
 - **Open in Finder / Cursor** — `OpenService` + IPC + inspector buttons
