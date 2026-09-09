@@ -3,6 +3,7 @@ mod domain;
 mod error;
 mod repositories;
 mod services;
+mod tray;
 
 use std::sync::Arc;
 
@@ -11,14 +12,15 @@ use tracing::info;
 
 use commands::{
     add_project, clear_project_logs, get_app_status, get_keep_awake_status, get_project_logs,
-    get_project_stack, get_settings, list_projects, peek_project_stack, remove_project,
-    resolve_port_conflict, restart_project, scan_projects, set_keep_awake_enabled, set_scan_roots,
-    start_project, start_project_stack, stop_project, stop_project_stack, update_project_commands,
+    get_project_stack, get_settings, list_projects, open_project_in_cursor, open_project_in_finder,
+    peek_project_stack, remove_project, resolve_port_conflict, restart_project, scan_projects,
+    set_keep_awake_enabled, set_scan_roots, start_project, start_project_stack, stop_project,
+    stop_project_stack, update_project_commands,
 };
 use repositories::{Database, ProjectRepository};
 use services::{
     docker_bin, AppService, CatalogService, ComposeService, KeepAwakeService, LogService,
-    PortOccupancyService, ProcessService, StackService,
+    OpenService, PortOccupancyService, ProcessService, StackService,
 };
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
@@ -65,6 +67,8 @@ pub fn run() {
             let keep_awake_service = Arc::new(KeepAwakeService::new(project_repository.clone()));
             keep_awake_service.rehydrate()?;
 
+            let open_service = Arc::new(OpenService::new(catalog_service.clone()));
+
             let app_service = AppService::new(database, app_data_dir.display().to_string());
             app.manage(app_service);
             app.manage(catalog_service);
@@ -72,6 +76,9 @@ pub fn run() {
             app.manage(keep_awake_service);
             app.manage(log_service);
             app.manage(stack_service);
+            app.manage(open_service);
+
+            tray::install_tray(app).map_err(|err| AppSetupError(err.to_string()))?;
 
             Ok(())
         })
@@ -86,6 +93,8 @@ pub fn run() {
             scan_projects,
             get_settings,
             set_scan_roots,
+            open_project_in_finder,
+            open_project_in_cursor,
             start_project,
             stop_project,
             restart_project,

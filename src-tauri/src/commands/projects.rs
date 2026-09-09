@@ -4,7 +4,7 @@ use tauri::State;
 
 use crate::domain::{AppSettings, Project, ScanCandidate};
 use crate::error::AppError;
-use crate::services::{CatalogService, ProcessService};
+use crate::services::{CatalogService, OpenService, ProcessService};
 
 #[tauri::command]
 pub fn list_projects(catalog: State<'_, Arc<CatalogService>>) -> Result<Vec<Project>, AppError> {
@@ -74,6 +74,22 @@ pub fn set_scan_roots(
     catalog: State<'_, Arc<CatalogService>>,
 ) -> Result<AppSettings, AppError> {
     catalog.set_scan_roots(roots)
+}
+
+#[tauri::command]
+pub fn open_project_in_finder(
+    id: String,
+    open: State<'_, Arc<OpenService>>,
+) -> Result<(), AppError> {
+    open.open_in_finder(&id)
+}
+
+#[tauri::command]
+pub fn open_project_in_cursor(
+    id: String,
+    open: State<'_, Arc<OpenService>>,
+) -> Result<(), AppError> {
+    open.open_in_cursor(&id)
 }
 
 #[tauri::command]

@@ -6,6 +6,11 @@ import {
   usePaneControls,
 } from "../../components";
 import { StackPanel } from "../docker";
+import {
+  formatInvokeError,
+  openProjectInCursor,
+  openProjectInFinder,
+} from "../../lib";
 import type { Project } from "../../types";
 import { ProjectLogViewer } from "./project-log-viewer";
 
@@ -131,6 +136,28 @@ export function ProjectDetail({
                 onClick={() => void onRestart(project.id)}
               >
                 Restart
+              </button>
+              <button
+                type="button"
+                disabled={busy}
+                onClick={() => {
+                  void openProjectInFinder(project.id).catch((err: unknown) => {
+                    onError(formatInvokeError(err));
+                  });
+                }}
+              >
+                Finder
+              </button>
+              <button
+                type="button"
+                disabled={busy}
+                onClick={() => {
+                  void openProjectInCursor(project.id).catch((err: unknown) => {
+                    onError(formatInvokeError(err));
+                  });
+                }}
+              >
+                Cursor
               </button>
               <button
                 type="button"

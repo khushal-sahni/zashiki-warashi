@@ -183,7 +183,11 @@ fn run_compose(
         .into_iter()
         .find(|text| !text.is_empty())
         .unwrap_or("docker compose failed");
-    Err(AppError::message(detail.to_string()))
+    Err(AppError::message(format_compose_failure(detail)))
+}
+
+fn format_compose_failure(detail: &str) -> String {
+    format!("compose failed: {detail}")
 }
 
 fn parse_running_service_names(raw: &str) -> Vec<String> {

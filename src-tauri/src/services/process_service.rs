@@ -120,7 +120,7 @@ impl ProcessService {
                     started_at: None,
                     started_at_unix: None,
                     status: RunState::Failed,
-                    last_error: Some(err.to_string()),
+                    last_error: Some(err.user_message()),
                 })?;
                 return Err(err);
             }

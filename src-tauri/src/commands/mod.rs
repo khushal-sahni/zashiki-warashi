@@ -10,6 +10,7 @@ pub use docker::{
 };
 pub use logs::{clear_project_logs, get_project_logs};
 pub use projects::{
-    add_project, get_settings, list_projects, remove_project, restart_project, scan_projects,
-    set_scan_roots, start_project, stop_project, update_project_commands,
+    add_project, get_settings, list_projects, open_project_in_cursor, open_project_in_finder,
+    remove_project, restart_project, scan_projects, set_scan_roots, start_project, stop_project,
+    update_project_commands,
 };

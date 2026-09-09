@@ -153,3 +153,17 @@ Use this format for each decision:
 - **Context**: Project switch felt ~0.3–1s slow because every select ran `$SHELL -lc 'docker compose ps'`, paying zsh startup + Compose on the hot path. Login shell remains necessary for `fnm`/`nvm` when starting user projects.
 - **Decision**: Resolve `docker` once at app start via login shell (`command -v docker`) and cache the path. Compose `ps` / up / stop / logs and `docker ps` occupancy use that binary directly. User project start/stop still uses `$SHELL -lc`. Select path uses `peek_project_stack` (files only); running flags refresh in the background. Process-spawning Tauri commands are `async` + `spawn_blocking`.
 - **Consequences**: Instant selection chrome; running dots may lag a beat. Docker must still be on the login-shell PATH at startup. Snappy rules live in AGENTS.md and `.cursor/rules/snappy.mdc`.
+
+### MIT + unsigned GitHub Releases + Workers landing page
+- **Date**: 2026-09-09
+- **Status**: Accepted
+- **Context**: Ready to let strangers use the app. Pricing is a weak fit; stars and daily use matter more. Apple notarization needs a Developer Program membership.
+- **Decision**: Ship as MIT OSS. Distribute unsigned macOS `.app`/`.dmg` via GitHub Releases (`v*` tags + `tauri-action`). Document Gatekeeper workarounds. Host a one-page site at `zashiki.anireco.app` on Cloudflare Workers static assets. No Polar/paywall; optional GitHub Sponsors only. Notarization and Homebrew deferred.
+- **Consequences**: Friction on first open until notarized. Subdomain under anireco.app is fine for a landing URL; product home remains the GitHub repo + binary.
+
+### Open in Cursor / Finder via system `open`
+- **Date**: 2026-09-09
+- **Status**: Accepted
+- **Context**: Deep-links are part of the glue story; Compass already uses `plugin-opener` for URIs.
+- **Decision**: `OpenService` shells out to `/usr/bin/open` (Finder) and `open -a Cursor` without `$SHELL -lc`. Missing Cursor maps to an actionable error.
+- **Consequences**: Works with default macOS installs. Does not launch arbitrary editors yet.

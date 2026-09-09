@@ -69,3 +69,11 @@ export async function stopProject(id: string): Promise<Project> {
 export async function restartProject(id: string): Promise<Project> {
   return invoke<Project>("restart_project", { id });
 }
+
+export async function openProjectInFinder(id: string): Promise<void> {
+  return invoke<void>("open_project_in_finder", { id });
+}
+
+export async function openProjectInCursor(id: string): Promise<void> {
+  return invoke<void>("open_project_in_cursor", { id });
+}

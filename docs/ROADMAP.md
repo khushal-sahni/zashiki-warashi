@@ -44,14 +44,14 @@ V1 is "useful on Monday" when you can open the app, find a project, start/stop i
 - [x] Port conflict reconciliation (stop occupant or remap)
 - [x] No query GUI; no DB provisioning
 
-### M3 — Glue polish `[ ]`
+### M3 — Glue polish `[x]`
 > Someone else (or you next month) could actually use this
 
-- [ ] Open in Cursor / Finder
-- [ ] Actionable failure messages
-- [ ] Optional menu-bar / tray entry
-- [ ] README with setup and usage
-- [ ] Basic smoke tests for catalog + lifecycle
+- [x] Open in Cursor / Finder
+- [x] Actionable failure messages
+- [x] Optional menu-bar / tray entry
+- [x] README with setup and usage
+- [x] Basic smoke tests for catalog + lifecycle
 
 ### M4+ — Future ideas `[ ]`
 > Nice-to-haves; not blocking v1
@@ -63,7 +63,8 @@ V1 is "useful on Monday" when you can open the app, find a project, start/stop i
 - [ ] Linux / Windows support
 - [ ] Env-file awareness beyond peek
 - [ ] Remote / SSH hosts
-
+- [ ] Apple notarization + Homebrew cask
+- [ ] Polar / paid notarized builds (optional later)
 ---
 
 ## What We're NOT Building (Scope Cuts)

@@ -1,0 +1,54 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - "v*"
+
+permissions:
+  contents: write
+
+jobs:
+  release-macos:
+    runs-on: macos-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install Rust stable
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Rust cache
+        uses: swatinem/rust-cache@v2
+        with:
+          workspaces: src-tauri -> target
+
+      - name: Install frontend dependencies
+        run: npm ci
+
+      - name: Build and upload unsigned macOS release
+        uses: tauri-apps/tauri-action@v0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tagName: ${{ github.ref_name }}
+          releaseName: Zashiki Warashi ${{ github.ref_name }}
+          releaseBody: |
+            macOS control plane for the localhost pile.
+
+            ## Install
+            1. Download the `.dmg` (or `.app` zip).
+            2. Drag **Zashiki Warashi** to Applications.
+            3. **Unsigned build — Gatekeeper:** right-click → Open, or:
+               `xattr -dr com.apple.quarantine "/Applications/Zashiki Warashi.app"`
+
+            Notarization is not included in this release path.
+          releaseDraft: true
+          prerelease: false
+          args: --bundles app,dmg

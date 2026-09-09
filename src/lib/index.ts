@@ -4,6 +4,8 @@ export {
   getKeepAwakeStatus,
   getSettings,
   listProjects,
+  openProjectInCursor,
+  openProjectInFinder,
   removeProject,
   restartProject,
   scanProjects,

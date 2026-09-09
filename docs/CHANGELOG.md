@@ -29,6 +29,36 @@
 
 ## Sessions
 
+## Session #9 — 2026-09-09
+
+### Built
+- **Open in Finder / Cursor** — `OpenService` + IPC + inspector buttons
+- **Actionable `AppError::user_message()`** — Docker missing/daemon, spawn, compose, start command; used for IPC DTO + `last_error`
+- **Menu-bar tray** — show main window / quit (`tray-icon`)
+- **MIT LICENSE** + `.github/FUNDING.yml`
+- **Unsigned macOS Release workflow** — `.github/workflows/release.yml` (`app` + `dmg` on `v*` tags)
+- **Landing page** — `site/` Cloudflare Workers static assets for `zashiki.anireco.app`
+- Stranger-facing README (install via Releases, Gatekeeper, usage, develop last)
+
+### Changed
+- `tauri.conf.json` bundle targets narrowed to `app` + `dmg`
+- ROADMAP M3 marked complete
+
+### Fixed
+- Compose failures prefixed as user-facing compose errors; daemon-down mapped clearly
+
+### Deferred / Not Done
+- Real `site/assets/screenshot.png` (Screen Recording / window capture blocked in agent session)
+- Cloudflare DNS attach + `wrangler deploy` (needs your anireco zone)
+- Tagging/publishing the first GitHub Release
+- Apple notarization / Homebrew
+
+### New Tech Debt
+- Landing page CSS preview fallback until a real screenshot is dropped in
+- Installed `~/Applications` app must be rebuilt (`tauri:install`) to pick up M3
+
+---
+
 ## Session #8 — 2026-09-09
 
 ### Built

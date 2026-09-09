@@ -1,6 +1,6 @@
 # STATUS.md
 > Your weekend dashboard. Read this first. Update this last.
-> Last updated: `2026-09-09` | Session: `#8`
+> Last updated: `2026-09-09` | Session: `#9`
 
 ---
 
@@ -23,12 +23,16 @@
 - [x] **Port reconciliation** — detect occupant (catalog / docker / native), stop or remap; remaps in app-data + spawn env
 - [x] **Resizable pane layout** — Cursor-style sidebar / inspector / logs splits; collapse + drag resize; layout in localStorage
 - [x] **Snappy project switch** — select paints from memory; compose peek without Docker; running dots refresh in background; cached `docker` binary
+- [x] **Open in Finder / Cursor** — inspector buttons via `OpenService`
+- [x] **Actionable errors** — `AppError::user_message()` for IPC + `last_error`
+- [x] **Menu-bar tray** — show window / quit
+- [x] **Public OSS path** — MIT, FUNDING.yml, stranger README, unsigned Release workflow, `site/` for zashiki.anireco.app
 
 ---
 
 ## In Progress
 
-- Nothing in progress. Next product work: **M3 — Glue polish**.
+- Nothing in progress. Manual follow-ups: `wrangler deploy` + DNS for `zashiki.anireco.app`, push a `v*` tag for the first Release draft.
 
 ---
 
@@ -37,12 +41,13 @@
 - Coffee lid-close mode requires administrator approval per enable/disable.
 - Compose/stack needs Docker CLI on the login-shell PATH (resolved once at startup).
 - Occupant matching relies on compose `working_dir` labels; unnamed containers may show as `dockerOther`.
+- macOS Releases are **unsigned** — Gatekeeper needs right-click Open or `xattr -dr com.apple.quarantine`.
 
 ---
 
 ## Where We Left Off
 
-Shipped **snappy project switching**: sidebar select no longer waits on `$SHELL -lc docker compose ps`. Peek is file-only; running flags arrive async; stale stack/logs clear on remount. Next: M3 polish.
+Shipped **M3 glue + OSS launch path**: Finder/Cursor open, user-facing errors, tray, MIT, GitHub Release workflow, Cloudflare Workers site folder. Landing screenshot is in `site/assets/screenshot.png`. Next: deploy site + DNS, tag a release.
 
 ---
 
@@ -51,18 +56,22 @@ Shipped **snappy project switching**: sidebar select no longer waits on `$SHELL 
 ```
 src/
 ├── components/              ✅ ShellHeader, KeepAwakeToggle, panes/
-├── features/projects/       ✅ list, detail, scan, settings, log viewer
-├── features/docker/         ✅ StackPanel (peek + background refresh), PortConflictDialog
-├── lib/                     ✅ api, logs, docker wrappers (peekProjectStack)
-└── types/                   ✅ Project, LogChunk, PortConflict, ProjectStack, …
+├── features/projects/       ✅ list, detail (+ Finder/Cursor), scan, settings, log viewer
+├── features/docker/         ✅ StackPanel, PortConflictDialog
+├── lib/                     ✅ api (+ open), logs, docker wrappers
+└── types/
 
 src-tauri/src/
-├── commands/                ✅ app + projects + logs + docker IPC (async spawn_blocking for Docker/process)
-├── services/                ✅ Catalog, Process, Log, Compose, docker_bin, Occupancy, Stack (peek vs full)
+├── commands/                ✅ app + projects (+ open) + logs + docker
+├── services/                ✅ Catalog, Process, Log, Compose, docker_bin, Open, Occupancy, Stack
+├── tray.rs                  ✅ menu-bar show / quit
 ├── repositories/            ✅ Database v3 + port_overrides
 ├── domain/                  ✅ Project, Log, Stack types
-├── error.rs                 ✅ AppError (+ port_conflict)
-└── lib.rs                   ✅ setup, rehydrate, warm docker bin, manage stack
+├── error.rs                 ✅ AppError + user_message mapper
+└── lib.rs                   ✅ setup, rehydrate, warm docker bin, tray, manage stack
+
+site/                        ✅ Workers static assets landing page
+.github/workflows/release.yml ✅ unsigned macOS app+dmg on v* tags
 ```
 
 ---
@@ -88,6 +97,9 @@ npm run tauri:install
 
 npm run build
 cd src-tauri && cargo test && cargo check
+
+# Landing page
+cd site && npx wrangler deploy
 ```
 
 ---
@@ -100,12 +112,13 @@ cd src-tauri && cargo test && cargo check
 - Compose `--wait` depends on Compose v2 healthcheck support
 - Native occupant stop requires an explicit confirm; still sharp-edged
 - ANSI log paint caps at last 400 lines for first paint; full virtualizer not yet needed
+- Apple notarization / Homebrew cask deferred
 
 ---
 
 ## Open Questions
 
-- Tray / menu-bar in M3 vs earlier if it helps daily use
+- When to spend the Apple Developer $99 for notarization
 
 ---
 
@@ -113,7 +126,7 @@ cd src-tauri && cargo test && cargo check
 
 | Metric | Value |
 |---|---|
-| Total sessions | 8 |
-| Modules complete | M0 + M1 + M2 (+ Coffee + logs + pane layout + snappy switch) |
-| Test coverage | 36 Rust unit tests |
-| Last deployed | Local `~/Applications` via `tauri:install` |
+| Total sessions | 9 |
+| Modules complete | M0 + M1 + M2 + M3 (+ Coffee + logs + panes + snappy + OSS path) |
+| Test coverage | 44 Rust unit tests |
+| Last deployed | Local `~/Applications` via `tauri:install` (rebuild to pick up M3) |
