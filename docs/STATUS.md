@@ -1,6 +1,6 @@
 # STATUS.md
 > Your weekend dashboard. Read this first. Update this last.
-> Last updated: `2026-09-09` | Session: `#10`
+> Last updated: `2026-09-09` | Session: `#11`
 
 ---
 
@@ -48,7 +48,7 @@
 
 ## Where We Left Off
 
-Redesigned the public landing (`site/`) under Impeccable: Noren Threshold / asymmetric reveal. Finish review disposition **ship**. Deploy with `wrangler deploy` when ready.
+Landing hero glue fixed (real lintel nav, no orange hotspot rings, no stuck screenshot overlay). Deploy still manual: `cd site && npx wrangler deploy` + DNS when ready.
 
 ---
 

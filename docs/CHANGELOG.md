@@ -29,6 +29,27 @@
 
 ## Sessions
 
+## Session #11 — 2026-09-09
+
+### Built
+- (none)
+
+### Changed
+- Landing hero: lintel nav is real links (`#offer` / `#proof` / `#needs` / `#spirit`) with invisible text over painted labels
+- Download / GitHub hit boxes tightened to painted chrome; keyboard `focus-visible` only (no hover glow)
+
+### Fixed
+- Misaligned orange hotspot rings on Download / Star on GitHub
+- Stuck-on `.app-proof` screenshot overlay removed (hero-comp already includes the window)
+
+### Deferred / Not Done
+- `wrangler deploy` still manual
+
+### New Tech Debt
+- (none this session)
+
+---
+
 ## Session #10 — 2026-09-09
 
 ### Built
