@@ -1,9 +1,10 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 
 import {
   formatInvokeError,
   getProjectStack,
   openCompass,
+  peekProjectStack,
   startProjectStack,
   stopProjectStack,
 } from "../../lib";
@@ -13,23 +14,60 @@ interface StackPanelProps {
   readonly projectId: string;
   readonly busy: boolean;
   readonly onBusyError: (message: string | null) => void;
+  readonly onComposePresence?: (hasCompose: boolean) => void;
 }
 
-export function StackPanel({ projectId, busy, onBusyError }: StackPanelProps) {
-  const [stack, setStack] = useState<ProjectStack | null>(null);
-  const [localBusy, setLocalBusy] = useState(false);
+const stackCache = new Map<string, ProjectStack>();
 
-  const refresh = useCallback(async (): Promise<void> => {
-    try {
-      setStack(await getProjectStack(projectId));
-    } catch (err) {
-      onBusyError(formatInvokeError(err));
-    }
-  }, [onBusyError, projectId]);
+export function StackPanel({
+  projectId,
+  busy,
+  onBusyError,
+  onComposePresence,
+}: StackPanelProps) {
+  const [stack, setStack] = useState<ProjectStack | null>(
+    () => stackCache.get(projectId) ?? null,
+  );
+  const [localBusy, setLocalBusy] = useState(false);
+  const generation = useRef(0);
+
+  const applyStack = useCallback(
+    (next: ProjectStack): void => {
+      stackCache.set(projectId, next);
+      setStack(next);
+      onComposePresence?.(next.composeFile !== null);
+    },
+    [onComposePresence, projectId],
+  );
 
   useEffect(() => {
-    void refresh();
-  }, [refresh]);
+    const gen = ++generation.current;
+    const cached = stackCache.get(projectId) ?? null;
+    setStack(cached);
+    onComposePresence?.(cached?.composeFile != null);
+
+    void peekProjectStack(projectId)
+      .then((peek) => {
+        if (generation.current !== gen) {
+          return;
+        }
+        applyStack(peek);
+        if (peek.composeFile === null) {
+          return;
+        }
+        void getProjectStack(projectId).then((full) => {
+          if (generation.current !== gen) {
+            return;
+          }
+          applyStack(full);
+        });
+      })
+      .catch((err: unknown) => {
+        if (generation.current === gen) {
+          onBusyError(formatInvokeError(err));
+        }
+      });
+  }, [applyStack, onBusyError, onComposePresence, projectId]);
 
   if (!stack || stack.composeFile === null) {
     return null;
@@ -60,7 +98,7 @@ export function StackPanel({ projectId, busy, onBusyError }: StackPanelProps) {
           disabled={disabled}
           onClick={() => {
             void runAction(async () => {
-              setStack(await startProjectStack(projectId));
+              applyStack(await startProjectStack(projectId));
             }, setLocalBusy, onBusyError);
           }}
         >
@@ -72,7 +110,7 @@ export function StackPanel({ projectId, busy, onBusyError }: StackPanelProps) {
           disabled={disabled}
           onClick={() => {
             void runAction(async () => {
-              setStack(await stopProjectStack(projectId));
+              applyStack(await stopProjectStack(projectId));
             }, setLocalBusy, onBusyError);
           }}
         >

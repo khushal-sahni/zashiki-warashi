@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 
 import {
   DetailSplit,
@@ -36,8 +36,13 @@ export function ProjectDetail({
 }: ProjectDetailProps) {
   const [startCommand, setStartCommand] = useState("");
   const [stopCommand, setStopCommand] = useState("");
+  const [hasCompose, setHasCompose] = useState(false);
   const logs = usePaneCollapse();
   const { registerLogs } = usePaneControls();
+
+  const onComposePresence = useCallback((value: boolean) => {
+    setHasCompose(value);
+  }, []);
 
   useEffect(() => {
     if (!project) {
@@ -61,10 +66,12 @@ export function ProjectDetail({
     if (!project) {
       setStartCommand("");
       setStopCommand("");
+      setHasCompose(false);
       return;
     }
     setStartCommand(project.startCommand ?? "");
     setStopCommand(project.stopCommand ?? "");
+    setHasCompose(false);
   }, [project]);
 
   if (!project) {
@@ -194,16 +201,20 @@ export function ProjectDetail({
             </details>
 
             <StackPanel
+              key={project.id}
               projectId={project.id}
               busy={busy}
               onBusyError={onError}
+              onComposePresence={onComposePresence}
             />
           </>
         }
         logsPane={
           <ProjectLogViewer
+            key={project.id}
             projectId={project.id}
             running={project.run.status === "running"}
+            hasCompose={hasCompose}
             collapsed={logs.collapsed}
             onExpand={logs.expand}
           />

@@ -102,8 +102,17 @@ src-tauri/src/
 - Processes **outlive the app**; on launch, rehydrate status from PIDs + `docker ps`
 
 ### Docker
-- Use **bollard** for Engine API listing/inspect
+- Use **bollard** for Engine API listing/inspect (when needed)
 - Use **`docker compose` CLI** for up/down/ps — do not reimplement Compose
+- Resolve the `docker` binary **once** at startup via login shell; reuse that path for status/`ps` (no `$SHELL -lc` per click)
+- Login shell (`$SHELL -lc`) is for **user project start/stop commands** only (fnm/nvm PATH)
+
+### Snappy UI (critical)
+- **Selection paints from memory in the same frame** — sidebar, inspector chrome, log chrome must not wait on IPC
+- **No Docker / login shell / compose `ps` on the select hot path** — running dots may lag a beat
+- **Clear stale pane state on project id change** (or remount with `key={projectId}`)
+- **I/O is background + cacheable** — invalidate on start/stop/up/down, not every click
+- **Sync Tauri commands must be cheap** — process spawn / Docker work is `async` + `spawn_blocking`
 
 ### UI layout (panes)
 - Major regions are **resizable, collapsible panes** — not fixed CSS grids or competing `max-height` / `min-height` fights
@@ -131,6 +140,8 @@ src-tauri/src/
 - ❌ Do not provision databases in v1 (peek + deep-link only)
 - ❌ Do not write into managed project repos unless the user explicitly opts into an export format later
 - ❌ No hard-coded pane heights (`max-height: 48%`, fixed log `min-height`, etc.) — use the pane system in `src/components/panes/`
+- ❌ No Docker / login-shell / compose `ps` on project select — peek from files; refresh running state in the background
+- ❌ Never leave previous project's stack or logs visible under a newly selected project
 
 ---
 

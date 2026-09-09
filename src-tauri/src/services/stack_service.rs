@@ -39,6 +39,21 @@ impl StackService {
         }
     }
 
+    pub fn peek_stack(&self, project_id: &str) -> Result<ProjectStack, AppError> {
+        let project = self.catalog.get_project(project_id)?;
+        let Some(info) = load_primary_compose(Path::new(&project.path)) else {
+            return Ok(ProjectStack {
+                compose_file: None,
+                endpoints: Vec::new(),
+            });
+        };
+        let endpoints = self.endpoints_for(&project.path, project_id, &info, None)?;
+        Ok(ProjectStack {
+            compose_file: Some(info.relative_path),
+            endpoints,
+        })
+    }
+
     pub fn get_stack(&self, project_id: &str) -> Result<ProjectStack, AppError> {
         let project = self.catalog.get_project(project_id)?;
         let Some(info) = load_primary_compose(Path::new(&project.path)) else {
@@ -47,11 +62,35 @@ impl StackService {
                 endpoints: Vec::new(),
             });
         };
-        let endpoints = self.endpoints_for(&project.path, project_id, &info)?;
+        let overlay = self.overlay_if_present(project_id);
+        let running = self
+            .compose
+            .running_services(&project.path, &info.relative_path, overlay.as_deref())
+            .unwrap_or_default();
+        let endpoints = self.endpoints_for(&project.path, project_id, &info, Some(&running))?;
         Ok(ProjectStack {
             compose_file: Some(info.relative_path),
             endpoints,
         })
+    }
+
+    pub fn compose_logs(
+        &self,
+        project_id: &str,
+        tail: u32,
+    ) -> Result<Option<String>, AppError> {
+        let project = self.catalog.get_project(project_id)?;
+        let Some(info) = load_primary_compose(Path::new(&project.path)) else {
+            return Ok(None);
+        };
+        let overlay = self.overlay_if_present(project_id);
+        let output = self.compose.logs(
+            &project.path,
+            &info.relative_path,
+            overlay.as_deref(),
+            tail,
+        )?;
+        Ok(Some(output))
     }
 
     pub fn ensure_databases(&self, project_id: &str) -> Result<(), AppError> {
@@ -144,7 +183,7 @@ impl StackService {
     }
 
     pub fn spawn_export_prefix(&self, project_id: &str) -> Result<String, AppError> {
-        let stack = self.get_stack(project_id)?;
+        let stack = self.peek_stack(project_id)?;
         if stack.endpoints.is_empty() {
             return Ok(String::new());
         }
@@ -158,19 +197,6 @@ impl StackService {
             ));
         }
         Ok(parts.join("; "))
-    }
-
-    pub fn compose_log_command(&self, project_id: &str, tail: u32) -> Result<Option<String>, AppError> {
-        let project = self.catalog.get_project(project_id)?;
-        let Some(info) = load_primary_compose(Path::new(&project.path)) else {
-            return Ok(None);
-        };
-        let overlay = self.overlay_if_present(project_id);
-        Ok(Some(ComposeService::logs_command(
-            &info.relative_path,
-            overlay.as_deref(),
-            tail,
-        )))
     }
 
     fn find_conflict(
@@ -284,13 +310,9 @@ impl StackService {
         project_path: &str,
         project_id: &str,
         info: &ComposeFileInfo,
+        running: Option<&[String]>,
     ) -> Result<Vec<DbEndpoint>, AppError> {
         let overrides = self.override_map(project_id)?;
-        let overlay = self.overlay_if_present(project_id);
-        let running = self
-            .compose
-            .running_services(project_path, &info.relative_path, overlay.as_deref())
-            .unwrap_or_default();
         let dotenv = read_dotenv(project_path);
         let mut endpoints = Vec::new();
         for service in &info.services {
@@ -299,6 +321,9 @@ impl StackService {
                 .map(|(host, _)| *host)
                 .unwrap_or(service.mapping.host_port);
             let uri = effective_uri(service, port, &dotenv);
+            let is_running = running
+                .map(|names| names.iter().any(|name| name == &service.name))
+                .unwrap_or(false);
             endpoints.push(DbEndpoint {
                 service: service.name.clone(),
                 kind: service.kind.clone(),
@@ -308,7 +333,7 @@ impl StackService {
                 database: service.database.clone(),
                 uri_masked: mask_uri(&uri),
                 uri,
-                running: running.iter().any(|name| name == &service.name),
+                running: is_running,
             });
         }
         Ok(endpoints)

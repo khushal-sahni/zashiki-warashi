@@ -2,7 +2,6 @@ use std::collections::HashMap;
 use std::fs::{self, File, OpenOptions};
 use std::io::{Read, Seek, SeekFrom};
 use std::path::{Path, PathBuf};
-use std::process::{Command, Stdio};
 use std::sync::{Arc, Mutex};
 use std::thread;
 use std::time::{Duration, SystemTime, UNIX_EPOCH};
@@ -74,16 +73,14 @@ impl LogService {
         Ok(())
     }
 
-    pub fn compose_logs(
+    pub fn compose_logs_from_output(
         &self,
         project_id: &str,
-        project_path: &str,
-        command: &str,
+        output: &str,
         max_lines: Option<u32>,
     ) -> Result<LogChunk, AppError> {
         let limit = max_lines.unwrap_or(DEFAULT_TAIL_LINES as u32).max(1);
-        let output = run_login_shell_capture(project_path, command)?;
-        let (lines, truncated) = last_n_lines(&output, limit as usize);
+        let (lines, truncated) = last_n_lines(output, limit as usize);
         Ok(LogChunk {
             project_id: project_id.to_string(),
             source: LogSource::Compose,
@@ -264,30 +261,6 @@ fn read_new_lines(path: &Path, offset: u64) -> Result<(Vec<String>, u64), AppErr
     let text = String::from_utf8_lossy(used);
     let lines = text.lines().map(str::to_string).collect();
     Ok((lines, offset + used.len() as u64))
-}
-
-fn run_login_shell_capture(cwd: &str, command: &str) -> Result<String, AppError> {
-    let shell = std::env::var("SHELL").unwrap_or_else(|_| "/bin/zsh".to_string());
-    let output = Command::new(&shell)
-        .args(["-lc", command])
-        .current_dir(cwd)
-        .stdin(Stdio::null())
-        .output()
-        .map_err(|err| AppError::Io(format!("failed to run `{command}`: {err}")))?;
-    let mut text = String::from_utf8_lossy(&output.stdout).into_owned();
-    if !output.stderr.is_empty() {
-        if !text.is_empty() && !text.ends_with('\n') {
-            text.push('\n');
-        }
-        text.push_str(&String::from_utf8_lossy(&output.stderr));
-    }
-    if output.status.success() || !text.trim().is_empty() {
-        return Ok(text);
-    }
-    Err(AppError::message(format!(
-        "docker compose logs failed ({})",
-        output.status
-    )))
 }
 
 fn validate_project_id(project_id: &str) -> Result<(), AppError> {

@@ -17,11 +17,11 @@ export {
   clearProjectLogs,
   getProjectLogs,
   listenProjectLogs,
-  projectHasCompose,
 } from "./logs";
 export {
   getProjectStack,
   openCompass,
+  peekProjectStack,
   resolvePortConflict,
   startProjectStack,
   stopProjectStack,

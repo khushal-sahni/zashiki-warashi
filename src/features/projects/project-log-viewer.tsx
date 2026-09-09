@@ -6,16 +6,17 @@ import {
   formatInvokeError,
   getProjectLogs,
   listenProjectLogs,
-  projectHasCompose,
 } from "../../lib";
 import type { LogSource } from "../../types";
 
 const MAX_LINES = 8_000;
+const ANSI_PAINT_LINES = 400;
 const COMPOSE_POLL_MS = 1_000;
 
 interface ProjectLogViewerProps {
   readonly projectId: string;
   readonly running: boolean;
+  readonly hasCompose?: boolean;
   readonly collapsed?: boolean;
   readonly onExpand?: () => void;
 }
@@ -23,11 +24,11 @@ interface ProjectLogViewerProps {
 export function ProjectLogViewer({
   projectId,
   running,
+  hasCompose = false,
   collapsed = false,
   onExpand,
 }: ProjectLogViewerProps) {
   const [source, setSource] = useState<LogSource>("process");
-  const [hasCompose, setHasCompose] = useState(false);
   const [lines, setLines] = useState<string[]>([]);
   const [truncated, setTruncated] = useState(false);
   const [filter, setFilter] = useState("");
@@ -41,26 +42,15 @@ export function ProjectLogViewer({
     setFilter("");
     setFollow(true);
     setError(null);
+    setLines([]);
+    setTruncated(false);
   }, [projectId]);
 
   useEffect(() => {
-    let cancelled = false;
-    void projectHasCompose(projectId)
-      .then((value) => {
-        if (!cancelled) {
-          setHasCompose(value);
-        }
-      })
-      .catch((err: unknown) => {
-        if (!cancelled) {
-          setHasCompose(false);
-          setError(formatInvokeError(err));
-        }
-      });
-    return () => {
-      cancelled = true;
-    };
-  }, [projectId]);
+    if (!hasCompose && source === "compose") {
+      setSource("process");
+    }
+  }, [hasCompose, source]);
 
   const appendLines = useCallback((incoming: readonly string[]) => {
     setLines((current) => {
@@ -101,7 +91,13 @@ export function ProjectLogViewer({
     }
   }, [filtered, follow]);
 
-  const html = useMemo(() => renderAnsiHtml(filtered), [filtered]);
+  const html = useMemo(() => {
+    const paint =
+      filtered.length > ANSI_PAINT_LINES
+        ? filtered.slice(filtered.length - ANSI_PAINT_LINES)
+        : filtered;
+    return renderAnsiHtml(paint);
+  }, [filtered]);
 
   if (collapsed) {
     return (

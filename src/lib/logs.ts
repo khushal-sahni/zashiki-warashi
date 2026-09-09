@@ -15,10 +15,6 @@ export async function clearProjectLogs(projectId: string): Promise<void> {
   return invoke<void>("clear_project_logs", { projectId });
 }
 
-export async function projectHasCompose(projectId: string): Promise<boolean> {
-  return invoke<boolean>("project_has_compose", { projectId });
-}
-
 export function listenProjectLogs(
   projectId: string,
   onLines: (lines: readonly string[]) => void,

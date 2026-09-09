@@ -1,6 +1,6 @@
 # STATUS.md
 > Your weekend dashboard. Read this first. Update this last.
-> Last updated: `2026-09-03` | Session: `#7`
+> Last updated: `2026-09-09` | Session: `#8`
 
 ---
 
@@ -22,6 +22,7 @@
 - [x] **Compose DB stack** — discover nested compose, Up/Stop DB services, peek/copy URI, Compass for mongo
 - [x] **Port reconciliation** — detect occupant (catalog / docker / native), stop or remap; remaps in app-data + spawn env
 - [x] **Resizable pane layout** — Cursor-style sidebar / inspector / logs splits; collapse + drag resize; layout in localStorage
+- [x] **Snappy project switch** — select paints from memory; compose peek without Docker; running dots refresh in background; cached `docker` binary
 
 ---
 
@@ -34,14 +35,14 @@
 ## Known Broken / Blocked
 
 - Coffee lid-close mode requires administrator approval per enable/disable.
-- Compose/stack needs Docker CLI on the login-shell PATH.
+- Compose/stack needs Docker CLI on the login-shell PATH (resolved once at startup).
 - Occupant matching relies on compose `working_dir` labels; unnamed containers may show as `dockerOther`.
 
 ---
 
 ## Where We Left Off
 
-Shipped **resizable pane layout**: sidebar, inspector, and logs are drag-resizable and collapsible (⌘B / ⌘J); settings and scan are overlays; layout persists in localStorage. Next: M3 polish.
+Shipped **snappy project switching**: sidebar select no longer waits on `$SHELL -lc docker compose ps`. Peek is file-only; running flags arrive async; stale stack/logs clear on remount. Next: M3 polish.
 
 ---
 
@@ -51,17 +52,17 @@ Shipped **resizable pane layout**: sidebar, inspector, and logs are drag-resizab
 src/
 ├── components/              ✅ ShellHeader, KeepAwakeToggle, panes/
 ├── features/projects/       ✅ list, detail, scan, settings, log viewer
-├── features/docker/         ✅ StackPanel, PortConflictDialog
-├── lib/                     ✅ api, logs, docker wrappers
+├── features/docker/         ✅ StackPanel (peek + background refresh), PortConflictDialog
+├── lib/                     ✅ api, logs, docker wrappers (peekProjectStack)
 └── types/                   ✅ Project, LogChunk, PortConflict, ProjectStack, …
 
 src-tauri/src/
-├── commands/                ✅ app + projects + logs + docker IPC
-├── services/                ✅ Catalog, Process, Log, Compose, Occupancy, Stack, …
+├── commands/                ✅ app + projects + logs + docker IPC (async spawn_blocking for Docker/process)
+├── services/                ✅ Catalog, Process, Log, Compose, docker_bin, Occupancy, Stack (peek vs full)
 ├── repositories/            ✅ Database v3 + port_overrides
 ├── domain/                  ✅ Project, Log, Stack types
 ├── error.rs                 ✅ AppError (+ port_conflict)
-└── lib.rs                   ✅ setup, rehydrate, manage stack
+└── lib.rs                   ✅ setup, rehydrate, warm docker bin, manage stack
 ```
 
 ---
@@ -72,6 +73,7 @@ src-tauri/src/
 # No app .env required.
 # Runtime: login shell PATH for npm/docker/etc.
 # Docker Desktop / OrbStack required for stack Up and port reconcile via docker ps.
+# docker binary is resolved once at startup via login shell, then invoked directly.
 ```
 
 ---
@@ -97,6 +99,7 @@ cd src-tauri && cargo test && cargo check
 - Compose occupancy uses `docker ps` + `lsof` (not bollard) for login-shell PATH reliability
 - Compose `--wait` depends on Compose v2 healthcheck support
 - Native occupant stop requires an explicit confirm; still sharp-edged
+- ANSI log paint caps at last 400 lines for first paint; full virtualizer not yet needed
 
 ---
 
@@ -110,7 +113,7 @@ cd src-tauri && cargo test && cargo check
 
 | Metric | Value |
 |---|---|
-| Total sessions | 7 |
-| Modules complete | M0 + M1 + M2 (+ Coffee + logs + pane layout) |
-| Test coverage | 34 Rust unit tests |
+| Total sessions | 8 |
+| Modules complete | M0 + M1 + M2 (+ Coffee + logs + pane layout + snappy switch) |
+| Test coverage | 36 Rust unit tests |
 | Last deployed | Local `~/Applications` via `tauri:install` |

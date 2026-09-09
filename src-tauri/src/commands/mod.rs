@@ -5,9 +5,10 @@ pub mod projects;
 
 pub use app::{get_app_status, get_keep_awake_status, set_keep_awake_enabled};
 pub use docker::{
-    get_project_stack, resolve_port_conflict, start_project_stack, stop_project_stack,
+    get_project_stack, peek_project_stack, resolve_port_conflict, start_project_stack,
+    stop_project_stack,
 };
-pub use logs::{clear_project_logs, get_project_logs, project_has_compose};
+pub use logs::{clear_project_logs, get_project_logs};
 pub use projects::{
     add_project, get_settings, list_projects, remove_project, restart_project, scan_projects,
     set_scan_roots, start_project, stop_project, update_project_commands,

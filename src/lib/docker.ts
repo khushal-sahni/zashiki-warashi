@@ -3,6 +3,10 @@ import { invoke } from "@tauri-apps/api/core";
 
 import type { PortConflict, ProjectStack, ReconcileAction } from "../types";
 
+export async function peekProjectStack(projectId: string): Promise<ProjectStack> {
+  return invoke<ProjectStack>("peek_project_stack", { projectId });
+}
+
 export async function getProjectStack(projectId: string): Promise<ProjectStack> {
   return invoke<ProjectStack>("get_project_stack", { projectId });
 }

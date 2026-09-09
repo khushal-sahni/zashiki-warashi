@@ -11,14 +11,14 @@ use tracing::info;
 
 use commands::{
     add_project, clear_project_logs, get_app_status, get_keep_awake_status, get_project_logs,
-    get_project_stack, get_settings, list_projects, project_has_compose, remove_project,
+    get_project_stack, get_settings, list_projects, peek_project_stack, remove_project,
     resolve_port_conflict, restart_project, scan_projects, set_keep_awake_enabled, set_scan_roots,
     start_project, start_project_stack, stop_project, stop_project_stack, update_project_commands,
 };
 use repositories::{Database, ProjectRepository};
 use services::{
-    AppService, CatalogService, ComposeService, KeepAwakeService, LogService, PortOccupancyService,
-    ProcessService, StackService,
+    docker_bin, AppService, CatalogService, ComposeService, KeepAwakeService, LogService,
+    PortOccupancyService, ProcessService, StackService,
 };
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
@@ -47,6 +47,7 @@ pub fn run() {
             log_service.start_tailer(app.handle().clone());
             let occupancy_service = Arc::new(PortOccupancyService::new(project_repository.clone()));
             let compose_service = Arc::new(ComposeService::new(app_data_dir.join("compose-overrides")));
+            docker_bin::warm_docker_bin();
             let stack_service = Arc::new(StackService::new(
                 catalog_service.clone(),
                 project_repository.clone(),
@@ -90,7 +91,7 @@ pub fn run() {
             restart_project,
             get_project_logs,
             clear_project_logs,
-            project_has_compose,
+            peek_project_stack,
             get_project_stack,
             start_project_stack,
             stop_project_stack,

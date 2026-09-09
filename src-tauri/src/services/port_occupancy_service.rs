@@ -174,10 +174,12 @@ fn parse_lsof_output(raw: &str) -> Vec<ListenerInfo> {
 }
 
 fn docker_ps_publishes() -> Result<Vec<DockerPublish>, AppError> {
-    let shell = std::env::var("SHELL").unwrap_or_else(|_| "/bin/zsh".to_string());
-    let script = "docker ps --format '{{.Names}}\\t{{.Label \"com.docker.compose.service\"}}\\t{{.Label \"com.docker.compose.project.working_dir\"}}\\t{{.Ports}}'";
-    let output = Command::new(&shell)
-        .args(["-lc", script])
+    let Ok(mut command) = crate::services::docker_bin::docker_command() else {
+        return Ok(Vec::new());
+    };
+    let format = "{{.Names}}\t{{.Label \"com.docker.compose.service\"}}\t{{.Label \"com.docker.compose.project.working_dir\"}}\t{{.Ports}}";
+    let output = command
+        .args(["ps", "--format", format])
         .output()
         .map_err(|err| AppError::Io(format!("docker ps failed: {err}")))?;
     if !output.status.success() {

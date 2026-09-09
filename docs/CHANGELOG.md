@@ -29,6 +29,32 @@
 
 ## Sessions
 
+## Session #8 — 2026-09-09
+
+### Built
+- **Snappy project switch** — select paints from in-memory catalog; no Docker on the hot path
+- `peek_project_stack` (YAML / `.env` / port overrides only) + background `get_project_stack` for running dots
+- `docker_bin` — resolve `docker` once via login shell at startup; compose/`ps`/logs use the cached binary
+- `.cursor/rules/snappy.mdc` + AGENTS.md snappy section
+
+### Changed
+- Stack / process / compose log Tauri commands are `async` + `spawn_blocking` so Docker cannot block the IPC thread
+- `StackPanel` peeks first, caches per project, refreshes running flags async; remounts with `key={projectId}`
+- Log viewer clears lines on switch; Compose tab presence comes from peek (`composeFile`); ANSI HTML capped to last 400 lines
+- Compose CLI no longer wraps every call in `$SHELL -lc`
+
+### Fixed
+- ~0.3–1s lag / stale stack+logs when clicking between projects
+
+### Deferred / Not Done
+- bollard for Engine API running-state (still CLI `docker compose ps`)
+- Full log virtualizer (cap was enough for first paint)
+
+### New Tech Debt
+- In-memory stack cache is process-local only (clears on app restart)
+
+---
+
 ## Session #7 — 2026-09-03
 
 ### Built

@@ -1,0 +1,17 @@
+---
+description: Selection and UI must feel instant — no Docker on the select hot path
+alwaysApply: true
+---
+
+# Snappy UI
+
+Zashiki Warashi must feel instant. Fast selection and responsive chrome are standing requirements — not optional polish.
+
+## Rules
+
+1. **Selection paints from memory in the same frame.** Sidebar highlight, inspector chrome (name / path / status / actions), and log pane chrome must not wait on IPC.
+2. **No Docker, no login shell, no `docker compose ps` on the select hot path.** Running dots / live occupancy may arrive a moment later.
+3. **Clear stale pane state on id change** (or remount with `key={projectId}`). Never show project A's stack/logs under project B's header.
+4. **I/O is background + cacheable.** Invalidate on start / stop / up / down, not on every click.
+5. **Sync Tauri commands must be cheap.** Anything that spawns a process or talks to Docker is `async` + `spawn_blocking`.
+6. **Login shell (`$SHELL -lc`) is for user project commands only** (start / stop with fnm / nvm PATH). Docker status / compose `ps` uses a cached binary path resolved once at startup.

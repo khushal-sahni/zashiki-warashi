@@ -146,3 +146,10 @@ Use this format for each decision:
 - **Context**: Fixed CSS grid and `max-height: 48%` on the inspector crushed project info while logs greedily consumed space; no collapse or drag resize.
 - **Decision**: Adopt `react-resizable-panels` with shared wrappers in `src/components/panes/`. Horizontal workspace (sidebar | main) and vertical detail (inspector | logs). Collapsible sidebar and logs; compact titlebar; settings/scan as overlays. Layout persisted in `localStorage` via `useDefaultLayout`, not SQLite.
 - **Consequences**: IDE-like UX with sensible defaults (sidebar ~24%, inspector ~42%, logs ~58%). Future UI regions must join `PanelGroup`s per AGENTS.md / `.cursor/rules/ui-panes.mdc`. Adds one frontend dependency; no backend changes.
+
+### Login shell only for user commands; cached docker for status
+- **Date**: 2026-09-09
+- **Status**: Accepted
+- **Context**: Project switch felt ~0.3–1s slow because every select ran `$SHELL -lc 'docker compose ps'`, paying zsh startup + Compose on the hot path. Login shell remains necessary for `fnm`/`nvm` when starting user projects.
+- **Decision**: Resolve `docker` once at app start via login shell (`command -v docker`) and cache the path. Compose `ps` / up / stop / logs and `docker ps` occupancy use that binary directly. User project start/stop still uses `$SHELL -lc`. Select path uses `peek_project_stack` (files only); running flags refresh in the background. Process-spawning Tauri commands are `async` + `spawn_blocking`.
+- **Consequences**: Instant selection chrome; running dots may lag a beat. Docker must still be on the login-shell PATH at startup. Snappy rules live in AGENTS.md and `.cursor/rules/snappy.mdc`.

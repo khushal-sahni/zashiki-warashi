@@ -1,9 +1,10 @@
 use std::fs;
 use std::path::{Path, PathBuf};
-use std::process::{Command, Stdio};
+use std::process::Stdio;
 
 use crate::domain::ComposeDbService;
 use crate::error::AppError;
+use crate::services::docker_bin::docker_command;
 
 pub struct ComposeService {
     overrides_root: PathBuf,
@@ -54,13 +55,19 @@ impl ComposeService {
         let names = service_names(services);
         // Force recreate so a previously-created container still bound to the old
         // host port (from a failed start) picks up the remapped publish.
-        let flags = if overlay.is_some() {
-            "up -d --wait --force-recreate"
+        let mut rest = if overlay.is_some() {
+            vec![
+                "up".into(),
+                "-d".into(),
+                "--wait".into(),
+                "--force-recreate".into(),
+            ]
         } else {
-            "up -d --wait"
+            vec!["up".into(), "-d".into(), "--wait".into()]
         };
-        let command = compose_command(compose_rel, overlay, &format!("{flags} {names}"));
-        run_compose(project_path, &command)
+        rest.extend(names);
+        run_compose(project_path, compose_rel, overlay, &rest)?;
+        Ok(())
     }
 
     pub fn stop_databases(
@@ -73,9 +80,10 @@ impl ComposeService {
         if services.is_empty() {
             return Ok(());
         }
-        let names = service_names(services);
-        let command = compose_command(compose_rel, overlay, &format!("stop {names}"));
-        run_compose(project_path, &command)
+        let mut rest = vec!["stop".into()];
+        rest.extend(service_names(services));
+        run_compose(project_path, compose_rel, overlay, &rest)?;
+        Ok(())
     }
 
     pub fn stop_named_service(
@@ -85,8 +93,13 @@ impl ComposeService {
         overlay: Option<&Path>,
         service: &str,
     ) -> Result<(), AppError> {
-        let command = compose_command(compose_rel, overlay, &format!("stop {service}"));
-        run_compose(project_path, &command)
+        run_compose(
+            project_path,
+            compose_rel,
+            overlay,
+            &["stop".into(), service.into()],
+        )?;
+        Ok(())
     }
 
     pub fn running_services(
@@ -95,51 +108,72 @@ impl ComposeService {
         compose_rel: &str,
         overlay: Option<&Path>,
     ) -> Result<Vec<String>, AppError> {
-        let command = compose_command(compose_rel, overlay, "ps --status running --format json");
-        let output = run_compose_capture(project_path, &command)?;
+        let output = run_compose(
+            project_path,
+            compose_rel,
+            overlay,
+            &[
+                "ps".into(),
+                "--status".into(),
+                "running".into(),
+                "--format".into(),
+                "json".into(),
+            ],
+        )?;
         Ok(parse_running_service_names(&output))
     }
 
-    pub fn logs_command(compose_rel: &str, overlay: Option<&Path>, tail: u32) -> String {
-        compose_command(compose_rel, overlay, &format!("logs --no-color --tail {tail}"))
+    pub fn logs(
+        &self,
+        project_path: &str,
+        compose_rel: &str,
+        overlay: Option<&Path>,
+        tail: u32,
+    ) -> Result<String, AppError> {
+        run_compose(
+            project_path,
+            compose_rel,
+            overlay,
+            &[
+                "logs".into(),
+                "--no-color".into(),
+                format!("--tail={tail}"),
+            ],
+        )
     }
 }
 
-fn service_names(services: &[ComposeDbService]) -> String {
+fn service_names(services: &[ComposeDbService]) -> Vec<String> {
     services
         .iter()
-        .map(|service| service.name.as_str())
-        .collect::<Vec<_>>()
-        .join(" ")
+        .map(|service| service.name.clone())
+        .collect()
 }
 
-fn compose_command(compose_rel: &str, overlay: Option<&Path>, rest: &str) -> String {
-    let mut command = format!("docker compose -f {}", shell_quote(compose_rel));
+fn compose_args(compose_rel: &str, overlay: Option<&Path>, rest: &[String]) -> Vec<String> {
+    let mut args = vec!["compose".into(), "-f".into(), compose_rel.to_string()];
     if let Some(path) = overlay {
-        command.push_str(" -f ");
-        command.push_str(&shell_quote(&path.to_string_lossy()));
+        args.push("-f".into());
+        args.push(path.to_string_lossy().into_owned());
     }
-    command.push(' ');
-    command.push_str(rest);
-    command
+    args.extend(rest.iter().cloned());
+    args
 }
 
-fn run_compose(cwd: &str, command: &str) -> Result<(), AppError> {
-    let output = run_compose_capture(cwd, command)?;
-    if output.trim().is_empty() {
-        return Ok(());
-    }
-    Ok(())
-}
-
-fn run_compose_capture(cwd: &str, command: &str) -> Result<String, AppError> {
-    let shell = std::env::var("SHELL").unwrap_or_else(|_| "/bin/zsh".to_string());
-    let output = Command::new(&shell)
-        .args(["-lc", command])
+fn run_compose(
+    cwd: &str,
+    compose_rel: &str,
+    overlay: Option<&Path>,
+    rest: &[String],
+) -> Result<String, AppError> {
+    let args = compose_args(compose_rel, overlay, rest);
+    let mut command = docker_command()?;
+    let output = command
+        .args(&args)
         .current_dir(cwd)
         .stdin(Stdio::null())
         .output()
-        .map_err(|err| AppError::Io(format!("failed to run `{command}`: {err}")))?;
+        .map_err(|err| AppError::Io(format!("failed to run docker {}: {err}", args.join(" "))))?;
     let stdout = String::from_utf8_lossy(&output.stdout).into_owned();
     let stderr = String::from_utf8_lossy(&output.stderr).into_owned();
     if output.status.success() {
@@ -172,15 +206,10 @@ fn parse_running_service_names(raw: &str) -> Vec<String> {
     names
 }
 
-fn shell_quote(value: &str) -> String {
-    format!("'{}'", value.replace('\'', "'\\''"))
-}
-
 pub fn stop_docker_container(name: &str) -> Result<(), AppError> {
-    let shell = std::env::var("SHELL").unwrap_or_else(|_| "/bin/zsh".to_string());
-    let command = format!("docker stop {}", shell_quote(name));
-    let status = Command::new(&shell)
-        .args(["-lc", &command])
+    let mut command = docker_command()?;
+    let status = command
+        .args(["stop", name])
         .stdin(Stdio::null())
         .status()
         .map_err(|err| AppError::Io(format!("docker stop failed: {err}")))?;
@@ -198,12 +227,27 @@ mod tests {
     use super::*;
 
     #[test]
-    fn compose_command_includes_overlay() {
+    fn compose_args_includes_overlay() {
         let overlay = PathBuf::from("/tmp/override.yml");
-        let command = compose_command("local/docker-compose.yml", Some(&overlay), "up -d --wait postgres");
-        assert!(command.contains("-f 'local/docker-compose.yml'"));
-        assert!(command.contains("-f '/tmp/override.yml'"));
-        assert!(command.contains("up -d --wait postgres"));
+        let args = compose_args(
+            "local/docker-compose.yml",
+            Some(&overlay),
+            &["up".into(), "-d".into(), "--wait".into(), "postgres".into()],
+        );
+        assert_eq!(
+            args,
+            vec![
+                "compose",
+                "-f",
+                "local/docker-compose.yml",
+                "-f",
+                "/tmp/override.yml",
+                "up",
+                "-d",
+                "--wait",
+                "postgres",
+            ]
+        );
     }
 
     #[test]

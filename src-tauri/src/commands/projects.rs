@@ -77,25 +77,34 @@ pub fn set_scan_roots(
 }
 
 #[tauri::command]
-pub fn start_project(
+pub async fn start_project(
     id: String,
     process: State<'_, Arc<ProcessService>>,
 ) -> Result<Project, AppError> {
-    process.start_project(&id)
+    let process = Arc::clone(&process);
+    tauri::async_runtime::spawn_blocking(move || process.start_project(&id))
+        .await
+        .map_err(|err| AppError::Io(format!("start project join failed: {err}")))?
 }
 
 #[tauri::command]
-pub fn stop_project(
+pub async fn stop_project(
     id: String,
     process: State<'_, Arc<ProcessService>>,
 ) -> Result<Project, AppError> {
-    process.stop_project(&id)
+    let process = Arc::clone(&process);
+    tauri::async_runtime::spawn_blocking(move || process.stop_project(&id))
+        .await
+        .map_err(|err| AppError::Io(format!("stop project join failed: {err}")))?
 }
 
 #[tauri::command]
-pub fn restart_project(
+pub async fn restart_project(
     id: String,
     process: State<'_, Arc<ProcessService>>,
 ) -> Result<Project, AppError> {
-    process.restart_project(&id)
+    let process = Arc::clone(&process);
+    tauri::async_runtime::spawn_blocking(move || process.restart_project(&id))
+        .await
+        .map_err(|err| AppError::Io(format!("restart project join failed: {err}")))?
 }

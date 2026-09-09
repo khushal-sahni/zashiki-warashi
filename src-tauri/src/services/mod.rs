@@ -2,6 +2,7 @@ pub mod app_service;
 pub mod catalog_service;
 pub mod compose_detect;
 pub mod compose_service;
+pub mod docker_bin;
 pub mod infer;
 pub mod keep_awake_service;
 pub mod log_service;
