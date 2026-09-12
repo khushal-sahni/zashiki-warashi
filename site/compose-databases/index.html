@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Peek Docker Compose databases locally — Zashiki Warashi</title>
+    <meta name="description" content="Peek Docker Compose DB services from a macOS project catalog: host, port, user, database, copy URI, open MongoDB Compass — without becoming a Docker GUI." />
+    <link rel="canonical" href="https://zashiki.anireco.app/compose-databases/" />
+    <link
+      rel="alternate"
+      type="text/markdown"
+      href="https://zashiki.anireco.app/compose-databases/index.md"
+      title="Markdown"
+    />
+    <meta property="og:type" content="article" />
+    <meta property="og:url" content="https://zashiki.anireco.app/compose-databases/" />
+    <meta property="og:title" content="Peek Docker Compose databases locally — Zashiki Warashi" />
+    <meta property="og:description" content="Peek Docker Compose DB services from a macOS project catalog: host, port, user, database, copy URI, open MongoDB Compass — without becoming a Docker GUI." />
+    <meta property="og:image" content="https://zashiki.anireco.app/assets/hero-comp.png" />
+    <meta property="og:site_name" content="Zashiki Warashi" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Peek Docker Compose databases locally — Zashiki Warashi" />
+    <meta name="twitter:description" content="Peek Docker Compose DB services from a macOS project catalog: host, port, user, database, copy URI, open MongoDB Compass — without becoming a Docker GUI." />
+    <meta name="twitter:image" content="https://zashiki.anireco.app/assets/hero-comp.png" />
+    <link rel="stylesheet" href="../fonts.css" />
+    <link rel="stylesheet" href="../styles.css" />
+    <link
+      rel="icon"
+      href="../favicon.svg"
+      type="image/svg+xml"
+    />
+    <script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position": 1,
+      "name": "Home",
+      "item": "https://zashiki.anireco.app/"
+    },
+    {
+      "@type": "ListItem",
+      "position": 2,
+      "name": "Compose and database peek",
+      "item": "https://zashiki.anireco.app/compose-databases/"
+    }
+  ]
+}
+    </script>
+    <script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "Does this replace Portainer or Docker Desktop?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "No. It peeks and drives compose for DB-like services as part of a project house. Full container management stays with your engine UI."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Are database passwords stored in SQLite?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "No. URIs are derived at runtime from compose/env. Passwords are not persisted; the UI masks secrets."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "How deep does compose discovery go?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Root plus nested compose within a shallow depth (including common nested layouts). Nested compose -f is supported for logs and stack actions."
+      }
+    }
+  ]
+}
+    </script>
+  </head>
+  <body class="page-interior">
+    <header class="site-chrome">
+      <a class="chrome-brand" href="../">Zashiki Warashi</a>
+      <nav class="chrome-actions" aria-label="Primary">
+        <a
+          class="ghost-inline chrome-github"
+          href="https://github.com/khushal-sahni/zashiki-warashi"
+          >GitHub</a
+        >
+        <a
+          class="download-inline"
+          href="https://github.com/khushal-sahni/zashiki-warashi/releases/latest"
+          >Download for macOS</a
+        >
+      </nav>
+    </header>
+
+    <main class="below interior-main">
+      <nav class="breadcrumb" aria-label="Breadcrumb">
+        <a href="../">Home</a>
+         <span aria-hidden="true">/</span> <span aria-current="page">Compose and database peek</span>
+      </nav>
+
+      <article class="room">
+        <header class="room-head">
+          <h1>Compose and database peek</h1>
+          <p class="lede">Zashiki Warashi finds Compose files in a project, lists DB-like services, and helps you copy a connection URI or open Compass — glue on top of Docker Desktop or OrbStack.</p>
+        </header>
+
+        <div class="prose"><p>Local apps often ship with a <code>docker-compose.yml</code> (or <code>compose.yaml</code>) that only exists to run Postgres, MySQL, Redis, or Mongo. You do not want a second career as a Docker Desktop power user just to copy a connection string.</p>
+<p><strong>Zashiki Warashi</strong> peeks that stack from the <strong>project</strong> you already cataloged.</p>
+<h2>What “peek” means</h2>
+<p>For a selected project, the app:</p>
+<ol>
+<li><strong>Discovers</strong> Compose files (project root and common nested locations)</li>
+<li><strong>Lists</strong> DB-like services and whether they look running (<code>docker compose ps</code> via a cached docker binary)</li>
+<li>Surfaces <strong>host / port / user / database</strong> derived from compose and env</li>
+<li>Lets you <strong>copy a URI</strong> or <strong>open MongoDB Compass</strong> when the service is mongo</li>
+<li>Offers <strong>Up / Stop</strong> for those DB-oriented services — not a full substitute for <code>docker compose</code> day-to-day ops</li>
+</ol>
+<p>This is <strong>observation + glue</strong>, not a Compose YAML editor, not volume browsers, not remote Docker fleets. For that class of tool, see <a href="/compare/portainer/">vs Portainer</a>.</p>
+<h2>Engine underneath</h2>
+<p>You still need <strong>Docker Desktop</strong> or <strong>OrbStack</strong> (or another engine that speaks <code>docker compose</code>). Zashiki does not ship a container runtime. Comparisons that stay honest:</p>
+<ul>
+<li><a href="/compare/docker-desktop/">vs Docker Desktop</a> — they are the engine; we are the project catalog</li>
+<li><a href="/compare/orbstack/">vs OrbStack</a> — we sit on top of OrbStack the same way</li>
+</ul>
+<h2>Secrets stay out of the catalog DB</h2>
+<p>Connection URIs may include passwords from env files. Product rule: <strong>derive at runtime, do not persist passwords in SQLite, mask in the UI</strong>. Peek again when files change.</p>
+<h2>How this fits the Monday workflow</h2>
+<ol>
+<li>Catalog the repo (<a href="/start-stop/">start/stop</a>)</li>
+<li>Start the app process if needed</li>
+<li>Up the DB services from the Stack pane</li>
+<li>Copy URI into your <code>.env</code> consumer — or open <a href="/mongodb-compass/">Compass</a> for mongo</li>
+<li>If host ports collide with another project, use <a href="/port-already-in-use/">port reconciliation</a></li>
+</ol>
+<h2>Nested compose</h2>
+<p>Real repos bury compose under <code>docker/</code> or <code>infra/</code>. Discovery walks a shallow depth and nested compose <code>-f</code> works for the log and stack paths the app supports. Exotic multi-file matrices may still need Terminal — the goal is the common path, not every Compose feature.</p>
+<h2>What we are not building (on purpose)</h2>
+<ul>
+<li>No Mongo / SQL query editor inside Zashiki</li>
+<li>No DB provisioning from scratch in v1</li>
+<li>No inventing a Docker GUI</li>
+</ul>
+<p>Download: <a href="https://github.com/khushal-sahni/zashiki-warashi/releases/latest">Releases</a>. MIT.</p>
+</div>
+
+        <section class="fold faq-fold" aria-labelledby="faq-heading">
+          <h2 id="faq-heading">FAQ</h2>
+          <details class="faq-item">
+            <summary>Does this replace Portainer or Docker Desktop?</summary>
+            <p>No. It peeks and drives compose for DB-like services as part of a project house. Full container management stays with your engine UI.</p>
+          </details>
+          <details class="faq-item">
+            <summary>Are database passwords stored in SQLite?</summary>
+            <p>No. URIs are derived at runtime from compose/env. Passwords are not persisted; the UI masks secrets.</p>
+          </details>
+          <details class="faq-item">
+            <summary>How deep does compose discovery go?</summary>
+            <p>Root plus nested compose within a shallow depth (including common nested layouts). Nested compose -f is supported for logs and stack actions.</p>
+          </details>
+        </section>
+
+        <section class="fold related-fold" aria-labelledby="related-heading">
+          <h2 id="related-heading">More rooms</h2>
+          <ul class="related-list">
+          <li><a href="../mongodb-compass/">MongoDB Compass</a></li>
+          <li><a href="../start-stop/">Start and stop projects</a></li>
+          <li><a href="../compare/portainer/">vs Portainer</a></li>
+          </ul>
+        </section>
+      </article>
+
+      <p class="closing">
+        <a
+          class="download-inline"
+          href="https://github.com/khushal-sahni/zashiki-warashi/releases/latest"
+          >Download for macOS</a
+        >
+        <a
+          class="ghost-inline"
+          href="https://github.com/khushal-sahni/zashiki-warashi"
+          >GitHub</a
+        >
+      </p>
+
+      <footer class="site-footer">
+        <span>座敷童子 — a house spirit that looks after the place.</span>
+        <span>
+          <a href="https://github.com/sponsors/khushal-sahni">Sponsors</a>
+          · MIT ·
+          <a href="https://zashiki.anireco.app/compose-databases/index.md">Markdown</a>
+        </span>
+      </footer>
+    </main>
+  </body>
+</html>

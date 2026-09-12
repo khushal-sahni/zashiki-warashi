@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Start and stop local projects on macOS — Zashiki Warashi</title>
+    <meta name="description" content="How Zashiki Warashi starts and stops local projects via your login shell, process groups, and PID rehydration — so fnm/nvm PATH works from a GUI app." />
+    <link rel="canonical" href="https://zashiki.anireco.app/start-stop/" />
+    <link
+      rel="alternate"
+      type="text/markdown"
+      href="https://zashiki.anireco.app/start-stop/index.md"
+      title="Markdown"
+    />
+    <meta property="og:type" content="article" />
+    <meta property="og:url" content="https://zashiki.anireco.app/start-stop/" />
+    <meta property="og:title" content="Start and stop local projects on macOS — Zashiki Warashi" />
+    <meta property="og:description" content="How Zashiki Warashi starts and stops local projects via your login shell, process groups, and PID rehydration — so fnm/nvm PATH works from a GUI app." />
+    <meta property="og:image" content="https://zashiki.anireco.app/assets/hero-comp.png" />
+    <meta property="og:site_name" content="Zashiki Warashi" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Start and stop local projects on macOS — Zashiki Warashi" />
+    <meta name="twitter:description" content="How Zashiki Warashi starts and stops local projects via your login shell, process groups, and PID rehydration — so fnm/nvm PATH works from a GUI app." />
+    <meta name="twitter:image" content="https://zashiki.anireco.app/assets/hero-comp.png" />
+    <link rel="stylesheet" href="../fonts.css" />
+    <link rel="stylesheet" href="../styles.css" />
+    <link
+      rel="icon"
+      href="../favicon.svg"
+      type="image/svg+xml"
+    />
+    <script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position": 1,
+      "name": "Home",
+      "item": "https://zashiki.anireco.app/"
+    },
+    {
+      "@type": "ListItem",
+      "position": 2,
+      "name": "One-button start and stop",
+      "item": "https://zashiki.anireco.app/start-stop/"
+    }
+  ]
+}
+    </script>
+    <script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "Why use a login shell instead of spawning node directly?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "So fnm, nvm, Homebrew, and docker on your interactive PATH work the same as in Terminal. GUI apps otherwise see a thinner environment."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Do projects die when I quit Zashiki?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "No. Processes outlive the app. On launch, status rehydrates from stored PIDs when they are still alive and match."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Can I override the inferred start command?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Yes. Overrides live in app SQLite data, not in the project repo."
+      }
+    }
+  ]
+}
+    </script>
+  </head>
+  <body class="page-interior">
+    <header class="site-chrome">
+      <a class="chrome-brand" href="../">Zashiki Warashi</a>
+      <nav class="chrome-actions" aria-label="Primary">
+        <a
+          class="ghost-inline chrome-github"
+          href="https://github.com/khushal-sahni/zashiki-warashi"
+          >GitHub</a
+        >
+        <a
+          class="download-inline"
+          href="https://github.com/khushal-sahni/zashiki-warashi/releases/latest"
+          >Download for macOS</a
+        >
+      </nav>
+    </header>
+
+    <main class="below interior-main">
+      <nav class="breadcrumb" aria-label="Breadcrumb">
+        <a href="../">Home</a>
+         <span aria-hidden="true">/</span> <span aria-current="page">One-button start and stop</span>
+      </nav>
+
+      <article class="room">
+        <header class="room-head">
+          <h1>One-button start and stop</h1>
+          <p class="lede">GUI apps on macOS often miss your interactive PATH. Zashiki starts project commands through your login shell, in a new process group, and remembers enough to stop them later.</p>
+        </header>
+
+        <div class="prose"><p>Starting a local app from a desktop GUI sounds trivial until PATH, child processes, and leftover PIDs enter the chat. <strong>Zashiki Warashi</strong> treats start/stop as a first-class lifecycle — not a fire-and-forget Terminal paste.</p>
+<h2>Inference, then override</h2>
+<p>When you add a project, the app looks for common start signals:</p>
+<ul>
+<li><code>package.json</code> scripts (<code>dev</code>, <code>start</code>, and cousins)</li>
+<li>Docker Compose layouts</li>
+<li>Makefile targets</li>
+<li>Cargo / Go project cues</li>
+</ul>
+<p>If inference is wrong, you set an override in the app. That override is stored in <strong>app data</strong>, not written into the repo. AI-generated folders stay untaxed; see <a href="/for-ai-projects/">For AI-generated projects</a>.</p>
+<h2>Login shell spawn</h2>
+<p>macOS GUI processes often lack the environment you built in zsh or fish: <code>fnm</code>, <code>nvm</code>, Volta, Homebrew’s <code>docker</code>. Zashiki runs project start/stop commands via:</p>
+<pre><code class="language-text">$SHELL -lc &#39;&lt;your start command&gt;&#39;
+</code></pre>
+<p>That matches Terminal behavior for the common case. Edge cases exist if <code>$SHELL</code> is unusual — but the default path is the one developers already trust.</p>
+<p>Docker status and <code>compose ps</code> use a <strong>cached docker binary path</strong> resolved once at startup, not a login shell on every click. Snappy selection matters: chrome paints from memory; running dots may lag a beat.</p>
+<h2>Process groups and stop</h2>
+<p>Many <code>npm run dev</code> trees spawn children. Signaling only the parent leaves orphans holding ports.</p>
+<p>Zashiki:</p>
+<ol>
+<li>Starts the command in a <strong>new process group</strong></li>
+<li>Persists pid (and related identity) in app data</li>
+<li>On <strong>Stop</strong>, sends SIGTERM to the group, then SIGKILL if needed</li>
+</ol>
+<p>That is how you free the port without playing <code>lsof</code> roulette every time — though when something else already owns the port, see <a href="/port-already-in-use/">Port already in use</a>.</p>
+<h2>Rehydrate on launch</h2>
+<p>Closing the control plane must not kill your stack. Processes <strong>outlive the app</strong>. Next launch, Zashiki rehydrates running status from stored PIDs when they are still alive and match expectations, and can refresh Docker occupancy in the background.</p>
+<h2>Logs</h2>
+<p>Live process logs (and Compose log views) sit in a resizable pane so start/stop is not a black box. You still have Terminal; you should not <em>need</em> it for the happy path.</p>
+<h2>What you need</h2>
+<ul>
+<li>macOS</li>
+<li>Whatever runtime your projects need on the login-shell PATH</li>
+<li>Docker Desktop or OrbStack if Compose is part of the project</li>
+</ul>
+<p>Install notes (unsigned builds, Gatekeeper): <a href="/download/">Download</a>.</p>
+<p>Source and releases: <a href="https://github.com/khushal-sahni/zashiki-warashi">GitHub</a>.</p>
+</div>
+
+        <section class="fold faq-fold" aria-labelledby="faq-heading">
+          <h2 id="faq-heading">FAQ</h2>
+          <details class="faq-item">
+            <summary>Why use a login shell instead of spawning node directly?</summary>
+            <p>So fnm, nvm, Homebrew, and docker on your interactive PATH work the same as in Terminal. GUI apps otherwise see a thinner environment.</p>
+          </details>
+          <details class="faq-item">
+            <summary>Do projects die when I quit Zashiki?</summary>
+            <p>No. Processes outlive the app. On launch, status rehydrates from stored PIDs when they are still alive and match.</p>
+          </details>
+          <details class="faq-item">
+            <summary>Can I override the inferred start command?</summary>
+            <p>Yes. Overrides live in app SQLite data, not in the project repo.</p>
+          </details>
+        </section>
+
+        <section class="fold related-fold" aria-labelledby="related-heading">
+          <h2 id="related-heading">More rooms</h2>
+          <ul class="related-list">
+          <li><a href="../for-ai-projects/">For AI-generated projects</a></li>
+          <li><a href="../port-already-in-use/">Port already in use</a></li>
+          <li><a href="../download/">Download for macOS</a></li>
+          </ul>
+        </section>
+      </article>
+
+      <p class="closing">
+        <a
+          class="download-inline"
+          href="https://github.com/khushal-sahni/zashiki-warashi/releases/latest"
+          >Download for macOS</a
+        >
+        <a
+          class="ghost-inline"
+          href="https://github.com/khushal-sahni/zashiki-warashi"
+          >GitHub</a
+        >
+      </p>
+
+      <footer class="site-footer">
+        <span>座敷童子 — a house spirit that looks after the place.</span>
+        <span>
+          <a href="https://github.com/sponsors/khushal-sahni">Sponsors</a>
+          · MIT ·
+          <a href="https://zashiki.anireco.app/start-stop/index.md">Markdown</a>
+        </span>
+      </footer>
+    </main>
+  </body>
+</html>

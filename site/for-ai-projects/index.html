@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Local control plane for AI-generated projects — Zashiki Warashi</title>
+    <meta name="description" content="macOS app that catalogs Cursor/vibe-coded repos, starts and stops them via your login shell, and peeks Compose DBs — without taxing every folder with YAML." />
+    <link rel="canonical" href="https://zashiki.anireco.app/for-ai-projects/" />
+    <link
+      rel="alternate"
+      type="text/markdown"
+      href="https://zashiki.anireco.app/for-ai-projects/index.md"
+      title="Markdown"
+    />
+    <meta property="og:type" content="article" />
+    <meta property="og:url" content="https://zashiki.anireco.app/for-ai-projects/" />
+    <meta property="og:title" content="Local control plane for AI-generated projects — Zashiki Warashi" />
+    <meta property="og:description" content="macOS app that catalogs Cursor/vibe-coded repos, starts and stops them via your login shell, and peeks Compose DBs — without taxing every folder with YAML." />
+    <meta property="og:image" content="https://zashiki.anireco.app/assets/hero-comp.png" />
+    <meta property="og:site_name" content="Zashiki Warashi" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Local control plane for AI-generated projects — Zashiki Warashi" />
+    <meta name="twitter:description" content="macOS app that catalogs Cursor/vibe-coded repos, starts and stops them via your login shell, and peeks Compose DBs — without taxing every folder with YAML." />
+    <meta name="twitter:image" content="https://zashiki.anireco.app/assets/hero-comp.png" />
+    <link rel="stylesheet" href="../fonts.css" />
+    <link rel="stylesheet" href="../styles.css" />
+    <link
+      rel="icon"
+      href="../favicon.svg"
+      type="image/svg+xml"
+    />
+    <script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position": 1,
+      "name": "Home",
+      "item": "https://zashiki.anireco.app/"
+    },
+    {
+      "@type": "ListItem",
+      "position": 2,
+      "name": "For the AI-generated project pile",
+      "item": "https://zashiki.anireco.app/for-ai-projects/"
+    }
+  ]
+}
+    </script>
+    <script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "Does Zashiki Warashi require a config file in each AI project?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "No. It observes existing repos and keeps overrides in app data. There is no required per-repo YAML."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Is this an AI coding agent?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "No. It does not write code or run agents. It catalogs, starts, stops, and peeks the projects those agents leave behind."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Will it work with Cursor-generated Node apps?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Yes when the project has a normal start signal (package.json scripts, compose, Makefile, Cargo, Go). You can override the start command in the app."
+      }
+    }
+  ]
+}
+    </script>
+  </head>
+  <body class="page-interior">
+    <header class="site-chrome">
+      <a class="chrome-brand" href="../">Zashiki Warashi</a>
+      <nav class="chrome-actions" aria-label="Primary">
+        <a
+          class="ghost-inline chrome-github"
+          href="https://github.com/khushal-sahni/zashiki-warashi"
+          >GitHub</a
+        >
+        <a
+          class="download-inline"
+          href="https://github.com/khushal-sahni/zashiki-warashi/releases/latest"
+          >Download for macOS</a
+        >
+      </nav>
+    </header>
+
+    <main class="below interior-main">
+      <nav class="breadcrumb" aria-label="Breadcrumb">
+        <a href="../">Home</a>
+         <span aria-hidden="true">/</span> <span aria-current="page">For the AI-generated project pile</span>
+      </nav>
+
+      <article class="room">
+        <header class="room-head">
+          <h1>For the AI-generated project pile</h1>
+          <p class="lede">When AI coding leaves you with a drawer of half-finished repos, you need a house that remembers them — not another config file in every project.</p>
+        </header>
+
+        <div class="prose"><p>AI assistants and vibe-coding tools are excellent at spinning up new folders. They are less excellent at helping you find last Tuesday’s API, remember which port it claimed, or stop the Node process that is still holding <code>3000</code> after you closed the chat.</p>
+<p><strong>Zashiki Warashi</strong> is a macOS-first desktop control plane for that pile. It keeps a machine-local catalog of projects, starts and stops them through your login shell (so <code>fnm</code> / <code>nvm</code> PATH works), peeks Docker Compose database endpoints, and deep-links into tools you already use — Cursor, Finder, MongoDB Compass.</p>
+<p>It is glue, not another framework. It does not ask every generated repo to adopt a new YAML format.</p>
+<h2>The pain it is built for</h2>
+<p>A typical week with Cursor, Claude Code, or similar tools looks like this:</p>
+<ol>
+<li>Scaffold a Next app. It runs. You close the window.</li>
+<li>Scaffold a FastAPI sidecar. Different port. Still running somewhere.</li>
+<li>Clone a compose stack for Postgres and Mongo. You copy a URI once, then lose the note.</li>
+<li>Monday: “Which folder was the invoice prototype?” Finder search. Terminal archaeology. <code>lsof -i :3000</code>.</li>
+</ol>
+<p>Folder bookmarks and Raycast snippets help a little. A Docker GUI helps when the problem is containers. Neither is a <strong>project house</strong> that knows your AI-spawned repos as first-class citizens.</p>
+<h2>Observe, don’t tax</h2>
+<p>Zashiki Warashi’s product rule is deliberate: <strong>observe existing repos</strong>. Catalog lives in the app’s SQLite data — not in your git trees. Start-command inference looks at <code>package.json</code>, Compose files, Makefiles, Cargo, and Go layouts. Overrides stay in app data.</p>
+<p>That matters for AI-generated code because those folders are disposable, half-owned, or not yours to litter with tooling config. You should not have to teach every throwaway prototype a new schema before you can start it again.</p>
+<p>Optional export formats may appear later. They will stay opt-in. V1 does not write into managed project repos by default.</p>
+<h2>What you do in the app</h2>
+<ol>
+<li><strong>Add a folder</strong> or <strong>scan roots</strong> you already keep projects under.</li>
+<li><strong>Select</strong> a project — sidebar and inspector paint from memory in the same frame.</li>
+<li><strong>Start / Stop / Restart</strong> via your login shell in a process group (children die with the group).</li>
+<li><strong>Peek the Stack</strong> for Compose DB-like services — copy a URI, open Compass for mongo.</li>
+<li>When ports collide, <strong>reconcile</strong>: stop the occupant or remap — see <a href="/port-already-in-use/">Port already in use</a>.</li>
+</ol>
+<p>Logs for the process (and Compose) live in a pane. The app can quit while projects keep running; status rehydrates from PIDs on launch.</p>
+<h2>What it is not</h2>
+<ul>
+<li>Not an AI coding agent or chat UI.</li>
+<li>Not Docker Desktop, OrbStack, Portainer, or a full Compose editor — see <a href="/compare/docker-desktop/">vs Docker Desktop</a> and <a href="/compare/portainer/">vs Portainer</a>.</li>
+<li>Not a replacement for Cursor — it opens Cursor for you when you want the editor.</li>
+</ul>
+<p>If your problem is “I have twelve vibe-coded folders and I cannot remember which ones are running,” this house is for that. If your problem is “I need a better container runtime,” use OrbStack or Docker Desktop and put Zashiki on top.</p>
+<h2>Honest requirements</h2>
+<ul>
+<li><strong>macOS</strong> first.</li>
+<li><strong>Docker Desktop or OrbStack</strong> when you use Compose stacks.</li>
+<li>Releases are <strong>unsigned</strong> for now — first open may need right-click → Open, or <code>xattr -dr com.apple.quarantine</code>. Details on <a href="/download/">Download</a>.</li>
+</ul>
+<p>MIT open source. Download from <a href="https://github.com/khushal-sahni/zashiki-warashi/releases/latest">GitHub Releases</a>.</p>
+</div>
+
+        <section class="fold faq-fold" aria-labelledby="faq-heading">
+          <h2 id="faq-heading">FAQ</h2>
+          <details class="faq-item">
+            <summary>Does Zashiki Warashi require a config file in each AI project?</summary>
+            <p>No. It observes existing repos and keeps overrides in app data. There is no required per-repo YAML.</p>
+          </details>
+          <details class="faq-item">
+            <summary>Is this an AI coding agent?</summary>
+            <p>No. It does not write code or run agents. It catalogs, starts, stops, and peeks the projects those agents leave behind.</p>
+          </details>
+          <details class="faq-item">
+            <summary>Will it work with Cursor-generated Node apps?</summary>
+            <p>Yes when the project has a normal start signal (package.json scripts, compose, Makefile, Cargo, Go). You can override the start command in the app.</p>
+          </details>
+        </section>
+
+        <section class="fold related-fold" aria-labelledby="related-heading">
+          <h2 id="related-heading">More rooms</h2>
+          <ul class="related-list">
+          <li><a href="../start-stop/">Start and stop projects</a></li>
+          <li><a href="../localhost-control-plane/">Localhost control plane</a></li>
+          <li><a href="../port-already-in-use/">Port already in use</a></li>
+          </ul>
+        </section>
+      </article>
+
+      <p class="closing">
+        <a
+          class="download-inline"
+          href="https://github.com/khushal-sahni/zashiki-warashi/releases/latest"
+          >Download for macOS</a
+        >
+        <a
+          class="ghost-inline"
+          href="https://github.com/khushal-sahni/zashiki-warashi"
+          >GitHub</a
+        >
+      </p>
+
+      <footer class="site-footer">
+        <span>座敷童子 — a house spirit that looks after the place.</span>
+        <span>
+          <a href="https://github.com/sponsors/khushal-sahni">Sponsors</a>
+          · MIT ·
+          <a href="https://zashiki.anireco.app/for-ai-projects/index.md">Markdown</a>
+        </span>
+      </footer>
+    </main>
+  </body>
+</html>

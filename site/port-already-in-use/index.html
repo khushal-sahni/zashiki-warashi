@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Fix port already in use on macOS (EADDRINUSE) — Zashiki Warashi</title>
+    <meta name="description" content="EADDRINUSE and Docker ‘port is already allocated’ on macOS — how Zashiki Warashi detects catalog, Docker, or native occupants and lets you stop or remap." />
+    <link rel="canonical" href="https://zashiki.anireco.app/port-already-in-use/" />
+    <link
+      rel="alternate"
+      type="text/markdown"
+      href="https://zashiki.anireco.app/port-already-in-use/index.md"
+      title="Markdown"
+    />
+    <meta property="og:type" content="article" />
+    <meta property="og:url" content="https://zashiki.anireco.app/port-already-in-use/" />
+    <meta property="og:title" content="Fix port already in use on macOS (EADDRINUSE) — Zashiki Warashi" />
+    <meta property="og:description" content="EADDRINUSE and Docker ‘port is already allocated’ on macOS — how Zashiki Warashi detects catalog, Docker, or native occupants and lets you stop or remap." />
+    <meta property="og:image" content="https://zashiki.anireco.app/assets/hero-comp.png" />
+    <meta property="og:site_name" content="Zashiki Warashi" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Fix port already in use on macOS (EADDRINUSE) — Zashiki Warashi" />
+    <meta name="twitter:description" content="EADDRINUSE and Docker ‘port is already allocated’ on macOS — how Zashiki Warashi detects catalog, Docker, or native occupants and lets you stop or remap." />
+    <meta name="twitter:image" content="https://zashiki.anireco.app/assets/hero-comp.png" />
+    <link rel="stylesheet" href="../fonts.css" />
+    <link rel="stylesheet" href="../styles.css" />
+    <link
+      rel="icon"
+      href="../favicon.svg"
+      type="image/svg+xml"
+    />
+    <script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position": 1,
+      "name": "Home",
+      "item": "https://zashiki.anireco.app/"
+    },
+    {
+      "@type": "ListItem",
+      "position": 2,
+      "name": "Port already in use",
+      "item": "https://zashiki.anireco.app/port-already-in-use/"
+    }
+  ]
+}
+    </script>
+    <script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "Is this only for Node EADDRINUSE?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "The pain shows up as Node EADDRINUSE, Vite bind errors, or Docker ‘port is already allocated’. Reconciliation covers catalog, docker, and native occupants."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Does remapping edit my compose file?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Remaps live in app data and spawn env for the project — observation first; it does not casually rewrite your repo."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Will it kill system services?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Native stop requires an explicit confirm. Treat database and system listeners carefully; prefer remap when unsure."
+      }
+    }
+  ]
+}
+    </script>
+  </head>
+  <body class="page-interior">
+    <header class="site-chrome">
+      <a class="chrome-brand" href="../">Zashiki Warashi</a>
+      <nav class="chrome-actions" aria-label="Primary">
+        <a
+          class="ghost-inline chrome-github"
+          href="https://github.com/khushal-sahni/zashiki-warashi"
+          >GitHub</a
+        >
+        <a
+          class="download-inline"
+          href="https://github.com/khushal-sahni/zashiki-warashi/releases/latest"
+          >Download for macOS</a
+        >
+      </nav>
+    </header>
+
+    <main class="below interior-main">
+      <nav class="breadcrumb" aria-label="Breadcrumb">
+        <a href="../">Home</a>
+         <span aria-hidden="true">/</span> <span aria-current="page">Port already in use</span>
+      </nav>
+
+      <article class="room">
+        <header class="room-head">
+          <h1>Port already in use</h1>
+          <p class="lede">When port 3000 is taken, the fix depends on who owns it: another cataloged project, a Docker publish, or a native process. Zashiki reconciles those cases instead of only teaching you lsof.</p>
+        </header>
+
+        <div class="prose"><p><code>Error: listen EADDRINUSE: address already in use :::3000</code> is not one problem. It is three:</p>
+<ol>
+<li><strong>You</strong> left last night’s <code>npm run dev</code> running (maybe from another AI-generated folder).</li>
+<li><strong>Docker</strong> still publishes that host port from a compose stack.</li>
+<li>Something <strong>native</strong> (another tool, AirPlay on 5000, a rogue process) holds the socket.</li>
+</ol>
+<p>Blind <code>kill -9 $(lsof -ti :3000)</code> works until the owner is <code>docker-proxy</code> — then you stopped nothing useful — or until you kill the wrong database.</p>
+<h2>What Zashiki Warashi does</h2>
+<p>When a start or stack action hits a conflict, the app tries to <strong>name the occupant</strong>:</p>
+<table>
+<thead>
+<tr>
+<th>Occupant kind</th>
+<th>Typical meaning</th>
+<th>Reconciliation</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Catalog project</td>
+<td>Another (or same) project Zashiki knows</td>
+<td>Stop that project, or remap</td>
+</tr>
+<tr>
+<td>Docker</td>
+<td>Container / compose publish</td>
+<td>Stop stack service / container path, or remap</td>
+</tr>
+<tr>
+<td>Native</td>
+<td>Host process outside the catalog</td>
+<td>Confirm before stop, or remap</td>
+</tr>
+</tbody></table>
+<p>Remaps are stored in <strong>app data</strong> and applied via spawn environment — so you can keep two projects alive without immediately editing every compose file. Compose file edits remain your choice when you want them permanent.</p>
+<h2>Why AI project piles make this worse</h2>
+<p>Vibe-coded apps love default ports: <code>3000</code>, <code>5173</code>, <code>8000</code>, <code>5432</code>, <code>27017</code>. Ten Cursor sessions later, Monday is a port lottery. A <a href="/for-ai-projects/">project catalog with lifecycle</a> plus occupant-aware reconciliation beats a shell alias you forget under stress.</p>
+<h2>Manual fallback (still useful)</h2>
+<p>When you are outside the app:</p>
+<pre><code class="language-bash">lsof -i :3000 -sTCP:LISTEN
+docker ps --filter publish=3000
+</code></pre>
+<p>If <code>COMMAND</code> is <code>com.docke</code> / <code>docker-proxy</code>, stop the container or <code>docker compose down</code> in the right project — <a href="/compose-databases/">Compose peek</a> helps you find which project that was.</p>
+<p>Prefer SIGTERM before SIGKILL for anything that looks like a database.</p>
+<h2>Process groups help the “my own leftover” case</h2>
+<p>Zashiki starts user commands in a <strong>process group</strong> and stops the group on Stop — so orphaned Node children are less likely to own the port after you thought you stopped. Details: <a href="/start-stop/">Start and stop</a>.</p>
+<h2>Honest limits</h2>
+<p>Occupancy matching for Docker uses compose labels / working_dir signals where available. Unnamed or odd containers may show as a generic docker occupant. Native stop remains sharp-edged on purpose — confirm before killing.</p>
+<p>Download the macOS app: <a href="https://github.com/khushal-sahni/zashiki-warashi/releases/latest">Releases</a>.</p>
+</div>
+
+        <section class="fold faq-fold" aria-labelledby="faq-heading">
+          <h2 id="faq-heading">FAQ</h2>
+          <details class="faq-item">
+            <summary>Is this only for Node EADDRINUSE?</summary>
+            <p>The pain shows up as Node EADDRINUSE, Vite bind errors, or Docker ‘port is already allocated’. Reconciliation covers catalog, docker, and native occupants.</p>
+          </details>
+          <details class="faq-item">
+            <summary>Does remapping edit my compose file?</summary>
+            <p>Remaps live in app data and spawn env for the project — observation first; it does not casually rewrite your repo.</p>
+          </details>
+          <details class="faq-item">
+            <summary>Will it kill system services?</summary>
+            <p>Native stop requires an explicit confirm. Treat database and system listeners carefully; prefer remap when unsure.</p>
+          </details>
+        </section>
+
+        <section class="fold related-fold" aria-labelledby="related-heading">
+          <h2 id="related-heading">More rooms</h2>
+          <ul class="related-list">
+          <li><a href="../start-stop/">Start and stop projects</a></li>
+          <li><a href="../compose-databases/">Compose and databases</a></li>
+          <li><a href="../for-ai-projects/">For AI-generated projects</a></li>
+          </ul>
+        </section>
+      </article>
+
+      <p class="closing">
+        <a
+          class="download-inline"
+          href="https://github.com/khushal-sahni/zashiki-warashi/releases/latest"
+          >Download for macOS</a
+        >
+        <a
+          class="ghost-inline"
+          href="https://github.com/khushal-sahni/zashiki-warashi"
+          >GitHub</a
+        >
+      </p>
+
+      <footer class="site-footer">
+        <span>座敷童子 — a house spirit that looks after the place.</span>
+        <span>
+          <a href="https://github.com/sponsors/khushal-sahni">Sponsors</a>
+          · MIT ·
+          <a href="https://zashiki.anireco.app/port-already-in-use/index.md">Markdown</a>
+        </span>
+      </footer>
+    </main>
+  </body>
+</html>

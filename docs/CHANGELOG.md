@@ -29,6 +29,33 @@
 
 ## Sessions
 
+## Session #14 — 2026-09-12
+
+### Built
+- **SEO rooms** on `site/` — 12 intent pages from Markdown (`content/`) plus compare hub
+- Tiny build (`scripts/build.mjs` + `marked` / `gray-matter`) → `slug/index.html` + `index.md` twins
+- `llms.txt`, `llms-full.txt`, `sitemap.xml`, `robots.txt`, `_headers`, `_redirects`, on-brand `404.html`
+- Interior chrome CSS (compact threshold bar, prose, FAQ folds, tables) — no noren raster on SEO pages
+- Home SEO: sr-only `h1`, canonical, OG/Twitter, `SoftwareApplication` JSON-LD, “More rooms” links
+
+### Changed
+- Wrangler assets: `not_found_handling = "404-page"` (no longer SPA-fallback all misses)
+- Root scripts: `site:build`, `site:preview`
+- `site/README.md` documents build-before-deploy
+
+### Fixed
+- (n/a — greenfield SEO surface)
+
+### Deferred / Not Done
+- `wrangler deploy` + DNS still manual
+- Cloudflare Markdown-for-Agents zone toggle (optional later)
+
+### New Tech Debt
+- Rebuild required after content edits (`npm run site:build`) before deploy
+- Absolute `/path/` links in markdown bodies assume site root hosting
+
+---
+
 ## Session #13 — 2026-09-09
 
 ### Built

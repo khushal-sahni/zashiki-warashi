@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>What is a localhost control plane? — Zashiki Warashi</title>
+    <meta name="description" content="Zashiki Warashi is a macOS control plane for local projects: catalog, start/stop, Compose/DB peek, and deep-links — not a Docker GUI, not Raycast, not a folder bookmark." />
+    <link rel="canonical" href="https://zashiki.anireco.app/localhost-control-plane/" />
+    <link
+      rel="alternate"
+      type="text/markdown"
+      href="https://zashiki.anireco.app/localhost-control-plane/index.md"
+      title="Markdown"
+    />
+    <meta property="og:type" content="article" />
+    <meta property="og:url" content="https://zashiki.anireco.app/localhost-control-plane/" />
+    <meta property="og:title" content="What is a localhost control plane? — Zashiki Warashi" />
+    <meta property="og:description" content="Zashiki Warashi is a macOS control plane for local projects: catalog, start/stop, Compose/DB peek, and deep-links — not a Docker GUI, not Raycast, not a folder bookmark." />
+    <meta property="og:image" content="https://zashiki.anireco.app/assets/hero-comp.png" />
+    <meta property="og:site_name" content="Zashiki Warashi" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="What is a localhost control plane? — Zashiki Warashi" />
+    <meta name="twitter:description" content="Zashiki Warashi is a macOS control plane for local projects: catalog, start/stop, Compose/DB peek, and deep-links — not a Docker GUI, not Raycast, not a folder bookmark." />
+    <meta name="twitter:image" content="https://zashiki.anireco.app/assets/hero-comp.png" />
+    <link rel="stylesheet" href="../fonts.css" />
+    <link rel="stylesheet" href="../styles.css" />
+    <link
+      rel="icon"
+      href="../favicon.svg"
+      type="image/svg+xml"
+    />
+    <script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position": 1,
+      "name": "Home",
+      "item": "https://zashiki.anireco.app/"
+    },
+    {
+      "@type": "ListItem",
+      "position": 2,
+      "name": "A control plane for localhost",
+      "item": "https://zashiki.anireco.app/localhost-control-plane/"
+    }
+  ]
+}
+    </script>
+    <script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "How is this different from Raycast or Spotlight?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Launchers open things. A control plane remembers project state, starts and stops processes, and peeks stack endpoints. Zashiki keeps a catalog and lifecycle, not only shortcuts."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Do I need cloud accounts?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "No. Catalog and overrides stay on your Mac. No sync, no login."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Does it replace Docker Desktop?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "No. Docker Desktop or OrbStack remain the engine for containers. Zashiki peeks and drives compose for DB-like services as glue."
+      }
+    }
+  ]
+}
+    </script>
+  </head>
+  <body class="page-interior">
+    <header class="site-chrome">
+      <a class="chrome-brand" href="../">Zashiki Warashi</a>
+      <nav class="chrome-actions" aria-label="Primary">
+        <a
+          class="ghost-inline chrome-github"
+          href="https://github.com/khushal-sahni/zashiki-warashi"
+          >GitHub</a
+        >
+        <a
+          class="download-inline"
+          href="https://github.com/khushal-sahni/zashiki-warashi/releases/latest"
+          >Download for macOS</a
+        >
+      </nav>
+    </header>
+
+    <main class="below interior-main">
+      <nav class="breadcrumb" aria-label="Breadcrumb">
+        <a href="../">Home</a>
+         <span aria-hidden="true">/</span> <span aria-current="page">A control plane for localhost</span>
+      </nav>
+
+      <article class="room">
+        <header class="room-head">
+          <h1>A control plane for localhost</h1>
+          <p class="lede">A control plane for localhost is one place that knows your local projects and can operate them — without becoming the editor, the runtime, or the database GUI.</p>
+        </header>
+
+        <div class="prose"><p>“Control plane” usually shows up in Kubernetes blogs. On a single developer Mac, the idea is simpler: <strong>one surface that knows what is local, what is running, and how to start or stop it</strong> — without replacing the tools that actually edit code, run containers, or query databases.</p>
+<p><strong>Zashiki Warashi</strong> is that surface for macOS localhost.</p>
+<h2>The jobs a control plane should own</h2>
+<table>
+<thead>
+<tr>
+<th>Job</th>
+<th>What Zashiki does</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Remember projects</td>
+<td>Machine-local catalog: add folder, scan roots, search, remove</td>
+</tr>
+<tr>
+<td>Operate processes</td>
+<td>Start / stop / restart via login shell; process groups; PID rehydrate</td>
+</tr>
+<tr>
+<td>Peek stacks</td>
+<td>Compose DB services, host/port/user/db, copy URI</td>
+</tr>
+<tr>
+<td>Hand off</td>
+<td>Open in Finder, Cursor, Compass for mongo</td>
+</tr>
+<tr>
+<td>Reduce collisions</td>
+<td>Port occupant detection — catalog, docker, or native</td>
+</tr>
+</tbody></table>
+<p>It deliberately does <strong>not</strong> own: editing code, full Docker Engine UI, query GUIs, cloud sync, or required per-repo config.</p>
+<h2>Why not “just a folder bookmark”?</h2>
+<p>Bookmarks answer <em>where</em>. They do not answer <em>is it running</em>, <em>what start command</em>, <em>which compose file is nested two levels down</em>, or <em>who owns port 5432</em>.</p>
+<p>Raycast, Alfred, and Spotlight are excellent launchers. They are not process-group-aware stop buttons with Compose peek and Compass deep-links. Zashiki is the house that keeps those operations together.</p>
+<h2>Why not a Docker GUI?</h2>
+<p>Docker Desktop, OrbStack, Dockev, Portainer, and Compose Launcher solve container-centric problems. Many local projects are mostly <code>npm run dev</code> with an optional compose file for Postgres. Treating every repo as a Docker project forces the wrong abstraction.</p>
+<p>Zashiki sits <strong>beside</strong> the engine: use Docker Desktop or OrbStack for containers; use Zashiki for the project catalog and lifecycle. Honest comparisons: <a href="/compare/docker-desktop/">vs Docker Desktop</a>, <a href="/compare/orbstack/">vs OrbStack</a>, <a href="/compare/portainer/">vs Portainer</a>.</p>
+<h2>Category language we use on purpose</h2>
+<ul>
+<li><strong>Localhost control plane</strong> — operate local projects as a fleet of one machine.</li>
+<li><strong>House spirit</strong> — named after 座敷童子; look after the place without owning every room. See <a href="/name/">The name</a>.</li>
+<li><strong>Observe, don’t tax</strong> — no mandatory <code>zashiki.toml</code> in every repo.</li>
+</ul>
+<p>If you searched for “manage multiple local projects macOS,” “localhost project manager,” or “start stop all my apps,” this is the category we mean — especially when those apps came from <a href="/for-ai-projects/">AI-assisted coding</a>.</p>
+<h2>What success looks like on Monday</h2>
+<p>Open the app. Find the project. Start it. See Compose services and a DB connection string. Copy the URI or open Compass. Stop when you are done. No spelunking Docker Engine by hand for the common path.</p>
+<p>Download: <a href="https://github.com/khushal-sahni/zashiki-warashi/releases/latest">GitHub Releases</a>. MIT.</p>
+</div>
+
+        <section class="fold faq-fold" aria-labelledby="faq-heading">
+          <h2 id="faq-heading">FAQ</h2>
+          <details class="faq-item">
+            <summary>How is this different from Raycast or Spotlight?</summary>
+            <p>Launchers open things. A control plane remembers project state, starts and stops processes, and peeks stack endpoints. Zashiki keeps a catalog and lifecycle, not only shortcuts.</p>
+          </details>
+          <details class="faq-item">
+            <summary>Do I need cloud accounts?</summary>
+            <p>No. Catalog and overrides stay on your Mac. No sync, no login.</p>
+          </details>
+          <details class="faq-item">
+            <summary>Does it replace Docker Desktop?</summary>
+            <p>No. Docker Desktop or OrbStack remain the engine for containers. Zashiki peeks and drives compose for DB-like services as glue.</p>
+          </details>
+        </section>
+
+        <section class="fold related-fold" aria-labelledby="related-heading">
+          <h2 id="related-heading">More rooms</h2>
+          <ul class="related-list">
+          <li><a href="../for-ai-projects/">For AI-generated projects</a></li>
+          <li><a href="../start-stop/">Start and stop projects</a></li>
+          <li><a href="../compose-databases/">Compose and databases</a></li>
+          </ul>
+        </section>
+      </article>
+
+      <p class="closing">
+        <a
+          class="download-inline"
+          href="https://github.com/khushal-sahni/zashiki-warashi/releases/latest"
+          >Download for macOS</a
+        >
+        <a
+          class="ghost-inline"
+          href="https://github.com/khushal-sahni/zashiki-warashi"
+          >GitHub</a
+        >
+      </p>
+
+      <footer class="site-footer">
+        <span>座敷童子 — a house spirit that looks after the place.</span>
+        <span>
+          <a href="https://github.com/sponsors/khushal-sahni">Sponsors</a>
+          · MIT ·
+          <a href="https://zashiki.anireco.app/localhost-control-plane/index.md">Markdown</a>
+        </span>
+      </footer>
+    </main>
+  </body>
+</html>

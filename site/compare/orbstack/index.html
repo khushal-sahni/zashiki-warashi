@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Zashiki Warashi vs OrbStack — honest comparison</title>
+    <meta name="description" content="OrbStack replaces Docker Desktop as a fast macOS container runtime. Zashiki Warashi catalogs local projects and peeks Compose — it runs on top of OrbStack, not instead of it." />
+    <link rel="canonical" href="https://zashiki.anireco.app/compare/orbstack/" />
+    <link
+      rel="alternate"
+      type="text/markdown"
+      href="https://zashiki.anireco.app/compare/orbstack/index.md"
+      title="Markdown"
+    />
+    <meta property="og:type" content="article" />
+    <meta property="og:url" content="https://zashiki.anireco.app/compare/orbstack/" />
+    <meta property="og:title" content="Zashiki Warashi vs OrbStack — honest comparison" />
+    <meta property="og:description" content="OrbStack replaces Docker Desktop as a fast macOS container runtime. Zashiki Warashi catalogs local projects and peeks Compose — it runs on top of OrbStack, not instead of it." />
+    <meta property="og:image" content="https://zashiki.anireco.app/assets/hero-comp.png" />
+    <meta property="og:site_name" content="Zashiki Warashi" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Zashiki Warashi vs OrbStack — honest comparison" />
+    <meta name="twitter:description" content="OrbStack replaces Docker Desktop as a fast macOS container runtime. Zashiki Warashi catalogs local projects and peeks Compose — it runs on top of OrbStack, not instead of it." />
+    <meta name="twitter:image" content="https://zashiki.anireco.app/assets/hero-comp.png" />
+    <link rel="stylesheet" href="../../fonts.css" />
+    <link rel="stylesheet" href="../../styles.css" />
+    <link
+      rel="icon"
+      href="../../favicon.svg"
+      type="image/svg+xml"
+    />
+    <script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position": 1,
+      "name": "Home",
+      "item": "https://zashiki.anireco.app/"
+    },
+    {
+      "@type": "ListItem",
+      "position": 2,
+      "name": "Compare",
+      "item": "https://zashiki.anireco.app/compare/"
+    },
+    {
+      "@type": "ListItem",
+      "position": 3,
+      "name": "vs OrbStack",
+      "item": "https://zashiki.anireco.app/compare/orbstack/"
+    }
+  ]
+}
+    </script>
+    <script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "Does Zashiki embed OrbStack?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "No. Install OrbStack (or Docker Desktop) separately. Zashiki shells out to docker compose using a cached binary path."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Is OrbStack required?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Any engine that provides a working docker compose on your PATH is fine. OrbStack is a common choice on macOS."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Will Zashiki manage OrbStack VMs?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "No. VM and engine settings stay in OrbStack."
+      }
+    }
+  ]
+}
+    </script>
+  </head>
+  <body class="page-interior">
+    <header class="site-chrome">
+      <a class="chrome-brand" href="../../">Zashiki Warashi</a>
+      <nav class="chrome-actions" aria-label="Primary">
+        <a
+          class="ghost-inline chrome-github"
+          href="https://github.com/khushal-sahni/zashiki-warashi"
+          >GitHub</a
+        >
+        <a
+          class="download-inline"
+          href="https://github.com/khushal-sahni/zashiki-warashi/releases/latest"
+          >Download for macOS</a
+        >
+      </nav>
+    </header>
+
+    <main class="below interior-main">
+      <nav class="breadcrumb" aria-label="Breadcrumb">
+        <a href="../../">Home</a>
+         <span aria-hidden="true">/</span> <a href="../../compare/">Compare</a> <span aria-hidden="true">/</span> <span aria-current="page">vs OrbStack</span>
+      </nav>
+
+      <article class="room">
+        <header class="room-head">
+          <h1>vs OrbStack</h1>
+          <p class="lede">OrbStack is an excellent engine choice on Mac. Zashiki Warashi does not compete with it. If OrbStack is your docker, Zashiki is the project house that talks to that docker.</p>
+        </header>
+
+        <div class="prose"><h2>Short answer</h2>
+<p><strong>OrbStack</strong> is a macOS-native container runtime — often chosen as a lighter Docker Desktop replacement. It speaks the Docker API and Compose.</p>
+<p><strong>Zashiki Warashi</strong> is a localhost <strong>project control plane</strong>: catalog, start/stop native project commands, peek DB-like Compose services, deep-link to tools you already have.</p>
+<p>If your search was “OrbStack vs Docker Desktop,” that comparison is elsewhere. This page answers “where does Zashiki fit?” — <strong>on top of OrbStack</strong>, not against it.</p>
+<h2>Side-by-side</h2>
+<table>
+<thead>
+<tr>
+<th>Concern</th>
+<th>OrbStack</th>
+<th>Zashiki Warashi</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Container runtime</td>
+<td>Yes</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Fast Docker-compatible API</td>
+<td>Yes</td>
+<td>Consumes via CLI</td>
+</tr>
+<tr>
+<td>Multi-project sidebar for <em>repos</em></td>
+<td>Container/project grouping ≠ app catalog</td>
+<td>Machine-local project catalog</td>
+</tr>
+<tr>
+<td>Login-shell <code>npm</code> / <code>fnm</code> start</td>
+<td>Not the product</td>
+<td>Yes</td>
+</tr>
+<tr>
+<td>Compass deep-link from compose mongo</td>
+<td>Manual</td>
+<td>Built-in peek path</td>
+</tr>
+<tr>
+<td>Resource usage of the engine</td>
+<td>OrbStack’s win</td>
+<td>N/A</td>
+</tr>
+</tbody></table>
+<h2>Recommended pairing</h2>
+<ol>
+<li>Install <strong>OrbStack</strong> (or Docker Desktop) for containers.</li>
+<li>Install <strong>Zashiki</strong> from <a href="https://github.com/khushal-sahni/zashiki-warashi/releases/latest">Releases</a>.</li>
+<li>Catalog repos; use Stack peek for DBs; use Start/Stop for app processes.</li>
+</ol>
+<p>See also <a href="/compare/docker-desktop/">vs Docker Desktop</a> and <a href="/compose-databases/">Compose and databases</a>.</p>
+</div>
+
+        <section class="fold faq-fold" aria-labelledby="faq-heading">
+          <h2 id="faq-heading">FAQ</h2>
+          <details class="faq-item">
+            <summary>Does Zashiki embed OrbStack?</summary>
+            <p>No. Install OrbStack (or Docker Desktop) separately. Zashiki shells out to docker compose using a cached binary path.</p>
+          </details>
+          <details class="faq-item">
+            <summary>Is OrbStack required?</summary>
+            <p>Any engine that provides a working docker compose on your PATH is fine. OrbStack is a common choice on macOS.</p>
+          </details>
+          <details class="faq-item">
+            <summary>Will Zashiki manage OrbStack VMs?</summary>
+            <p>No. VM and engine settings stay in OrbStack.</p>
+          </details>
+        </section>
+
+        <section class="fold related-fold" aria-labelledby="related-heading">
+          <h2 id="related-heading">More rooms</h2>
+          <ul class="related-list">
+          <li><a href="../../compare/docker-desktop/">vs Docker Desktop</a></li>
+          <li><a href="../../compose-databases/">Compose and databases</a></li>
+          <li><a href="../../start-stop/">Start and stop projects</a></li>
+          </ul>
+        </section>
+      </article>
+
+      <p class="closing">
+        <a
+          class="download-inline"
+          href="https://github.com/khushal-sahni/zashiki-warashi/releases/latest"
+          >Download for macOS</a
+        >
+        <a
+          class="ghost-inline"
+          href="https://github.com/khushal-sahni/zashiki-warashi"
+          >GitHub</a
+        >
+      </p>
+
+      <footer class="site-footer">
+        <span>座敷童子 — a house spirit that looks after the place.</span>
+        <span>
+          <a href="https://github.com/sponsors/khushal-sahni">Sponsors</a>
+          · MIT ·
+          <a href="https://zashiki.anireco.app/compare/orbstack/index.md">Markdown</a>
+        </span>
+      </footer>
+    </main>
+  </body>
+</html>

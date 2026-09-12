@@ -181,3 +181,10 @@ Use this format for each decision:
 - **Context**: Impeccable’s new-work path took ~1hr on the landing (direction tournament, comps, pixel gates) and produced a photo-hero with fake hotspots. Good UI is still required; that ceremony is not. A project-scoped craft rule showed up in git; the floor should apply in every Cursor project.
 - **Decision**: Uninstall the Impeccable skill and its agents. Do not install a replacement design-director skill. Put the positive UI quality floor in the **user-level** rule `~/.cursor/rules/ui-craft.mdc` (`alwaysApply: true`) — spacing, both widths, hierarchy, contrast, states, taste — not in the zashiki repo. This project keeps pane + snappy rules and `DESIGN.md` for product-specific look.
 - **Consequences**: UI craft applies across Cursor. Zashiki git stays free of the global rule. Reinstall Impeccable only for an explicit, one-shot `/impeccable` session.
+
+### Multi-page SEO rooms + markdown twins (not an SPA site)
+- **Date**: 2026-09-12
+- **Status**: Accepted
+- **Context**: Single conversion landing had no crawl surface; Wrangler SPA 404 handling would 200 the homepage for unknown URLs. Search intent spans AI-repo piles, start/stop, Compose/Compass, ports, honest “vs Docker/OrbStack/lpm/Portainer,” and folklore/brand collision with Live2D Warashi. ChatGPT-class crawlers prefer HTML; coding agents often want markdown / `llms.txt`.
+- **Decision**: Keep static Cloudflare Workers assets. Noren home stays conversion-only. Add evergreen rooms built from `site/content/*.md` via a tiny Node build into `/slug/index.html` + sibling `index.md`. Ship `llms.txt` / `llms-full.txt`, sitemap, robots allowing major AI crawlers, FAQ/Breadcrumb/SoftwareApplication JSON-LD. Interior pages use compact threshold chrome (no hero raster). Switch `not_found_handling` to `404-page`. Comparisons are disambiguation, not scorecards.
+- **Consequences**: Must run `npm run site:build` before deploy. Content edits live in Markdown; generated HTML is deployable output. Distinct keyword nets without inventing social proof.

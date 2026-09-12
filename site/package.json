@@ -1,0 +1,15 @@
+{
+  "name": "zashiki-warashi-site",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "description": "Static marketing site for zashiki.anireco.app",
+  "scripts": {
+    "build": "node scripts/build.mjs",
+    "preview": "python3 -m http.server 8765"
+  },
+  "devDependencies": {
+    "gray-matter": "^4.0.3",
+    "marked": "^18.0.12"
+  }
+}

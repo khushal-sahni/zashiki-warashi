@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Zashiki Warashi vs lpm — local project managers compared</title>
+    <meta name="description" content="lpm is a macOS local project manager with services YAML and agent terminals. Zashiki Warashi observes existing repos without required per-project config — catalog, start/stop, Compose DB peek." />
+    <link rel="canonical" href="https://zashiki.anireco.app/compare/lpm/" />
+    <link
+      rel="alternate"
+      type="text/markdown"
+      href="https://zashiki.anireco.app/compare/lpm/index.md"
+      title="Markdown"
+    />
+    <meta property="og:type" content="article" />
+    <meta property="og:url" content="https://zashiki.anireco.app/compare/lpm/" />
+    <meta property="og:title" content="Zashiki Warashi vs lpm — local project managers compared" />
+    <meta property="og:description" content="lpm is a macOS local project manager with services YAML and agent terminals. Zashiki Warashi observes existing repos without required per-project config — catalog, start/stop, Compose DB peek." />
+    <meta property="og:image" content="https://zashiki.anireco.app/assets/hero-comp.png" />
+    <meta property="og:site_name" content="Zashiki Warashi" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Zashiki Warashi vs lpm — local project managers compared" />
+    <meta name="twitter:description" content="lpm is a macOS local project manager with services YAML and agent terminals. Zashiki Warashi observes existing repos without required per-project config — catalog, start/stop, Compose DB peek." />
+    <meta name="twitter:image" content="https://zashiki.anireco.app/assets/hero-comp.png" />
+    <link rel="stylesheet" href="../../fonts.css" />
+    <link rel="stylesheet" href="../../styles.css" />
+    <link
+      rel="icon"
+      href="../../favicon.svg"
+      type="image/svg+xml"
+    />
+    <script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position": 1,
+      "name": "Home",
+      "item": "https://zashiki.anireco.app/"
+    },
+    {
+      "@type": "ListItem",
+      "position": 2,
+      "name": "Compare",
+      "item": "https://zashiki.anireco.app/compare/"
+    },
+    {
+      "@type": "ListItem",
+      "position": 3,
+      "name": "vs lpm",
+      "item": "https://zashiki.anireco.app/compare/lpm/"
+    }
+  ]
+}
+    </script>
+    <script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "Which one needs YAML in the project?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "lpm is built around defining services (and profiles) in config. Zashiki infers start commands and keeps overrides in app data — no required per-repo YAML."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Does Zashiki run Claude Code or Codex terminals?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "No. It is not an agent workspace. It operates the projects agents leave behind and can open Cursor."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Can I use both?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Yes in principle — they optimize different workflows. Pick one as the daily house to avoid duplicate lifecycle ownership."
+      }
+    }
+  ]
+}
+    </script>
+  </head>
+  <body class="page-interior">
+    <header class="site-chrome">
+      <a class="chrome-brand" href="../../">Zashiki Warashi</a>
+      <nav class="chrome-actions" aria-label="Primary">
+        <a
+          class="ghost-inline chrome-github"
+          href="https://github.com/khushal-sahni/zashiki-warashi"
+          >GitHub</a
+        >
+        <a
+          class="download-inline"
+          href="https://github.com/khushal-sahni/zashiki-warashi/releases/latest"
+          >Download for macOS</a
+        >
+      </nav>
+    </header>
+
+    <main class="below interior-main">
+      <nav class="breadcrumb" aria-label="Breadcrumb">
+        <a href="../../">Home</a>
+         <span aria-hidden="true">/</span> <a href="../../compare/">Compare</a> <span aria-hidden="true">/</span> <span aria-current="page">vs lpm</span>
+      </nav>
+
+      <article class="room">
+        <header class="room-head">
+          <h1>vs lpm</h1>
+          <p class="lede">lpm and Zashiki both care about multiple local projects on a Mac. The fork in the road is configuration tax versus observe-only catalog — and whether AI agent terminals are in scope.</p>
+        </header>
+
+        <div class="prose"><h2>Short answer</h2>
+<p><strong><a href="https://lpm.cx/">lpm</a></strong> (and similar local project managers) shine when you want a defined multi-service workspace — often with explicit config, live terminals, and AI-agent-oriented flows.</p>
+<p><strong>Zashiki Warashi</strong> shines when you want a <strong>house spirit for folders you already have</strong>: scan roots, infer start commands, stop process groups, peek Compose DBs, open Compass — <strong>without</strong> taxing every AI-generated repo with a new schema.</p>
+<h2>Side-by-side</h2>
+<table>
+<thead>
+<tr>
+<th>Concern</th>
+<th>lpm (typical)</th>
+<th>Zashiki Warashi</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Project model</td>
+<td>Services you define</td>
+<td>Observe existing repo signals</td>
+</tr>
+<tr>
+<td>Per-project config</td>
+<td>Central to the workflow</td>
+<td>Optional later; none required in v1</td>
+</tr>
+<tr>
+<td>AI coding agents in-app</td>
+<td>Strong focus in current lpm</td>
+<td>Out of scope</td>
+</tr>
+<tr>
+<td>Compose DB URI / Compass</td>
+<td>Not the core story</td>
+<td>First-class peek</td>
+</tr>
+<tr>
+<td>Port reconciliation</td>
+<td>Varies</td>
+<td>Catalog / docker / native occupants</td>
+</tr>
+<tr>
+<td>Cloud accounts</td>
+<td>No (local)</td>
+<td>No (local)</td>
+</tr>
+</tbody></table>
+<p>Exact lpm features move quickly — treat their site as source of truth. This page is about <strong>category fit</strong>, not a scorecard of version N.</p>
+<h2>Who should pick Zashiki</h2>
+<ul>
+<li>You have a pile of <a href="/for-ai-projects/">Cursor / vibe-coded folders</a> and refuse another YAML per folder</li>
+<li>You care about Compose DB peek and Compass more than embedded agent terminals</li>
+<li>You want login-shell start/stop with process-group semantics — <a href="/start-stop/">Start and stop</a></li>
+</ul>
+<h2>Who should pick lpm (or similar)</h2>
+<ul>
+<li>You want one workspace that runs services <strong>and</strong> AI agent terminals side by side</li>
+<li>You are happy maintaining explicit service definitions and profiles</li>
+<li>Duplicating checkouts for parallel agents is a primary workflow</li>
+</ul>
+<p>Honest product principle: prove the mechanism; do not invent superiority. Both can be right for different Mondays.</p>
+<p>Download Zashiki: <a href="https://github.com/khushal-sahni/zashiki-warashi/releases/latest">Releases</a>.</p>
+</div>
+
+        <section class="fold faq-fold" aria-labelledby="faq-heading">
+          <h2 id="faq-heading">FAQ</h2>
+          <details class="faq-item">
+            <summary>Which one needs YAML in the project?</summary>
+            <p>lpm is built around defining services (and profiles) in config. Zashiki infers start commands and keeps overrides in app data — no required per-repo YAML.</p>
+          </details>
+          <details class="faq-item">
+            <summary>Does Zashiki run Claude Code or Codex terminals?</summary>
+            <p>No. It is not an agent workspace. It operates the projects agents leave behind and can open Cursor.</p>
+          </details>
+          <details class="faq-item">
+            <summary>Can I use both?</summary>
+            <p>Yes in principle — they optimize different workflows. Pick one as the daily house to avoid duplicate lifecycle ownership.</p>
+          </details>
+        </section>
+
+        <section class="fold related-fold" aria-labelledby="related-heading">
+          <h2 id="related-heading">More rooms</h2>
+          <ul class="related-list">
+          <li><a href="../../for-ai-projects/">For AI-generated projects</a></li>
+          <li><a href="../../start-stop/">Start and stop projects</a></li>
+          <li><a href="../../localhost-control-plane/">Localhost control plane</a></li>
+          </ul>
+        </section>
+      </article>
+
+      <p class="closing">
+        <a
+          class="download-inline"
+          href="https://github.com/khushal-sahni/zashiki-warashi/releases/latest"
+          >Download for macOS</a
+        >
+        <a
+          class="ghost-inline"
+          href="https://github.com/khushal-sahni/zashiki-warashi"
+          >GitHub</a
+        >
+      </p>
+
+      <footer class="site-footer">
+        <span>座敷童子 — a house spirit that looks after the place.</span>
+        <span>
+          <a href="https://github.com/sponsors/khushal-sahni">Sponsors</a>
+          · MIT ·
+          <a href="https://zashiki.anireco.app/compare/lpm/index.md">Markdown</a>
+        </span>
+      </footer>
+    </main>
+  </body>
+</html>

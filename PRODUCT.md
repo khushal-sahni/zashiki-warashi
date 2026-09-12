@@ -8,7 +8,7 @@ web
 
 ## Stack
 
-Static HTML/CSS deployed as Cloudflare Workers static assets (`site/`). The desktop product itself is Tauri 2 + React + Vite + TypeScript (UI) with a Rust backend; this PRODUCT.md covers the public landing surface at zashiki.anireco.app and the product it markets.
+Static HTML/CSS deployed as Cloudflare Workers static assets (`site/`). Home is the Noren Threshold conversion page; evergreen SEO rooms are Markdown-built HTML with markdown twins and `llms.txt` for agents. The desktop product itself is Tauri 2 + React + Vite + TypeScript (UI) with a Rust backend; this PRODUCT.md covers the public landing surface at zashiki.anireco.app and the product it markets.
 
 ## Users
 
@@ -56,4 +56,4 @@ Landing stack constraint: stay static HTML/CSS on Cloudflare Workers; no inventi
 2. Observe existing repos; never tax them with required config.
 3. Glue existing tools (Cursor, Finder, Compass, Docker) rather than replace them.
 4. Stay honest about macOS-first, unsigned builds, and Docker needs.
-5. The landing page's only job is clear offer → Download for macOS.
+5. The landing page's primary job is clear offer → Download for macOS; SEO rooms capture distinct search intent without inventing proof.

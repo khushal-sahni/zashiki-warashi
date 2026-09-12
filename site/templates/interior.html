@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{{title}}</title>
+    <meta name="description" content="{{description}}" />
+    <link rel="canonical" href="{{canonical}}" />
+    <link
+      rel="alternate"
+      type="text/markdown"
+      href="{{markdown_href}}"
+      title="Markdown"
+    />
+    <meta property="og:type" content="article" />
+    <meta property="og:url" content="{{canonical}}" />
+    <meta property="og:title" content="{{title}}" />
+    <meta property="og:description" content="{{description}}" />
+    <meta property="og:image" content="{{og_image}}" />
+    <meta property="og:site_name" content="Zashiki Warashi" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="{{title}}" />
+    <meta name="twitter:description" content="{{description}}" />
+    <meta name="twitter:image" content="{{og_image}}" />
+    <link rel="stylesheet" href="{{asset_prefix}}fonts.css" />
+    <link rel="stylesheet" href="{{asset_prefix}}styles.css" />
+    <link
+      rel="icon"
+      href="{{asset_prefix}}favicon.svg"
+      type="image/svg+xml"
+    />
+    <script type="application/ld+json">
+{{breadcrumb_json}}
+    </script>
+{{faq_json_block}}
+  </head>
+  <body class="page-interior">
+    <header class="site-chrome">
+      <a class="chrome-brand" href="{{asset_prefix}}">Zashiki Warashi</a>
+      <nav class="chrome-actions" aria-label="Primary">
+        <a
+          class="ghost-inline chrome-github"
+          href="https://github.com/khushal-sahni/zashiki-warashi"
+          >GitHub</a
+        >
+        <a
+          class="download-inline"
+          href="https://github.com/khushal-sahni/zashiki-warashi/releases/latest"
+          >Download for macOS</a
+        >
+      </nav>
+    </header>
+
+    <main class="below interior-main">
+      <nav class="breadcrumb" aria-label="Breadcrumb">
+        <a href="{{asset_prefix}}">Home</a>
+        {{breadcrumb_trail}}
+      </nav>
+
+      <article class="room">
+        <header class="room-head">
+          <h1>{{h1}}</h1>
+          <p class="lede">{{lede}}</p>
+        </header>
+
+        <div class="prose">{{body}}</div>
+
+{{faq_section}}
+
+{{related_section}}
+      </article>
+
+      <p class="closing">
+        <a
+          class="download-inline"
+          href="https://github.com/khushal-sahni/zashiki-warashi/releases/latest"
+          >Download for macOS</a
+        >
+        <a
+          class="ghost-inline"
+          href="https://github.com/khushal-sahni/zashiki-warashi"
+          >GitHub</a
+        >
+      </p>
+
+      <footer class="site-footer">
+        <span>座敷童子 — a house spirit that looks after the place.</span>
+        <span>
+          <a href="https://github.com/sponsors/khushal-sahni">Sponsors</a>
+          · MIT ·
+          <a href="{{markdown_href}}">Markdown</a>
+        </span>
+      </footer>
+    </main>
+  </body>
+</html>

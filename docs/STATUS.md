@@ -1,6 +1,6 @@
 # STATUS.md
 > Your weekend dashboard. Read this first. Update this last.
-> Last updated: `2026-09-09` | Session: `#13`
+> Last updated: `2026-09-12` | Session: `#14`
 
 ---
 
@@ -28,12 +28,13 @@
 - [x] **Menu-bar tray** — show window / quit
 - [x] **Public OSS path** — MIT, FUNDING.yml, stranger README, unsigned Release workflow, `site/` for zashiki.anireco.app
 - [x] **Landing redesign** — Noren Threshold world (PRODUCT.md + DESIGN.md); static `site/` ready to deploy
+- [x] **SEO rooms** — 12 intent pages + compare hub; markdown twins; `llms.txt` / `llms-full.txt`; sitemap; real 404; cache headers
 
 ---
 
 ## In Progress
 
-- Nothing in progress. Manual follow-ups: `cd site && npx wrangler deploy` + DNS for `zashiki.anireco.app`, push a `v*` tag for the first Release draft.
+- Nothing in progress. Manual follow-ups: `cd site && npm run build && npx wrangler deploy` + DNS for `zashiki.anireco.app`, push a `v*` tag for the first Release draft.
 
 ---
 
@@ -48,19 +49,18 @@
 
 ## Where We Left Off
 
-UI craft floor lives in user-level `~/.cursor/rules/ui-craft.mdc` (not in this repo). Landing hero glue fixed. Deploy still manual: `cd site && npx wrangler deploy` + DNS when ready.
+SEO multi-room static site built under `site/` (markdown source → HTML). Previewed locally at `:8765`. Still need `wrangler deploy` + DNS when ready.
 
 ---
 
 ## Current Architecture State
 
 ```
-src/                         ✅ app UI (unchanged this session)
-src-tauri/                   ✅ backend (unchanged this session)
-site/                        ✅ redesigned landing (Noren Threshold)
+src/                         ✅ app UI
+src-tauri/                   ✅ backend
+site/                        ✅ noren home + SEO rooms (build: npm run site:build)
 PRODUCT.md                   ✅ product truth
 DESIGN.md                    ✅ visual system from shipped site
-.impeccable/                 leftover design.json / surface brief (skill uninstalled)
 ```
 
 ---
@@ -69,7 +69,7 @@ DESIGN.md                    ✅ visual system from shipped site
 
 ```env
 # No app .env required.
-# Landing: cd site && npx wrangler deploy
+# Landing: cd site && npm run build && npx wrangler deploy
 ```
 
 ---
@@ -80,10 +80,11 @@ DESIGN.md                    ✅ visual system from shipped site
 npm install
 npm run tauri:dev
 
-# Landing page preview
-cd site && python3 -m http.server 8765
+# Landing + SEO rooms
+cd site && npm install && npm run build
+npm run site:preview   # http://127.0.0.1:8765
 # Deploy
-cd site && npx wrangler deploy
+cd site && npm run build && npx wrangler deploy
 ```
 
 ---
@@ -99,6 +100,8 @@ cd site && npx wrangler deploy
 - Apple notarization / Homebrew cask deferred
 - Landing hero is approved-comp raster + hotspots (not a fully semantic CSS reconstruction of every region)
 - Unused intermediate plates under `site/assets/plates/` from the comp-led path
+- SEO room body links use root-absolute `/slug/` paths (fine in prod; python preview matches)
+- Generated HTML under `site/*/index.html` must be rebuilt after editing `site/content/`
 
 ---
 
@@ -112,7 +115,8 @@ cd site && npx wrangler deploy
 
 | Metric | Value |
 |---|---|
-| Total sessions | 13 |
-| Modules complete | M0 + M1 + M2 + M3 (+ Coffee + logs + panes + snappy + OSS path + landing redesign) |
+| Total sessions | 14 |
+| Modules complete | M0 + M1 + M2 + M3 (+ Coffee + logs + panes + snappy + OSS path + landing redesign + SEO rooms) |
 | Test coverage | 44 Rust unit tests |
-| Last deployed | Local `~/Applications` via `tauri:install`; site redesign not yet wrangler-deployed |
+| Last deployed | Local `~/Applications` via `tauri:install`; site SEO not yet wrangler-deployed |
+| SEO rooms | 12 + compare hub |

@@ -1,11 +1,28 @@
-# Landing page (`zashiki.anireco.app`)
+# Landing + SEO rooms (`zashiki.anireco.app`)
 
-Static site for Cloudflare Workers static assets.
+Static site for Cloudflare Workers static assets. Home is the Noren Threshold hero; interior SEO rooms are built from Markdown.
+
+## Develop
+
+```bash
+# Edit rooms
+site/content/*.md
+site/content/compare/*.md
+
+# Build HTML + markdown twins + sitemap + llms.txt
+cd site && npm install && npm run build
+
+# Preview
+npm run preview   # http://127.0.0.1:8765
+```
+
+From repo root: `npm run site:build` / `npm run site:preview`.
 
 ## Deploy
 
 ```bash
 cd site
+npm run build
 npx wrangler deploy
 ```
 
@@ -18,4 +35,10 @@ On the **anireco.app** Cloudflare zone:
 
 ## Screenshot
 
-Real app window capture lives at [`assets/screenshot.png`](./assets/screenshot.png). If that file is missing, `index.html` falls back to the on-brand CSS preview.
+Real app window capture lives at [`assets/screenshot.png`](./assets/screenshot.png).
+
+## Agent / LLM
+
+- [`llms.txt`](./llms.txt) — curated room index
+- [`llms-full.txt`](./llms-full.txt) — concatenated room bodies
+- Each room also ships `index.md` next to `index.html`

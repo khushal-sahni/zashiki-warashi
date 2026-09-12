@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Open local MongoDB in Compass from Compose — Zashiki Warashi</title>
+    <meta name="description" content="How Zashiki Warashi peeks a Compose Mongo service on macOS and opens MongoDB Compass with a derived connection URI — without storing passwords in the app database." />
+    <link rel="canonical" href="https://zashiki.anireco.app/mongodb-compass/" />
+    <link
+      rel="alternate"
+      type="text/markdown"
+      href="https://zashiki.anireco.app/mongodb-compass/index.md"
+      title="Markdown"
+    />
+    <meta property="og:type" content="article" />
+    <meta property="og:url" content="https://zashiki.anireco.app/mongodb-compass/" />
+    <meta property="og:title" content="Open local MongoDB in Compass from Compose — Zashiki Warashi" />
+    <meta property="og:description" content="How Zashiki Warashi peeks a Compose Mongo service on macOS and opens MongoDB Compass with a derived connection URI — without storing passwords in the app database." />
+    <meta property="og:image" content="https://zashiki.anireco.app/assets/hero-comp.png" />
+    <meta property="og:site_name" content="Zashiki Warashi" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Open local MongoDB in Compass from Compose — Zashiki Warashi" />
+    <meta name="twitter:description" content="How Zashiki Warashi peeks a Compose Mongo service on macOS and opens MongoDB Compass with a derived connection URI — without storing passwords in the app database." />
+    <meta name="twitter:image" content="https://zashiki.anireco.app/assets/hero-comp.png" />
+    <link rel="stylesheet" href="../fonts.css" />
+    <link rel="stylesheet" href="../styles.css" />
+    <link
+      rel="icon"
+      href="../favicon.svg"
+      type="image/svg+xml"
+    />
+    <script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position": 1,
+      "name": "Home",
+      "item": "https://zashiki.anireco.app/"
+    },
+    {
+      "@type": "ListItem",
+      "position": 2,
+      "name": "Local MongoDB → Compass",
+      "item": "https://zashiki.anireco.app/mongodb-compass/"
+    }
+  ]
+}
+    </script>
+    <script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "Do I need Compass installed?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Yes for the open action. Without Compass you can still copy the URI into any Mongo client."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Does Zashiki include a query editor?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "No. Compass (or another client) remains the query tool. Zashiki only peeks and deep-links."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Will it work with OrbStack?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Yes if `docker compose` works on your login-shell PATH the same as with Docker Desktop."
+      }
+    }
+  ]
+}
+    </script>
+  </head>
+  <body class="page-interior">
+    <header class="site-chrome">
+      <a class="chrome-brand" href="../">Zashiki Warashi</a>
+      <nav class="chrome-actions" aria-label="Primary">
+        <a
+          class="ghost-inline chrome-github"
+          href="https://github.com/khushal-sahni/zashiki-warashi"
+          >GitHub</a
+        >
+        <a
+          class="download-inline"
+          href="https://github.com/khushal-sahni/zashiki-warashi/releases/latest"
+          >Download for macOS</a
+        >
+      </nav>
+    </header>
+
+    <main class="below interior-main">
+      <nav class="breadcrumb" aria-label="Breadcrumb">
+        <a href="../">Home</a>
+         <span aria-hidden="true">/</span> <span aria-current="page">Local MongoDB → Compass</span>
+      </nav>
+
+      <article class="room">
+        <header class="room-head">
+          <h1>Local MongoDB → Compass</h1>
+          <p class="lede">When your project’s compose file runs Mongo locally, Zashiki can surface the endpoint and hand you off to MongoDB Compass instead of making you rebuild the URI by hand.</p>
+        </header>
+
+        <div class="prose"><p>MongoDB Compass is a fine place to inspect documents. It is a poor place to <em>discover</em> which compose service on which host port belongs to which throwaway project from last week.</p>
+<p><strong>Zashiki Warashi</strong> bridges that gap on macOS: catalog the project, peek the Compose stack, open Compass (or copy the URI).</p>
+<h2>The happy path</h2>
+<ol>
+<li>Add the project folder (or land on it after a root scan).</li>
+<li>Ensure Docker Desktop or OrbStack is running.</li>
+<li>Open the project’s <strong>Stack</strong> pane — Mongo-like services show with connection fields derived from compose/env.</li>
+<li><strong>Up</strong> the DB service if it is not running.</li>
+<li>Click <strong>Open in Compass</strong>, or <strong>Copy URI</strong> for another client.</li>
+</ol>
+<p>No query GUI ships inside Zashiki. That is intentional: glue into Compass rather than reinvent it. Broader stack peek: <a href="/compose-databases/">Compose and databases</a>.</p>
+<h2>How the URI is built</h2>
+<p>Fields come from what compose and env already declare — image cues for mongo, published ports, user, database name, password when present. The URI is <strong>computed when you peek</strong>, not loaded from a password vault in SQLite.</p>
+<p>Product constraints:</p>
+<ul>
+<li>Do not persist passwords in the app database</li>
+<li>Mask secrets in the UI</li>
+<li>Prefer deep-link over reimplementing Compass</li>
+</ul>
+<h2>When it fails</h2>
+<table>
+<thead>
+<tr>
+<th>Symptom</th>
+<th>What to check</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>No mongo service listed</td>
+<td>Compose file missing, nested deeper than discovery, or image not recognized as DB-like</td>
+</tr>
+<tr>
+<td>Port busy</td>
+<td>Another container or native process — <a href="/port-already-in-use/">port already in use</a></td>
+</tr>
+<tr>
+<td>Compass does not open</td>
+<td>Install Compass; or copy URI manually</td>
+</tr>
+<tr>
+<td>Wrong credentials</td>
+<td>Fix compose/env in the project; Zashiki does not invent auth</td>
+</tr>
+</tbody></table>
+<h2>Related lifecycle</h2>
+<p>App processes (API, Next, etc.) still use <a href="/start-stop/">login-shell start/stop</a>. Mongo in Compose is stack lifecycle. Both live under one project selection so Monday morning is one house, not three Terminal tabs and a sticky note.</p>
+<p>Download: <a href="https://github.com/khushal-sahni/zashiki-warashi/releases/latest">GitHub Releases</a>. MIT · <a href="https://github.com/khushal-sahni/zashiki-warashi">repo</a>.</p>
+</div>
+
+        <section class="fold faq-fold" aria-labelledby="faq-heading">
+          <h2 id="faq-heading">FAQ</h2>
+          <details class="faq-item">
+            <summary>Do I need Compass installed?</summary>
+            <p>Yes for the open action. Without Compass you can still copy the URI into any Mongo client.</p>
+          </details>
+          <details class="faq-item">
+            <summary>Does Zashiki include a query editor?</summary>
+            <p>No. Compass (or another client) remains the query tool. Zashiki only peeks and deep-links.</p>
+          </details>
+          <details class="faq-item">
+            <summary>Will it work with OrbStack?</summary>
+            <p>Yes if `docker compose` works on your login-shell PATH the same as with Docker Desktop.</p>
+          </details>
+        </section>
+
+        <section class="fold related-fold" aria-labelledby="related-heading">
+          <h2 id="related-heading">More rooms</h2>
+          <ul class="related-list">
+          <li><a href="../compose-databases/">Compose and databases</a></li>
+          <li><a href="../start-stop/">Start and stop projects</a></li>
+          <li><a href="../port-already-in-use/">Port already in use</a></li>
+          </ul>
+        </section>
+      </article>
+
+      <p class="closing">
+        <a
+          class="download-inline"
+          href="https://github.com/khushal-sahni/zashiki-warashi/releases/latest"
+          >Download for macOS</a
+        >
+        <a
+          class="ghost-inline"
+          href="https://github.com/khushal-sahni/zashiki-warashi"
+          >GitHub</a
+        >
+      </p>
+
+      <footer class="site-footer">
+        <span>座敷童子 — a house spirit that looks after the place.</span>
+        <span>
+          <a href="https://github.com/sponsors/khushal-sahni">Sponsors</a>
+          · MIT ·
+          <a href="https://zashiki.anireco.app/mongodb-compass/index.md">Markdown</a>
+        </span>
+      </footer>
+    </main>
+  </body>
+</html>

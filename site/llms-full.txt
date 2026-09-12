@@ -1,0 +1,721 @@
+# Zashiki Warashi — full site for agents
+
+> macOS-first desktop control plane for localhost. Catalog local projects (especially AI-generated repos), one-button start/stop, Compose/DB peek, deep-links into Cursor, Finder, and Compass. Observe existing repos — no required per-repo YAML.
+
+Home: https://zashiki.anireco.app/
+Download: https://github.com/khushal-sahni/zashiki-warashi/releases/latest
+GitHub: https://github.com/khushal-sahni/zashiki-warashi
+
+
+---
+
+# vs Docker Desktop
+
+## Short answer
+
+**Docker Desktop** = container engine + Docker GUI on your Mac.
+
+**Zashiki Warashi** = catalog of local *projects*, one-button process start/stop, Compose/DB peek, deep-links to Cursor / Finder / Compass.
+
+Zashiki is **not** a Docker Desktop alternative. Calling it one would be false advertising. It **uses** `docker compose` when your projects have stacks.
+
+## Side-by-side
+
+| Concern | Docker Desktop | Zashiki Warashi |
+| --- | --- | --- |
+| Runs containers | Yes | No (needs an engine) |
+| Project catalog across repos | Not the job | Yes |
+| `npm run dev` lifecycle | Indirect | First-class via login shell |
+| Compose DB URI → Compass | Manual | Peek + deep-link |
+| Port conflict vs other *projects* | Container-focused | Catalog / docker / native occupants |
+| Required per-repo YAML | Compose when you use it | None for the catalog |
+
+## When to use which
+
+- **Choose Docker Desktop** (or [OrbStack](/compare/orbstack/)) when you need the engine, Kubernetes bits, or a full container GUI.
+- **Choose Zashiki** when the pain is “too many local repos / AI folders / leftover processes,” and Compose is only part of the story.
+- **Use both** when Monday looks like: start the API from the catalog, up Postgres from Stack, open Compass, stop when done.
+
+## Related honest pages
+
+- [vs OrbStack](/compare/orbstack/)
+- [vs Portainer](/compare/portainer/) — remote/full Docker UI vs machine-local project house
+- [Compose and databases](/compose-databases/)
+
+Download Zashiki: [Releases](https://github.com/khushal-sahni/zashiki-warashi/releases/latest).
+
+## FAQ
+
+### Can Zashiki replace Docker Desktop?
+
+No. It does not run a container engine. You still need Docker Desktop, OrbStack, or another engine for Compose.
+
+### Do I need Docker Desktop if I only run npm?
+
+Not for plain Node projects. You need an engine when you use Compose stacks / DB peek.
+
+### Why does this page exist then?
+
+Because ‘Docker alternative’ searches often mean ‘I’m drowning in local projects and containers.’ We disambiguate so you pick the right layer.
+
+---
+
+# vs lpm
+
+## Short answer
+
+**[lpm](https://lpm.cx/)** (and similar local project managers) shine when you want a defined multi-service workspace — often with explicit config, live terminals, and AI-agent-oriented flows.
+
+**Zashiki Warashi** shines when you want a **house spirit for folders you already have**: scan roots, infer start commands, stop process groups, peek Compose DBs, open Compass — **without** taxing every AI-generated repo with a new schema.
+
+## Side-by-side
+
+| Concern | lpm (typical) | Zashiki Warashi |
+| --- | --- | --- |
+| Project model | Services you define | Observe existing repo signals |
+| Per-project config | Central to the workflow | Optional later; none required in v1 |
+| AI coding agents in-app | Strong focus in current lpm | Out of scope |
+| Compose DB URI / Compass | Not the core story | First-class peek |
+| Port reconciliation | Varies | Catalog / docker / native occupants |
+| Cloud accounts | No (local) | No (local) |
+
+Exact lpm features move quickly — treat their site as source of truth. This page is about **category fit**, not a scorecard of version N.
+
+## Who should pick Zashiki
+
+- You have a pile of [Cursor / vibe-coded folders](/for-ai-projects/) and refuse another YAML per folder
+- You care about Compose DB peek and Compass more than embedded agent terminals
+- You want login-shell start/stop with process-group semantics — [Start and stop](/start-stop/)
+
+## Who should pick lpm (or similar)
+
+- You want one workspace that runs services **and** AI agent terminals side by side
+- You are happy maintaining explicit service definitions and profiles
+- Duplicating checkouts for parallel agents is a primary workflow
+
+Honest product principle: prove the mechanism; do not invent superiority. Both can be right for different Mondays.
+
+Download Zashiki: [Releases](https://github.com/khushal-sahni/zashiki-warashi/releases/latest).
+
+## FAQ
+
+### Which one needs YAML in the project?
+
+lpm is built around defining services (and profiles) in config. Zashiki infers start commands and keeps overrides in app data — no required per-repo YAML.
+
+### Does Zashiki run Claude Code or Codex terminals?
+
+No. It is not an agent workspace. It operates the projects agents leave behind and can open Cursor.
+
+### Can I use both?
+
+Yes in principle — they optimize different workflows. Pick one as the daily house to avoid duplicate lifecycle ownership.
+
+---
+
+# vs OrbStack
+
+## Short answer
+
+**OrbStack** is a macOS-native container runtime — often chosen as a lighter Docker Desktop replacement. It speaks the Docker API and Compose.
+
+**Zashiki Warashi** is a localhost **project control plane**: catalog, start/stop native project commands, peek DB-like Compose services, deep-link to tools you already have.
+
+If your search was “OrbStack vs Docker Desktop,” that comparison is elsewhere. This page answers “where does Zashiki fit?” — **on top of OrbStack**, not against it.
+
+## Side-by-side
+
+| Concern | OrbStack | Zashiki Warashi |
+| --- | --- | --- |
+| Container runtime | Yes | No |
+| Fast Docker-compatible API | Yes | Consumes via CLI |
+| Multi-project sidebar for *repos* | Container/project grouping ≠ app catalog | Machine-local project catalog |
+| Login-shell `npm` / `fnm` start | Not the product | Yes |
+| Compass deep-link from compose mongo | Manual | Built-in peek path |
+| Resource usage of the engine | OrbStack’s win | N/A |
+
+## Recommended pairing
+
+1. Install **OrbStack** (or Docker Desktop) for containers.
+2. Install **Zashiki** from [Releases](https://github.com/khushal-sahni/zashiki-warashi/releases/latest).
+3. Catalog repos; use Stack peek for DBs; use Start/Stop for app processes.
+
+See also [vs Docker Desktop](/compare/docker-desktop/) and [Compose and databases](/compose-databases/).
+
+## FAQ
+
+### Does Zashiki embed OrbStack?
+
+No. Install OrbStack (or Docker Desktop) separately. Zashiki shells out to docker compose using a cached binary path.
+
+### Is OrbStack required?
+
+Any engine that provides a working docker compose on your PATH is fine. OrbStack is a common choice on macOS.
+
+### Will Zashiki manage OrbStack VMs?
+
+No. VM and engine settings stay in OrbStack.
+
+---
+
+# vs Portainer
+
+## Short answer
+
+**Portainer** is a mature **Docker / container management** UI — stacks, environments, often remote endpoints, team-oriented Docker ops.
+
+**Zashiki Warashi** is a **macOS localhost control plane** for developer projects: catalog folders, start/stop app processes via login shell, peek Compose DB endpoints, open Cursor / Compass.
+
+Zashiki is **not** a Portainer alternative. If you need Portainer’s job, use Portainer (or Docker Desktop / OrbStack GUIs). If you need a project house, use Zashiki — optionally with those engines underneath.
+
+## Side-by-side
+
+| Concern | Portainer | Zashiki Warashi |
+| --- | --- | --- |
+| Primary object | Containers / stacks / environments | Local project folders |
+| Remote Docker | Core strength | Out of scope (v1) |
+| `npm run dev` / fnm PATH | Not the product | Login-shell lifecycle |
+| DB URI copy + Compass | Manual / external | Built-in peek path |
+| RBAC / multi-user | Portainer’s world | Single machine, no accounts |
+| Required project config | Compose for stacks | No required per-repo YAML |
+
+## Choose Portainer when
+
+- You administer Docker environments (local or remote) as the main job
+- You need broad container, volume, network, and stack operations in a UI
+- Multiple hosts or team access patterns matter
+
+## Choose Zashiki when
+
+- The mess is **repos and processes** on one Mac — especially [AI-generated piles](/for-ai-projects/)
+- Compose exists mainly to run databases beside an app you start with npm/cargo/go
+- You want [port reconciliation](/port-already-in-use/) across catalog and docker occupants
+
+Also read [vs Docker Desktop](/compare/docker-desktop/) and [Compose and databases](/compose-databases/).
+
+Download: [GitHub Releases](https://github.com/khushal-sahni/zashiki-warashi/releases/latest). MIT.
+
+## FAQ
+
+### Can Zashiki manage remote Docker hosts?
+
+Not in v1. It is machine-local. Remote/SSH hosts are future ideas, not current scope.
+
+### Does Zashiki edit Compose YAML visually?
+
+No. Peek and up/stop for DB-like services; editing stays in your editor.
+
+### I only need local compose up/down — is Portainer overkill?
+
+Often yes. If your pain is multi-repo localhost plus occasional compose DBs, a project house may fit better than a full Docker UI.
+
+---
+
+# Compose and database peek
+
+Local apps often ship with a `docker-compose.yml` (or `compose.yaml`) that only exists to run Postgres, MySQL, Redis, or Mongo. You do not want a second career as a Docker Desktop power user just to copy a connection string.
+
+**Zashiki Warashi** peeks that stack from the **project** you already cataloged.
+
+## What “peek” means
+
+For a selected project, the app:
+
+1. **Discovers** Compose files (project root and common nested locations)
+2. **Lists** DB-like services and whether they look running (`docker compose ps` via a cached docker binary)
+3. Surfaces **host / port / user / database** derived from compose and env
+4. Lets you **copy a URI** or **open MongoDB Compass** when the service is mongo
+5. Offers **Up / Stop** for those DB-oriented services — not a full substitute for `docker compose` day-to-day ops
+
+This is **observation + glue**, not a Compose YAML editor, not volume browsers, not remote Docker fleets. For that class of tool, see [vs Portainer](/compare/portainer/).
+
+## Engine underneath
+
+You still need **Docker Desktop** or **OrbStack** (or another engine that speaks `docker compose`). Zashiki does not ship a container runtime. Comparisons that stay honest:
+
+- [vs Docker Desktop](/compare/docker-desktop/) — they are the engine; we are the project catalog
+- [vs OrbStack](/compare/orbstack/) — we sit on top of OrbStack the same way
+
+## Secrets stay out of the catalog DB
+
+Connection URIs may include passwords from env files. Product rule: **derive at runtime, do not persist passwords in SQLite, mask in the UI**. Peek again when files change.
+
+## How this fits the Monday workflow
+
+1. Catalog the repo ([start/stop](/start-stop/))
+2. Start the app process if needed
+3. Up the DB services from the Stack pane
+4. Copy URI into your `.env` consumer — or open [Compass](/mongodb-compass/) for mongo
+5. If host ports collide with another project, use [port reconciliation](/port-already-in-use/)
+
+## Nested compose
+
+Real repos bury compose under `docker/` or `infra/`. Discovery walks a shallow depth and nested compose `-f` works for the log and stack paths the app supports. Exotic multi-file matrices may still need Terminal — the goal is the common path, not every Compose feature.
+
+## What we are not building (on purpose)
+
+- No Mongo / SQL query editor inside Zashiki
+- No DB provisioning from scratch in v1
+- No inventing a Docker GUI
+
+Download: [Releases](https://github.com/khushal-sahni/zashiki-warashi/releases/latest). MIT.
+
+## FAQ
+
+### Does this replace Portainer or Docker Desktop?
+
+No. It peeks and drives compose for DB-like services as part of a project house. Full container management stays with your engine UI.
+
+### Are database passwords stored in SQLite?
+
+No. URIs are derived at runtime from compose/env. Passwords are not persisted; the UI masks secrets.
+
+### How deep does compose discovery go?
+
+Root plus nested compose within a shallow depth (including common nested layouts). Nested compose -f is supported for logs and stack actions.
+
+---
+
+# Download for macOS
+
+## Get the app
+
+**[Download the latest release](https://github.com/khushal-sahni/zashiki-warashi/releases/latest)** from GitHub.
+
+Source, issues, and MIT license live in the [repository](https://github.com/khushal-sahni/zashiki-warashi). Optional support: [GitHub Sponsors](https://github.com/sponsors/khushal-sahni).
+
+## First open on macOS (unsigned builds)
+
+Releases are **not Apple-notarized** yet. Gatekeeper may block a double-click.
+
+**Option A — right-click Open**
+
+1. Open Finder → Applications (or wherever you placed the app)
+2. Right-click **Zashiki Warashi** → **Open**
+3. Confirm Open in the dialog
+
+**Option B — clear quarantine**
+
+```bash
+xattr -dr com.apple.quarantine "/path/to/Zashiki Warashi.app"
+```
+
+Then open normally.
+
+This friction is honest product debt, not a mystery. Notarization and Homebrew cask are deferred until the right time — not pretended away on the marketing site.
+
+## What you need after install
+
+| Need | Why |
+| --- | --- |
+| macOS | Primary supported platform |
+| Docker Desktop or OrbStack | Compose stacks / DB peek |
+| Optional Cursor | Open in Cursor |
+| Optional MongoDB Compass | Open mongo URIs |
+
+Project start/stop uses your **login shell**, so language runtimes installed for Terminal (`fnm`, `nvm`, etc.) apply. See [Start and stop](/start-stop/).
+
+## What you get
+
+- Catalog local projects (great for [AI-generated piles](/for-ai-projects/))
+- Start / stop / restart with logs
+- Compose DB peek, copy URI, Compass for mongo
+- Port conflict reconciliation
+- Machine-local only — no cloud account
+
+## Verify you have the right “Warashi”
+
+This product is a **localhost control plane**, named after the folklore house spirit 座敷童子. It is **not** the Live2D AI companion also nicknamed Warashi. Disambiguation: [The name](/name/).
+
+## FAQ
+
+### Is it notarized by Apple?
+
+Not yet. Use right-click → Open, or clear quarantine with xattr. Notarization is on the roadmap when Developer Program timing allows.
+
+### Is there Homebrew?
+
+Not yet. Install from GitHub Releases. A cask may come after notarization.
+
+### Linux or Windows?
+
+macOS-first. Other platforms are future work.
+
+---
+
+# For the AI-generated project pile
+
+AI assistants and vibe-coding tools are excellent at spinning up new folders. They are less excellent at helping you find last Tuesday’s API, remember which port it claimed, or stop the Node process that is still holding `3000` after you closed the chat.
+
+**Zashiki Warashi** is a macOS-first desktop control plane for that pile. It keeps a machine-local catalog of projects, starts and stops them through your login shell (so `fnm` / `nvm` PATH works), peeks Docker Compose database endpoints, and deep-links into tools you already use — Cursor, Finder, MongoDB Compass.
+
+It is glue, not another framework. It does not ask every generated repo to adopt a new YAML format.
+
+## The pain it is built for
+
+A typical week with Cursor, Claude Code, or similar tools looks like this:
+
+1. Scaffold a Next app. It runs. You close the window.
+2. Scaffold a FastAPI sidecar. Different port. Still running somewhere.
+3. Clone a compose stack for Postgres and Mongo. You copy a URI once, then lose the note.
+4. Monday: “Which folder was the invoice prototype?” Finder search. Terminal archaeology. `lsof -i :3000`.
+
+Folder bookmarks and Raycast snippets help a little. A Docker GUI helps when the problem is containers. Neither is a **project house** that knows your AI-spawned repos as first-class citizens.
+
+## Observe, don’t tax
+
+Zashiki Warashi’s product rule is deliberate: **observe existing repos**. Catalog lives in the app’s SQLite data — not in your git trees. Start-command inference looks at `package.json`, Compose files, Makefiles, Cargo, and Go layouts. Overrides stay in app data.
+
+That matters for AI-generated code because those folders are disposable, half-owned, or not yours to litter with tooling config. You should not have to teach every throwaway prototype a new schema before you can start it again.
+
+Optional export formats may appear later. They will stay opt-in. V1 does not write into managed project repos by default.
+
+## What you do in the app
+
+1. **Add a folder** or **scan roots** you already keep projects under.
+2. **Select** a project — sidebar and inspector paint from memory in the same frame.
+3. **Start / Stop / Restart** via your login shell in a process group (children die with the group).
+4. **Peek the Stack** for Compose DB-like services — copy a URI, open Compass for mongo.
+5. When ports collide, **reconcile**: stop the occupant or remap — see [Port already in use](/port-already-in-use/).
+
+Logs for the process (and Compose) live in a pane. The app can quit while projects keep running; status rehydrates from PIDs on launch.
+
+## What it is not
+
+- Not an AI coding agent or chat UI.
+- Not Docker Desktop, OrbStack, Portainer, or a full Compose editor — see [vs Docker Desktop](/compare/docker-desktop/) and [vs Portainer](/compare/portainer/).
+- Not a replacement for Cursor — it opens Cursor for you when you want the editor.
+
+If your problem is “I have twelve vibe-coded folders and I cannot remember which ones are running,” this house is for that. If your problem is “I need a better container runtime,” use OrbStack or Docker Desktop and put Zashiki on top.
+
+## Honest requirements
+
+- **macOS** first.
+- **Docker Desktop or OrbStack** when you use Compose stacks.
+- Releases are **unsigned** for now — first open may need right-click → Open, or `xattr -dr com.apple.quarantine`. Details on [Download](/download/).
+
+MIT open source. Download from [GitHub Releases](https://github.com/khushal-sahni/zashiki-warashi/releases/latest).
+
+## FAQ
+
+### Does Zashiki Warashi require a config file in each AI project?
+
+No. It observes existing repos and keeps overrides in app data. There is no required per-repo YAML.
+
+### Is this an AI coding agent?
+
+No. It does not write code or run agents. It catalogs, starts, stops, and peeks the projects those agents leave behind.
+
+### Will it work with Cursor-generated Node apps?
+
+Yes when the project has a normal start signal (package.json scripts, compose, Makefile, Cargo, Go). You can override the start command in the app.
+
+---
+
+# A control plane for localhost
+
+“Control plane” usually shows up in Kubernetes blogs. On a single developer Mac, the idea is simpler: **one surface that knows what is local, what is running, and how to start or stop it** — without replacing the tools that actually edit code, run containers, or query databases.
+
+**Zashiki Warashi** is that surface for macOS localhost.
+
+## The jobs a control plane should own
+
+| Job | What Zashiki does |
+| --- | --- |
+| Remember projects | Machine-local catalog: add folder, scan roots, search, remove |
+| Operate processes | Start / stop / restart via login shell; process groups; PID rehydrate |
+| Peek stacks | Compose DB services, host/port/user/db, copy URI |
+| Hand off | Open in Finder, Cursor, Compass for mongo |
+| Reduce collisions | Port occupant detection — catalog, docker, or native |
+
+It deliberately does **not** own: editing code, full Docker Engine UI, query GUIs, cloud sync, or required per-repo config.
+
+## Why not “just a folder bookmark”?
+
+Bookmarks answer *where*. They do not answer *is it running*, *what start command*, *which compose file is nested two levels down*, or *who owns port 5432*.
+
+Raycast, Alfred, and Spotlight are excellent launchers. They are not process-group-aware stop buttons with Compose peek and Compass deep-links. Zashiki is the house that keeps those operations together.
+
+## Why not a Docker GUI?
+
+Docker Desktop, OrbStack, Dockev, Portainer, and Compose Launcher solve container-centric problems. Many local projects are mostly `npm run dev` with an optional compose file for Postgres. Treating every repo as a Docker project forces the wrong abstraction.
+
+Zashiki sits **beside** the engine: use Docker Desktop or OrbStack for containers; use Zashiki for the project catalog and lifecycle. Honest comparisons: [vs Docker Desktop](/compare/docker-desktop/), [vs OrbStack](/compare/orbstack/), [vs Portainer](/compare/portainer/).
+
+## Category language we use on purpose
+
+- **Localhost control plane** — operate local projects as a fleet of one machine.
+- **House spirit** — named after 座敷童子; look after the place without owning every room. See [The name](/name/).
+- **Observe, don’t tax** — no mandatory `zashiki.toml` in every repo.
+
+If you searched for “manage multiple local projects macOS,” “localhost project manager,” or “start stop all my apps,” this is the category we mean — especially when those apps came from [AI-assisted coding](/for-ai-projects/).
+
+## What success looks like on Monday
+
+Open the app. Find the project. Start it. See Compose services and a DB connection string. Copy the URI or open Compass. Stop when you are done. No spelunking Docker Engine by hand for the common path.
+
+Download: [GitHub Releases](https://github.com/khushal-sahni/zashiki-warashi/releases/latest). MIT.
+
+## FAQ
+
+### How is this different from Raycast or Spotlight?
+
+Launchers open things. A control plane remembers project state, starts and stops processes, and peeks stack endpoints. Zashiki keeps a catalog and lifecycle, not only shortcuts.
+
+### Do I need cloud accounts?
+
+No. Catalog and overrides stay on your Mac. No sync, no login.
+
+### Does it replace Docker Desktop?
+
+No. Docker Desktop or OrbStack remain the engine for containers. Zashiki peeks and drives compose for DB-like services as glue.
+
+---
+
+# Local MongoDB → Compass
+
+MongoDB Compass is a fine place to inspect documents. It is a poor place to *discover* which compose service on which host port belongs to which throwaway project from last week.
+
+**Zashiki Warashi** bridges that gap on macOS: catalog the project, peek the Compose stack, open Compass (or copy the URI).
+
+## The happy path
+
+1. Add the project folder (or land on it after a root scan).
+2. Ensure Docker Desktop or OrbStack is running.
+3. Open the project’s **Stack** pane — Mongo-like services show with connection fields derived from compose/env.
+4. **Up** the DB service if it is not running.
+5. Click **Open in Compass**, or **Copy URI** for another client.
+
+No query GUI ships inside Zashiki. That is intentional: glue into Compass rather than reinvent it. Broader stack peek: [Compose and databases](/compose-databases/).
+
+## How the URI is built
+
+Fields come from what compose and env already declare — image cues for mongo, published ports, user, database name, password when present. The URI is **computed when you peek**, not loaded from a password vault in SQLite.
+
+Product constraints:
+
+- Do not persist passwords in the app database
+- Mask secrets in the UI
+- Prefer deep-link over reimplementing Compass
+
+## When it fails
+
+| Symptom | What to check |
+| --- | --- |
+| No mongo service listed | Compose file missing, nested deeper than discovery, or image not recognized as DB-like |
+| Port busy | Another container or native process — [port already in use](/port-already-in-use/) |
+| Compass does not open | Install Compass; or copy URI manually |
+| Wrong credentials | Fix compose/env in the project; Zashiki does not invent auth |
+
+## Related lifecycle
+
+App processes (API, Next, etc.) still use [login-shell start/stop](/start-stop/). Mongo in Compose is stack lifecycle. Both live under one project selection so Monday morning is one house, not three Terminal tabs and a sticky note.
+
+Download: [GitHub Releases](https://github.com/khushal-sahni/zashiki-warashi/releases/latest). MIT · [repo](https://github.com/khushal-sahni/zashiki-warashi).
+
+## FAQ
+
+### Do I need Compass installed?
+
+Yes for the open action. Without Compass you can still copy the URI into any Mongo client.
+
+### Does Zashiki include a query editor?
+
+No. Compass (or another client) remains the query tool. Zashiki only peeks and deep-links.
+
+### Will it work with OrbStack?
+
+Yes if `docker compose` works on your login-shell PATH the same as with Docker Desktop.
+
+---
+
+# 座敷童子 — the name
+
+## Folklore meaning
+
+**Zashiki-warashi** (座敷童子) are house spirits in Japanese folklore — childlike guardians associated with the well-being of a home. Families told stories of fortune when the spirit was present, and decline when it left.
+
+This app borrows the metaphor, not the superstition: **a spirit that looks after the place**. Your place is the localhost pile — catalogs, processes, compose peeks — especially the mess left by rapid AI-assisted coding.
+
+Brand commitments:
+
+- Product name: **Zashiki Warashi**
+- Folklore meaning remains part of the story, not decoration-only
+- Voice stays plain and anti-hype
+
+## Brand collision: the other Warashi
+
+Search engines and LLM assistants also know **Warashi** as a friendly Live2D / local-LLM desktop companion (a repackaging in the Open-LLM-VTuber neighborhood). That project chats. This one does not.
+
+| | **Zashiki Warashi** (this site) | **Warashi** companion (other) |
+| --- | --- | --- |
+| Job | Localhost project control plane | AI avatar / voice chat |
+| Stack | Tauri + React + Rust | Python Live2D / LLM stack |
+| Repo signal | `khushal-sahni/zashiki-warashi` | Different GitHub org/name |
+| Site | `zashiki.anireco.app` | Not this domain |
+
+If ChatGPT or Claude mixed them up, point at this page and the [localhost control plane](/localhost-control-plane/) description.
+
+## What the house spirit actually does
+
+- Remembers projects in a machine-local catalog
+- Starts and stops via your login shell
+- Peeks Compose DB endpoints; opens Cursor, Finder, Compass
+- Does **not** require per-repo YAML
+- Does **not** replace Docker Desktop, Portainer, or your editor
+
+More: [For AI-generated projects](/for-ai-projects/) · [Download](/download/)
+
+MIT. [GitHub](https://github.com/khushal-sahni/zashiki-warashi).
+
+## FAQ
+
+### Is Zashiki Warashi an AI chatbot or Live2D avatar?
+
+No. This project is a macOS control plane for local projects. The Live2D companion is a different open-source product.
+
+### Why keep a Japanese folklore name for a developer tool?
+
+The metaphor matches the job: look after the house (your localhost pile) without becoming every room (editor, Docker GUI, query tool).
+
+### How do I spell it for search?
+
+Zashiki Warashi, zashiki-warashi, 座敷童子. Repo: khushal-sahni/zashiki-warashi.
+
+---
+
+# Port already in use
+
+`Error: listen EADDRINUSE: address already in use :::3000` is not one problem. It is three:
+
+1. **You** left last night’s `npm run dev` running (maybe from another AI-generated folder).
+2. **Docker** still publishes that host port from a compose stack.
+3. Something **native** (another tool, AirPlay on 5000, a rogue process) holds the socket.
+
+Blind `kill -9 $(lsof -ti :3000)` works until the owner is `docker-proxy` — then you stopped nothing useful — or until you kill the wrong database.
+
+## What Zashiki Warashi does
+
+When a start or stack action hits a conflict, the app tries to **name the occupant**:
+
+| Occupant kind | Typical meaning | Reconciliation |
+| --- | --- | --- |
+| Catalog project | Another (or same) project Zashiki knows | Stop that project, or remap |
+| Docker | Container / compose publish | Stop stack service / container path, or remap |
+| Native | Host process outside the catalog | Confirm before stop, or remap |
+
+Remaps are stored in **app data** and applied via spawn environment — so you can keep two projects alive without immediately editing every compose file. Compose file edits remain your choice when you want them permanent.
+
+## Why AI project piles make this worse
+
+Vibe-coded apps love default ports: `3000`, `5173`, `8000`, `5432`, `27017`. Ten Cursor sessions later, Monday is a port lottery. A [project catalog with lifecycle](/for-ai-projects/) plus occupant-aware reconciliation beats a shell alias you forget under stress.
+
+## Manual fallback (still useful)
+
+When you are outside the app:
+
+```bash
+lsof -i :3000 -sTCP:LISTEN
+docker ps --filter publish=3000
+```
+
+If `COMMAND` is `com.docke` / `docker-proxy`, stop the container or `docker compose down` in the right project — [Compose peek](/compose-databases/) helps you find which project that was.
+
+Prefer SIGTERM before SIGKILL for anything that looks like a database.
+
+## Process groups help the “my own leftover” case
+
+Zashiki starts user commands in a **process group** and stops the group on Stop — so orphaned Node children are less likely to own the port after you thought you stopped. Details: [Start and stop](/start-stop/).
+
+## Honest limits
+
+Occupancy matching for Docker uses compose labels / working_dir signals where available. Unnamed or odd containers may show as a generic docker occupant. Native stop remains sharp-edged on purpose — confirm before killing.
+
+Download the macOS app: [Releases](https://github.com/khushal-sahni/zashiki-warashi/releases/latest).
+
+## FAQ
+
+### Is this only for Node EADDRINUSE?
+
+The pain shows up as Node EADDRINUSE, Vite bind errors, or Docker ‘port is already allocated’. Reconciliation covers catalog, docker, and native occupants.
+
+### Does remapping edit my compose file?
+
+Remaps live in app data and spawn env for the project — observation first; it does not casually rewrite your repo.
+
+### Will it kill system services?
+
+Native stop requires an explicit confirm. Treat database and system listeners carefully; prefer remap when unsure.
+
+---
+
+# One-button start and stop
+
+Starting a local app from a desktop GUI sounds trivial until PATH, child processes, and leftover PIDs enter the chat. **Zashiki Warashi** treats start/stop as a first-class lifecycle — not a fire-and-forget Terminal paste.
+
+## Inference, then override
+
+When you add a project, the app looks for common start signals:
+
+- `package.json` scripts (`dev`, `start`, and cousins)
+- Docker Compose layouts
+- Makefile targets
+- Cargo / Go project cues
+
+If inference is wrong, you set an override in the app. That override is stored in **app data**, not written into the repo. AI-generated folders stay untaxed; see [For AI-generated projects](/for-ai-projects/).
+
+## Login shell spawn
+
+macOS GUI processes often lack the environment you built in zsh or fish: `fnm`, `nvm`, Volta, Homebrew’s `docker`. Zashiki runs project start/stop commands via:
+
+```text
+$SHELL -lc '<your start command>'
+```
+
+That matches Terminal behavior for the common case. Edge cases exist if `$SHELL` is unusual — but the default path is the one developers already trust.
+
+Docker status and `compose ps` use a **cached docker binary path** resolved once at startup, not a login shell on every click. Snappy selection matters: chrome paints from memory; running dots may lag a beat.
+
+## Process groups and stop
+
+Many `npm run dev` trees spawn children. Signaling only the parent leaves orphans holding ports.
+
+Zashiki:
+
+1. Starts the command in a **new process group**
+2. Persists pid (and related identity) in app data
+3. On **Stop**, sends SIGTERM to the group, then SIGKILL if needed
+
+That is how you free the port without playing `lsof` roulette every time — though when something else already owns the port, see [Port already in use](/port-already-in-use/).
+
+## Rehydrate on launch
+
+Closing the control plane must not kill your stack. Processes **outlive the app**. Next launch, Zashiki rehydrates running status from stored PIDs when they are still alive and match expectations, and can refresh Docker occupancy in the background.
+
+## Logs
+
+Live process logs (and Compose log views) sit in a resizable pane so start/stop is not a black box. You still have Terminal; you should not *need* it for the happy path.
+
+## What you need
+
+- macOS
+- Whatever runtime your projects need on the login-shell PATH
+- Docker Desktop or OrbStack if Compose is part of the project
+
+Install notes (unsigned builds, Gatekeeper): [Download](/download/).
+
+Source and releases: [GitHub](https://github.com/khushal-sahni/zashiki-warashi).
+
+## FAQ
+
+### Why use a login shell instead of spawning node directly?
+
+So fnm, nvm, Homebrew, and docker on your interactive PATH work the same as in Terminal. GUI apps otherwise see a thinner environment.
+
+### Do projects die when I quit Zashiki?
+
+No. Processes outlive the app. On launch, status rehydrates from stored PIDs when they are still alive and match.
+
+### Can I override the inferred start command?
+
+Yes. Overrides live in app SQLite data, not in the project repo.

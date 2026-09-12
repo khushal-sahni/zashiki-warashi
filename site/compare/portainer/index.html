@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Zashiki Warashi vs Portainer — Docker UI vs project house</title>
+    <meta name="description" content="Portainer is a Docker/container management UI (often remote). Zashiki Warashi is a macOS-local project catalog with process start/stop and Compose DB peek — not a Portainer replacement." />
+    <link rel="canonical" href="https://zashiki.anireco.app/compare/portainer/" />
+    <link
+      rel="alternate"
+      type="text/markdown"
+      href="https://zashiki.anireco.app/compare/portainer/index.md"
+      title="Markdown"
+    />
+    <meta property="og:type" content="article" />
+    <meta property="og:url" content="https://zashiki.anireco.app/compare/portainer/" />
+    <meta property="og:title" content="Zashiki Warashi vs Portainer — Docker UI vs project house" />
+    <meta property="og:description" content="Portainer is a Docker/container management UI (often remote). Zashiki Warashi is a macOS-local project catalog with process start/stop and Compose DB peek — not a Portainer replacement." />
+    <meta property="og:image" content="https://zashiki.anireco.app/assets/hero-comp.png" />
+    <meta property="og:site_name" content="Zashiki Warashi" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Zashiki Warashi vs Portainer — Docker UI vs project house" />
+    <meta name="twitter:description" content="Portainer is a Docker/container management UI (often remote). Zashiki Warashi is a macOS-local project catalog with process start/stop and Compose DB peek — not a Portainer replacement." />
+    <meta name="twitter:image" content="https://zashiki.anireco.app/assets/hero-comp.png" />
+    <link rel="stylesheet" href="../../fonts.css" />
+    <link rel="stylesheet" href="../../styles.css" />
+    <link
+      rel="icon"
+      href="../../favicon.svg"
+      type="image/svg+xml"
+    />
+    <script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position": 1,
+      "name": "Home",
+      "item": "https://zashiki.anireco.app/"
+    },
+    {
+      "@type": "ListItem",
+      "position": 2,
+      "name": "Compare",
+      "item": "https://zashiki.anireco.app/compare/"
+    },
+    {
+      "@type": "ListItem",
+      "position": 3,
+      "name": "vs Portainer",
+      "item": "https://zashiki.anireco.app/compare/portainer/"
+    }
+  ]
+}
+    </script>
+    <script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "Can Zashiki manage remote Docker hosts?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Not in v1. It is machine-local. Remote/SSH hosts are future ideas, not current scope."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Does Zashiki edit Compose YAML visually?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "No. Peek and up/stop for DB-like services; editing stays in your editor."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "I only need local compose up/down — is Portainer overkill?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Often yes. If your pain is multi-repo localhost plus occasional compose DBs, a project house may fit better than a full Docker UI."
+      }
+    }
+  ]
+}
+    </script>
+  </head>
+  <body class="page-interior">
+    <header class="site-chrome">
+      <a class="chrome-brand" href="../../">Zashiki Warashi</a>
+      <nav class="chrome-actions" aria-label="Primary">
+        <a
+          class="ghost-inline chrome-github"
+          href="https://github.com/khushal-sahni/zashiki-warashi"
+          >GitHub</a
+        >
+        <a
+          class="download-inline"
+          href="https://github.com/khushal-sahni/zashiki-warashi/releases/latest"
+          >Download for macOS</a
+        >
+      </nav>
+    </header>
+
+    <main class="below interior-main">
+      <nav class="breadcrumb" aria-label="Breadcrumb">
+        <a href="../../">Home</a>
+         <span aria-hidden="true">/</span> <a href="../../compare/">Compare</a> <span aria-hidden="true">/</span> <span aria-current="page">vs Portainer</span>
+      </nav>
+
+      <article class="room">
+        <header class="room-head">
+          <h1>vs Portainer</h1>
+          <p class="lede">Portainer manages containers and environments. Zashiki manages the developer’s local project pile and glues into Docker only where Compose databases matter.</p>
+        </header>
+
+        <div class="prose"><h2>Short answer</h2>
+<p><strong>Portainer</strong> is a mature <strong>Docker / container management</strong> UI — stacks, environments, often remote endpoints, team-oriented Docker ops.</p>
+<p><strong>Zashiki Warashi</strong> is a <strong>macOS localhost control plane</strong> for developer projects: catalog folders, start/stop app processes via login shell, peek Compose DB endpoints, open Cursor / Compass.</p>
+<p>Zashiki is <strong>not</strong> a Portainer alternative. If you need Portainer’s job, use Portainer (or Docker Desktop / OrbStack GUIs). If you need a project house, use Zashiki — optionally with those engines underneath.</p>
+<h2>Side-by-side</h2>
+<table>
+<thead>
+<tr>
+<th>Concern</th>
+<th>Portainer</th>
+<th>Zashiki Warashi</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Primary object</td>
+<td>Containers / stacks / environments</td>
+<td>Local project folders</td>
+</tr>
+<tr>
+<td>Remote Docker</td>
+<td>Core strength</td>
+<td>Out of scope (v1)</td>
+</tr>
+<tr>
+<td><code>npm run dev</code> / fnm PATH</td>
+<td>Not the product</td>
+<td>Login-shell lifecycle</td>
+</tr>
+<tr>
+<td>DB URI copy + Compass</td>
+<td>Manual / external</td>
+<td>Built-in peek path</td>
+</tr>
+<tr>
+<td>RBAC / multi-user</td>
+<td>Portainer’s world</td>
+<td>Single machine, no accounts</td>
+</tr>
+<tr>
+<td>Required project config</td>
+<td>Compose for stacks</td>
+<td>No required per-repo YAML</td>
+</tr>
+</tbody></table>
+<h2>Choose Portainer when</h2>
+<ul>
+<li>You administer Docker environments (local or remote) as the main job</li>
+<li>You need broad container, volume, network, and stack operations in a UI</li>
+<li>Multiple hosts or team access patterns matter</li>
+</ul>
+<h2>Choose Zashiki when</h2>
+<ul>
+<li>The mess is <strong>repos and processes</strong> on one Mac — especially <a href="/for-ai-projects/">AI-generated piles</a></li>
+<li>Compose exists mainly to run databases beside an app you start with npm/cargo/go</li>
+<li>You want <a href="/port-already-in-use/">port reconciliation</a> across catalog and docker occupants</li>
+</ul>
+<p>Also read <a href="/compare/docker-desktop/">vs Docker Desktop</a> and <a href="/compose-databases/">Compose and databases</a>.</p>
+<p>Download: <a href="https://github.com/khushal-sahni/zashiki-warashi/releases/latest">GitHub Releases</a>. MIT.</p>
+</div>
+
+        <section class="fold faq-fold" aria-labelledby="faq-heading">
+          <h2 id="faq-heading">FAQ</h2>
+          <details class="faq-item">
+            <summary>Can Zashiki manage remote Docker hosts?</summary>
+            <p>Not in v1. It is machine-local. Remote/SSH hosts are future ideas, not current scope.</p>
+          </details>
+          <details class="faq-item">
+            <summary>Does Zashiki edit Compose YAML visually?</summary>
+            <p>No. Peek and up/stop for DB-like services; editing stays in your editor.</p>
+          </details>
+          <details class="faq-item">
+            <summary>I only need local compose up/down — is Portainer overkill?</summary>
+            <p>Often yes. If your pain is multi-repo localhost plus occasional compose DBs, a project house may fit better than a full Docker UI.</p>
+          </details>
+        </section>
+
+        <section class="fold related-fold" aria-labelledby="related-heading">
+          <h2 id="related-heading">More rooms</h2>
+          <ul class="related-list">
+          <li><a href="../../compose-databases/">Compose and databases</a></li>
+          <li><a href="../../compare/docker-desktop/">vs Docker Desktop</a></li>
+          <li><a href="../../localhost-control-plane/">Localhost control plane</a></li>
+          </ul>
+        </section>
+      </article>
+
+      <p class="closing">
+        <a
+          class="download-inline"
+          href="https://github.com/khushal-sahni/zashiki-warashi/releases/latest"
+          >Download for macOS</a
+        >
+        <a
+          class="ghost-inline"
+          href="https://github.com/khushal-sahni/zashiki-warashi"
+          >GitHub</a
+        >
+      </p>
+
+      <footer class="site-footer">
+        <span>座敷童子 — a house spirit that looks after the place.</span>
+        <span>
+          <a href="https://github.com/sponsors/khushal-sahni">Sponsors</a>
+          · MIT ·
+          <a href="https://zashiki.anireco.app/compare/portainer/index.md">Markdown</a>
+        </span>
+      </footer>
+    </main>
+  </body>
+</html>

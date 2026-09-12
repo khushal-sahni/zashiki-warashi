@@ -10,7 +10,9 @@
     "tauri": "tauri",
     "tauri:dev": "tauri dev",
     "tauri:build": "tauri build",
-    "tauri:install": "bash scripts/install-macos.sh"
+    "tauri:install": "bash scripts/install-macos.sh",
+    "site:build": "npm run build --prefix site",
+    "site:preview": "npm run preview --prefix site"
   },
   "dependencies": {
     "@tauri-apps/api": "^2",

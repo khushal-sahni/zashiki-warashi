@@ -329,3 +329,269 @@ a:focus-visible {
     overflow: visible;
   }
 }
+
+/* —— Interior SEO rooms (no noren raster) —— */
+
+.page-interior {
+  min-height: 100vh;
+}
+
+.site-chrome {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem 1.25rem;
+  padding: 0.75rem 1.25rem;
+  background:
+    linear-gradient(
+      180deg,
+      color-mix(in srgb, var(--indigo) 55%, #0d172a),
+      color-mix(in srgb, var(--ink) 92%, #1a2744)
+    );
+  border-bottom: 1px solid color-mix(in srgb, var(--paper) 12%, transparent);
+}
+
+.chrome-brand {
+  font-family: Fresca, "Protest Revolution", sans-serif;
+  font-size: 1.35rem;
+  letter-spacing: 0.02em;
+  color: var(--paper);
+  text-decoration: none;
+}
+
+.chrome-brand:hover {
+  color: color-mix(in srgb, var(--paper) 88%, #fff);
+}
+
+.chrome-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.chrome-actions .download-inline,
+.chrome-actions .ghost-inline {
+  min-height: 2.75rem;
+}
+
+.interior-main {
+  padding-top: 1.5rem;
+}
+
+.breadcrumb {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.35rem;
+  margin: 0 0 1.5rem;
+  color: var(--muted);
+  font-size: 0.9rem;
+  line-height: 1.4;
+}
+
+.breadcrumb a {
+  color: color-mix(in srgb, var(--paper) 78%, var(--muted));
+  text-decoration: none;
+}
+
+.breadcrumb a:hover {
+  color: var(--paper);
+  text-decoration: underline;
+}
+
+.room-head {
+  margin: 0 0 1.5rem;
+}
+
+.room-head h1 {
+  margin: 0 0 0.75rem;
+  font-family: Fresca, "Protest Revolution", sans-serif;
+  font-size: clamp(1.85rem, 5vw, 2.35rem);
+  font-weight: 400;
+  letter-spacing: 0.02em;
+  line-height: 1.15;
+  color: var(--paper);
+}
+
+.lede {
+  margin: 0;
+  color: var(--muted);
+  font-size: 1.1rem;
+  line-height: 1.65;
+  max-width: 40rem;
+}
+
+.prose {
+  margin: 0 0 2.75rem;
+}
+
+.prose > *:first-child {
+  margin-top: 0;
+}
+
+.prose h2 {
+  margin: 2rem 0 0.65rem;
+  font-family: Fresca, "Protest Revolution", sans-serif;
+  font-size: 1.45rem;
+  font-weight: 400;
+  letter-spacing: 0.03em;
+  color: var(--paper);
+}
+
+.prose h3 {
+  margin: 1.5rem 0 0.5rem;
+  font-family: Fresca, "Protest Revolution", sans-serif;
+  font-size: 1.15rem;
+  font-weight: 400;
+  color: var(--paper);
+}
+
+.prose p,
+.prose li {
+  color: var(--muted);
+  font-size: 1.05rem;
+  line-height: 1.65;
+}
+
+.prose p {
+  margin: 0 0 1rem;
+}
+
+.prose ul,
+.prose ol {
+  margin: 0 0 1rem;
+  padding-left: 1.25rem;
+}
+
+.prose li + li {
+  margin-top: 0.4rem;
+}
+
+.prose a {
+  color: color-mix(in srgb, var(--paper) 70%, var(--persimmon));
+}
+
+.prose a:hover {
+  color: var(--paper);
+}
+
+.prose code {
+  font-size: 0.9em;
+  color: var(--paper);
+  word-break: break-word;
+}
+
+.prose strong {
+  color: color-mix(in srgb, var(--paper) 88%, var(--muted));
+  font-weight: 600;
+}
+
+.prose blockquote {
+  margin: 0 0 1rem;
+  padding: 0.75rem 1rem;
+  border-left: 3px solid color-mix(in srgb, var(--indigo) 70%, var(--paper));
+  background: color-mix(in srgb, var(--indigo) 22%, transparent);
+  border-radius: 0 0.5rem 0.5rem 0;
+  color: var(--muted);
+}
+
+.prose blockquote p:last-child {
+  margin-bottom: 0;
+}
+
+.prose table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 0 0 1rem;
+  font-size: 0.95rem;
+  line-height: 1.45;
+}
+
+.prose th,
+.prose td {
+  padding: 0.55rem 0.65rem;
+  border: 1px solid color-mix(in srgb, var(--paper) 14%, transparent);
+  text-align: left;
+  vertical-align: top;
+  color: var(--muted);
+}
+
+.prose th {
+  color: var(--paper);
+  background: color-mix(in srgb, var(--indigo) 40%, transparent);
+  font-weight: 600;
+}
+
+.prose td code {
+  font-size: 0.85em;
+}
+
+.related-list {
+  margin: 0;
+  padding-left: 1.2rem;
+}
+
+.related-list li + li {
+  margin-top: 0.45rem;
+}
+
+.related-list a,
+.fold a {
+  color: color-mix(in srgb, var(--paper) 70%, var(--persimmon));
+}
+
+.faq-item {
+  margin: 0.75rem 0 0;
+  padding: 0.65rem 0 0;
+  border-top: 1px solid color-mix(in srgb, var(--paper) 12%, transparent);
+}
+
+.faq-item:first-of-type {
+  margin-top: 0.5rem;
+}
+
+.faq-item summary {
+  cursor: pointer;
+  color: var(--paper);
+  font-size: 1.05rem;
+  line-height: 1.45;
+  list-style-position: outside;
+}
+
+.faq-item summary:focus-visible {
+  outline: 2px solid var(--persimmon);
+  outline-offset: 3px;
+}
+
+.faq-item p {
+  margin: 0.55rem 0 0;
+  color: var(--muted);
+  font-size: 1.05rem;
+  line-height: 1.65;
+}
+
+@media (max-width: 820px) {
+  .site-chrome {
+    flex-direction: column;
+    align-items: stretch;
+    padding: 1rem 1rem 1.1rem;
+  }
+
+  .chrome-actions {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .chrome-actions .download-inline,
+  .chrome-actions .ghost-inline {
+    width: 100%;
+    min-height: 2.75rem;
+    justify-content: center;
+  }
+
+  .interior-main {
+    padding-top: 1.25rem;
+  }
+}
