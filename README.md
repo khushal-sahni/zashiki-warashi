@@ -52,7 +52,7 @@ Daily-driver install from a local checkout:
 npm run tauri:install
 ```
 
-Builds a release `.app` into `~/Applications/Zashiki Warashi.app`. Do **not** run the installed app and `tauri:dev` at the same time — they share the same SQLite catalog.
+Builds a release `.app` into `/Applications/Zashiki Warashi.app`. macOS may prompt for Touch ID or an admin password when writing to `/Applications`. Do **not** run the installed app and `tauri:dev` at the same time — they share the same SQLite catalog.
 
 ```bash
 npm run tauri:build   # bundle under src-tauri/target/release/bundle/

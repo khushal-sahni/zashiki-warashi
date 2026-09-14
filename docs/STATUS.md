@@ -1,6 +1,6 @@
 # STATUS.md
 > Your weekend dashboard. Read this first. Update this last.
-> Last updated: `2026-09-12` | Session: `#14`
+> Last updated: `2026-09-14` | Session: `#15`
 
 ---
 
@@ -16,7 +16,7 @@
 - [x] **Lifecycle** — start / stop / restart via login shell + process groups
 - [x] **PID + pgid persistence** and rehydrate on launch
 - [x] Catalog UI (sidebar + detail + scan results + scan-root settings)
-- [x] **Local install** — `npm run tauri:install` → `~/Applications/Zashiki Warashi.app`
+- [x] **Local install** — `npm run tauri:install` → `/Applications/Zashiki Warashi.app` (auth sheet when needed)
 - [x] **Coffee toggle** — compact toolbar keep-awake
 - [x] **Live project logs** + Compose log tab (nested compose `-f`)
 - [x] **Compose DB stack** — discover nested compose, Up/Stop DB services, peek/copy URI, Compass for mongo
@@ -49,7 +49,7 @@
 
 ## Where We Left Off
 
-SEO multi-room static site built under `site/` (markdown source → HTML). Previewed locally at `:8765`. Still need `wrangler deploy` + DNS when ready.
+Daily-driver install now targets `/Applications` (Spotlight-friendly) with Authorization Services when elevation is needed. Still need `wrangler deploy` + DNS when ready for the site.
 
 ---
 
@@ -115,8 +115,8 @@ cd site && npm run build && npx wrangler deploy
 
 | Metric | Value |
 |---|---|
-| Total sessions | 14 |
+| Total sessions | 15 |
 | Modules complete | M0 + M1 + M2 + M3 (+ Coffee + logs + panes + snappy + OSS path + landing redesign + SEO rooms) |
 | Test coverage | 44 Rust unit tests |
-| Last deployed | Local `~/Applications` via `tauri:install`; site SEO not yet wrangler-deployed |
+| Last deployed | Local `/Applications` via `tauri:install`; site SEO not yet wrangler-deployed |
 | SEO rooms | 12 + compare hub |

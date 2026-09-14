@@ -107,10 +107,17 @@ Use this format for each decision:
 
 ### Daily driver via local `~/Applications` install (not auto on tauri:dev)
 - **Date**: 2026-08-26
-- **Status**: Accepted
+- **Status**: Superseded by [Daily driver via `/Applications`](#daily-driver-via-applications-install-not-auto-on-tauridev)
 - **Context**: Want Zashiki available from Spotlight/Dock like a normal app, while keeping `tauri:dev` for coding. Hooking install into every `tauri:dev` would be slow and still would not reflect mid-session edits.
 - **Decision**: Separate `npm run tauri:install` builds a release `.app` and copies it to `~/Applications`. Dev and installed app share `com.zashiki.warashi` app data; do not run both at once.
-- **Consequences**: Fast coding loop unchanged. Daily driver is refreshed on demand. No Apple signing/notarization for personal local use yet.
+- **Consequences**: Fast coding loop unchanged. Daily driver is refreshed on demand. No Apple signing/notarization for personal local use yet. Spotlight often does not index `~/Applications`, so the app was hard to find.
+
+### Daily driver via `/Applications` install (not auto on tauri:dev)
+- **Date**: 2026-09-14
+- **Status**: Accepted
+- **Context**: `~/Applications` installs were missing from Spotlight/Launchpad. Writing to `/Applications` may need elevation; `sudo` in Cursor’s terminal often skips Touch ID even when PAM is configured.
+- **Decision**: `npm run tauri:install` installs to `/Applications/Zashiki Warashi.app`. Prefer an unprivileged `ditto` when writable; otherwise use AppleScript `do shell script … with administrator privileges` so macOS shows the standard auth sheet (Touch ID when enrolled, password / other methods otherwise). No silent fallback to `~/Applications`. Remove a leftover `~/Applications` copy and `lsregister` after install. Still not auto on `tauri:dev`.
+- **Consequences**: Spotlight finds the daily driver. First install (or when ownership blocks write) may prompt for auth. Dev and installed app still share `com.zashiki.warashi` app data — do not run both at once.
 
 ### Project logs via app-data files + Tauri events
 - **Date**: 2026-09-03

@@ -29,6 +29,28 @@
 
 ## Sessions
 
+## Session #15 — 2026-09-14
+
+### Built
+- Nothing net-new product surface
+
+### Changed
+- **`scripts/install-macos.sh`** — install daily driver to `/Applications` (not `~/Applications`) so Spotlight/Launchpad index it
+- Prefer unprivileged `ditto` when writable; else AppleScript `do shell script … with administrator privileges` (Touch ID / password auth sheet — not `sudo`)
+- Remove leftover `~/Applications` copy after success; `lsregister` the new bundle
+- Docs: DECISIONS supersede, README develop-from-source path, STATUS
+
+### Fixed
+- Local `tauri:install` apps missing from Spotlight because they lived under `~/Applications`
+
+### Deferred / Not Done
+- Did not run a full `tauri:install` in-session (long release build + interactive auth)
+
+### New Tech Debt
+- None
+
+---
+
 ## Session #14 — 2026-09-12
 
 ### Built
