@@ -53,6 +53,17 @@ V1 is "useful on Monday" when you can open the app, find a project, start/stop i
 - [x] README with setup and usage
 - [x] Basic smoke tests for catalog + lifecycle
 
+### M5 — Scheduled jobs `[x]`
+> Zashiki makes sure the Mac is ready on time; your script does the work
+
+- [x] Jobs mode beside Projects: list, inspector, run history, run log, read-only "other launch agents"
+- [x] Per-job launchd agents (calendar slots, catch-up on wake) + background supervisor
+- [x] Runner: login shell, process group, network wait, keep-awake hold, max runtime, run log
+- [x] Optional root wake helper that only arms/cancels Zashiki's own `pmset` wakes
+- [x] Local socket API + MCP server for agents and scripts
+- [ ] Real-hardware check of lid-closed wake on AC power
+- [ ] Signed/notarized helper (today's helper is installed via admin prompt)
+
 ### M4+ — Future ideas `[ ]`
 > Nice-to-haves; not blocking v1
 

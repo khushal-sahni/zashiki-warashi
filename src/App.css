@@ -219,6 +219,54 @@ button.danger {
   color: #f0a8a0;
 }
 
+button.primary {
+  background: rgba(88, 140, 120, 0.35);
+  border-color: rgba(143, 191, 168, 0.55);
+  color: var(--sage-text);
+  font-weight: 600;
+}
+
+button:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible,
+summary:focus-visible {
+  outline: 2px solid rgba(143, 191, 168, 0.75);
+  outline-offset: 2px;
+}
+
+select {
+  width: 100%;
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(12, 14, 18, 0.8);
+  color: inherit;
+  padding: 0.5rem 0.6rem;
+  font: inherit;
+}
+
+.titlebar-lead {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  min-width: 0;
+}
+
+.mode-switch {
+  display: inline-flex;
+  gap: 0.25rem;
+  padding: 0.2rem;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(12, 14, 18, 0.55);
+}
+
+.mode-switch button {
+  padding: 0.3rem 0.75rem;
+  border-color: transparent;
+  font-size: 0.88rem;
+}
+
 .panel {
   background: rgba(24, 27, 34, 0.9);
   border: 1px solid rgba(255, 255, 255, 0.08);
@@ -879,5 +927,372 @@ code {
 
   .toolbar {
     justify-content: flex-start;
+  }
+}
+
+/* Scheduled jobs */
+
+.status-ok {
+  background: var(--sage);
+}
+
+.badge-ok {
+  color: var(--sage);
+  border-color: rgba(143, 191, 168, 0.35);
+}
+
+.job-item-meta {
+  font-size: 0.75rem;
+  color: var(--muted);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.job-list .project-item-text {
+  flex: 1;
+}
+
+.foreign-agents {
+  flex-shrink: 0;
+  max-height: 45%;
+  overflow: auto;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+  padding-top: 0.55rem;
+}
+
+.foreign-agents summary {
+  cursor: pointer;
+  font-size: 0.78rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.foreign-agents-note {
+  font-size: 0.75rem;
+  margin: 0.35rem 0;
+}
+
+.foreign-agent-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+}
+
+.foreign-agent {
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+  min-width: 0;
+  font-size: 0.78rem;
+}
+
+.foreign-agent-label {
+  font-weight: 600;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.foreign-agent-meta {
+  color: var(--muted);
+}
+
+.foreign-agent-program {
+  font-size: 0.72rem;
+  color: var(--muted);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.detail-header-text {
+  min-width: 0;
+}
+
+.detail-header-text .path {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.job-note {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin: 0 0 0.65rem;
+  padding: 0.55rem 0.75rem;
+  border-radius: 10px;
+  font-size: 0.82rem;
+  color: var(--muted);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(12, 14, 18, 0.45);
+}
+
+.job-note.warn {
+  color: var(--amber-text);
+  border-color: rgba(240, 196, 120, 0.3);
+  background: rgba(160, 120, 60, 0.12);
+}
+
+.job-note button {
+  flex-shrink: 0;
+}
+
+.fact-mono {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 0.82rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.status-grid dd {
+  min-width: 0;
+}
+
+.run-row {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  padding: 0.35rem 0.55rem;
+  text-align: left;
+  font-size: 0.8rem;
+  background: transparent;
+  border-color: transparent;
+}
+
+.run-row.active {
+  background: rgba(88, 140, 120, 0.16);
+  border-color: rgba(143, 191, 168, 0.35);
+}
+
+.run-row-when {
+  flex-shrink: 0;
+  font-variant-numeric: tabular-nums;
+}
+
+.run-row-meta {
+  color: var(--muted);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.run-history .stack-list {
+  gap: 0.15rem;
+}
+
+.run-picker select {
+  padding: 0.28rem 0.5rem;
+  border-radius: 8px;
+  font-size: 0.78rem;
+  background: rgba(8, 10, 14, 0.9);
+}
+
+.jobs-empty {
+  padding: 1.25rem;
+}
+
+.jobs-empty p {
+  max-width: 36rem;
+}
+
+.job-editor {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.job-editor .detail-header h2 {
+  margin: 0;
+}
+
+.job-editor-lede {
+  margin: 0;
+  font-size: 0.85rem;
+}
+
+.job-fieldset {
+  margin: 0;
+  padding: 0;
+  border: none;
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+}
+
+.job-fieldset legend {
+  padding: 0;
+  margin-bottom: 0.35rem;
+  font-size: 0.78rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--sage);
+}
+
+.job-fieldset label {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  font-size: 0.88rem;
+  color: #b7b3a8;
+}
+
+.job-fieldset input:not([type="radio"]):not([type="checkbox"]) {
+  width: 100%;
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(12, 14, 18, 0.8);
+  color: inherit;
+  padding: 0.5rem 0.65rem;
+  font: inherit;
+}
+
+.job-fieldset textarea {
+  margin: 0;
+}
+
+.job-fieldset input:disabled {
+  opacity: 0.5;
+}
+
+.job-fieldset .mono-input {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 0.85rem;
+}
+
+.field-hint {
+  font-size: 0.75rem;
+  color: var(--muted);
+}
+
+.field-row {
+  display: flex;
+  gap: 0.45rem;
+}
+
+.field-row input {
+  flex: 1;
+  min-width: 0;
+}
+
+.field-grid {
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr;
+  gap: 0.55rem;
+}
+
+.segmented,
+.weekday-picker {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+}
+
+.weekday-picker button {
+  min-width: 3.1rem;
+  padding: 0.35rem 0.55rem;
+}
+
+.job-fieldset .radio-row,
+.job-fieldset .check-row {
+  flex-direction: row;
+  align-items: flex-start;
+  gap: 0.55rem;
+  cursor: pointer;
+}
+
+.radio-row > span {
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+  color: var(--text);
+}
+
+.radio-row input,
+.check-row input {
+  margin-top: 0.3rem;
+  accent-color: var(--sage);
+}
+
+.job-editor-actions {
+  margin: 0;
+}
+
+.settings-heading {
+  margin: 0.75rem 0 0.25rem;
+  font-size: 0.78rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--sage);
+}
+
+.jobs-settings p {
+  margin: 0 0 0.45rem;
+  font-size: 0.85rem;
+}
+
+.settings-row {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  margin: 0.25rem 0 0.45rem;
+}
+
+.copy-field {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  margin: 0 0 0.35rem;
+  min-width: 0;
+}
+
+.copy-field-label {
+  flex-shrink: 0;
+  width: 6.5rem;
+  font-size: 0.78rem;
+  color: var(--muted);
+}
+
+.copy-field-value {
+  flex: 1;
+  min-width: 0;
+  padding: 0.35rem 0.55rem;
+  border-radius: 8px;
+  background: rgba(8, 10, 14, 0.9);
+  font-size: 0.75rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+@media (max-width: 800px) {
+  .titlebar-lead {
+    justify-content: space-between;
+  }
+
+  .field-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .job-note {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .copy-field {
+    flex-wrap: wrap;
+  }
+
+  .copy-field-label {
+    width: 100%;
   }
 }

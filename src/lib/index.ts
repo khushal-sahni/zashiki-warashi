@@ -16,6 +16,20 @@ export {
   updateProjectCommands,
 } from "./api";
 export {
+  createJob,
+  deleteJob,
+  getJobRunLog,
+  getJobSystemStatus,
+  installWakeHelper,
+  listForeignAgents,
+  listJobRuns,
+  listJobs,
+  runJobNow,
+  setJobEnabled,
+  uninstallWakeHelper,
+  updateJob,
+} from "./jobs";
+export {
   clearProjectLogs,
   getProjectLogs,
   listenProjectLogs,

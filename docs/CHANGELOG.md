@@ -29,6 +29,34 @@
 
 ## Sessions
 
+## Session #16 — 2026-10-07
+
+### Built
+- **Scheduled jobs** (M5): new Jobs mode next to Projects
+- Backend: `domain/job.rs`, `JobRepository` (schema v4: `jobs`, `job_runs`; WAL + busy timeout), `job_schedule`, `job_runner`, `launchd_service`, `wake_requests`, `wake_helper`, `job_service`, `job_socket`, `job_mcp`, `system_probe`, `login_shell`, `job_paths`
+- CLI subcommands in the same binary: `job run <id> [--manual]`, `job supervise`, `job wake-daemon`, `job mcp`
+- launchd: per-job `com.zashiki.warashi.job.<id>` agents + `com.zashiki.warashi.jobs` supervisor (socket + housekeeping)
+- Optional root `com.zashiki.warashi.wake` daemon: copied to `/Library/PrivilegedHelperTools`, reconciles only Zashiki-owned `pmset` wakes 90s before exact jobs
+- Runner: Wi-Fi power-on + default-route wait, `caffeinate -w` hold, max runtime (TERM → KILL group), per-run logs, trigger classification (on time / catch-up / manual)
+- 0600 Unix socket JSON-lines API + stdio MCP server (`list_jobs`, `upsert_job`, `set_job_enabled`, `run_job`, `job_runs`, `job_log`)
+- UI: job list, inspector (Run now / Edit / Pause / two-step Delete, wake + battery notes, facts, run history), run log pane with run picker and live follow, editor overlay, jobs settings overlay (wake helper, MCP command, socket)
+
+### Changed
+- `App.tsx` gains a Projects / Jobs mode switch (persisted in `zw-mode`); toolbar and footer are mode-aware
+- `main.rs` dispatches CLI subcommands before starting Tauri
+
+### Fixed
+- Sidebar no longer says "wakes Mac" for paused jobs
+- Run history shows a loading state instead of a false "No runs recorded"
+
+### Deferred / Not Done
+- Wake helper install (admin prompt) and real launchd/pmset wakes not exercised on hardware this session
+- UI verified in the browser against a mocked Tauri backend
+
+### New Tech Debt
+- `login_shell.rs` duplicates some process-group helpers from `process_service`
+- Supervisor plist points at the current executable; running `tauri:dev` points it at the dev binary until the installed app launches again
+
 ## Session #15 — 2026-09-14
 
 ### Built

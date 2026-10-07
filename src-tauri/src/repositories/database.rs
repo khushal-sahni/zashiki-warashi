@@ -6,7 +6,46 @@ use tracing::info;
 
 use crate::error::AppError;
 
-const SCHEMA_VERSION: i64 = 3;
+const SCHEMA_VERSION: i64 = 4;
+
+const JOBS_MIGRATION: &str = "
+    CREATE TABLE IF NOT EXISTS jobs (
+        id TEXT PRIMARY KEY NOT NULL,
+        name TEXT NOT NULL,
+        command TEXT NOT NULL,
+        working_dir TEXT,
+        enabled INTEGER NOT NULL DEFAULT 1,
+        schedule_json TEXT NOT NULL,
+        policy TEXT NOT NULL,
+        network TEXT NOT NULL,
+        network_grace_seconds INTEGER NOT NULL,
+        max_runtime_seconds INTEGER,
+        created_at INTEGER NOT NULL,
+        updated_at INTEGER NOT NULL
+    );
+
+    CREATE TABLE IF NOT EXISTS job_runs (
+        id TEXT PRIMARY KEY NOT NULL,
+        job_id TEXT NOT NULL,
+        trigger TEXT NOT NULL,
+        status TEXT NOT NULL,
+        scheduled_for_unix INTEGER,
+        started_at_unix INTEGER NOT NULL,
+        finished_at_unix INTEGER,
+        exit_code INTEGER,
+        network TEXT,
+        power_source TEXT,
+        runner_pid INTEGER,
+        log_path TEXT NOT NULL,
+        message TEXT,
+        FOREIGN KEY (job_id) REFERENCES jobs(id) ON DELETE CASCADE
+    );
+
+    CREATE INDEX IF NOT EXISTS idx_job_runs_job_started
+        ON job_runs (job_id, started_at_unix DESC);
+
+    PRAGMA user_version = 4;
+";
 
 pub struct Database {
     connection: Mutex<Connection>,
@@ -18,7 +57,9 @@ impl Database {
         std::fs::create_dir_all(app_data_dir)?;
         let path = app_data_dir.join("zashiki.db");
         let connection = Connection::open(&path)?;
-        connection.execute_batch("PRAGMA foreign_keys = ON;")?;
+        connection.execute_batch(
+            "PRAGMA foreign_keys = ON; PRAGMA journal_mode = WAL; PRAGMA busy_timeout = 5000;",
+        )?;
         let db = Self {
             connection: Mutex::new(connection),
             path,
@@ -112,6 +153,12 @@ impl Database {
                 PRAGMA user_version = 3;
                 ",
             )?;
+            info!(from = version, to = 3, "applied database migration");
+        }
+
+        let version: i64 = conn.query_row("PRAGMA user_version", [], |row| row.get(0))?;
+        if version < 4 {
+            conn.execute_batch(JOBS_MIGRATION)?;
             info!(from = version, to = SCHEMA_VERSION, "applied database migration");
         }
 
@@ -144,7 +191,7 @@ mod tests {
     fn opens_and_migrates_fresh_database() {
         let dir = temp_dir();
         let db = Database::open(&dir).expect("open database");
-        assert_eq!(db.schema_version().expect("schema"), 3);
+        assert_eq!(db.schema_version().expect("schema"), 4);
         db.ping().expect("ping");
         let _ = std::fs::remove_dir_all(&dir);
     }

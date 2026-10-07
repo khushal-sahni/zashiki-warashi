@@ -12,6 +12,13 @@ import {
 } from "./components";
 import { PortConflictDialog } from "./features/docker";
 import {
+  JobsMain,
+  JobsOverlays,
+  JobsSidebar,
+  useJobsController,
+  type JobsController,
+} from "./features/jobs";
+import {
   ProjectDetail,
   ProjectList,
   ScanResults,
@@ -44,7 +51,15 @@ import type {
 } from "./types";
 import "./App.css";
 
+type AppMode = "projects" | "jobs";
+const MODE_KEY = "zw-mode";
+
+function readMode(): AppMode {
+  return localStorage.getItem(MODE_KEY) === "jobs" ? "jobs" : "projects";
+}
+
 function App() {
+  const [mode, setModeState] = useState<AppMode>(readMode);
   const [projects, setProjects] = useState<Project[]>([]);
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [query, setQuery] = useState("");
@@ -101,7 +116,7 @@ function App() {
     };
   }, [refresh]);
 
-  async function withBusy(action: () => Promise<void>): Promise<void> {
+  const withBusy = useCallback(async (action: () => Promise<void>): Promise<void> => {
     setBusy(true);
     setError(null);
     try {
@@ -111,7 +126,15 @@ function App() {
     } finally {
       setBusy(false);
     }
-  }
+  }, []);
+
+  const jobs = useJobsController(mode === "jobs", withBusy, setBusy, setError);
+
+  const setMode = useCallback((next: AppMode) => {
+    localStorage.setItem(MODE_KEY, next);
+    setModeState(next);
+    setError(null);
+  }, []);
 
   async function handleAddFolder(): Promise<void> {
     await withBusy(async () => {
@@ -218,6 +241,9 @@ function App() {
   return (
     <PaneControlsProvider sidebar={sidebar}>
       <AppShell
+        mode={mode}
+        jobs={jobs}
+        onModeChange={setMode}
         projects={projects}
         selected={selected}
         selectedId={selectedId}
@@ -318,6 +344,9 @@ function App() {
 }
 
 interface AppShellProps {
+  readonly mode: AppMode;
+  readonly jobs: JobsController;
+  readonly onModeChange: (mode: AppMode) => void;
   readonly projects: readonly Project[];
   readonly selected: Project | null;
   readonly selectedId: string | null;
@@ -388,17 +417,35 @@ function AppShell(props: AppShellProps) {
     };
   }, [sidebar, toggleLogs]);
 
+  const settingsOpen = props.mode === "projects" ? props.showSettings : props.jobs.showSettings;
+  const refreshJobs = (): void => {
+    void Promise.all([props.jobs.state.refreshJobs(), props.jobs.state.refreshSystem()]).catch(
+      (err: unknown) => props.onError(formatInvokeError(err)),
+    );
+  };
+
   return (
     <main className="shell app-shell">
       <div className="titlebar">
-        <ShellHeader title="Zashiki Warashi" subtitle="LOCALHOST CONTROL PLANE" />
+        <div className="titlebar-lead">
+          <ShellHeader title="Zashiki Warashi" subtitle="LOCALHOST CONTROL PLANE" />
+          <ModeSwitch mode={props.mode} onChange={props.onModeChange} />
+        </div>
         <div className="toolbar">
-          <button type="button" disabled={props.busy} onClick={props.onAddFolder}>
-            Add folder
-          </button>
-          <button type="button" disabled={props.busy} onClick={props.onScan}>
-            Scan
-          </button>
+          {props.mode === "projects" ? (
+            <>
+              <button type="button" disabled={props.busy} onClick={props.onAddFolder}>
+                Add folder
+              </button>
+              <button type="button" disabled={props.busy} onClick={props.onScan}>
+                Scan
+              </button>
+            </>
+          ) : (
+            <button type="button" disabled={props.busy} onClick={props.jobs.openNew}>
+              New job
+            </button>
+          )}
           <KeepAwakeToggle
             status={props.keepAwake}
             busy={props.busy}
@@ -422,9 +469,13 @@ function AppShell(props: AppShellProps) {
           </button>
           <button
             type="button"
-            className={props.showSettings ? "ghost active" : "ghost"}
+            className={settingsOpen ? "ghost active" : "ghost"}
             disabled={props.busy}
-            onClick={props.onToggleSettings}
+            onClick={
+              props.mode === "projects"
+                ? props.onToggleSettings
+                : () => props.jobs.setShowSettings(!props.jobs.showSettings)
+            }
           >
             Settings
           </button>
@@ -432,7 +483,7 @@ function AppShell(props: AppShellProps) {
             type="button"
             className="ghost"
             disabled={props.busy}
-            onClick={props.onRefresh}
+            onClick={props.mode === "projects" ? props.onRefresh : refreshJobs}
           >
             Refresh
           </button>
@@ -493,29 +544,39 @@ function AppShell(props: AppShellProps) {
         </div>
       )}
 
+      <JobsOverlays controller={props.jobs} busy={props.busy} />
+
       <WorkspaceLayout
         sidebar={sidebar}
         sidebarContent={
-          <ProjectList
-            projects={props.projects}
-            selectedId={props.selectedId}
-            query={props.query}
-            onQueryChange={props.onQueryChange}
-            onSelect={props.onSelect}
-          />
+          props.mode === "jobs" ? (
+            <JobsSidebar controller={props.jobs} busy={props.busy} />
+          ) : (
+            <ProjectList
+              projects={props.projects}
+              selectedId={props.selectedId}
+              query={props.query}
+              onQueryChange={props.onQueryChange}
+              onSelect={props.onSelect}
+            />
+          )
         }
         sidebarRail={<SidebarRail onExpand={sidebar.expand} />}
         main={
-          <ProjectDetail
-            project={props.selected}
-            busy={props.busy}
-            onError={props.onError}
-            onStart={props.onStart}
-            onStop={props.onStop}
-            onRestart={props.onRestart}
-            onRemove={props.onRemove}
-            onSaveCommands={props.onSaveCommands}
-          />
+          props.mode === "jobs" ? (
+            <JobsMain controller={props.jobs} busy={props.busy} onError={props.onError} />
+          ) : (
+            <ProjectDetail
+              project={props.selected}
+              busy={props.busy}
+              onError={props.onError}
+              onStart={props.onStart}
+              onStop={props.onStop}
+              onRestart={props.onRestart}
+              onRemove={props.onRemove}
+              onSaveCommands={props.onSaveCommands}
+            />
+          )
         }
       />
 
@@ -523,14 +584,46 @@ function AppShell(props: AppShellProps) {
         {props.status ? (
           <span>
             {props.status.name} v{props.status.version} · DB schema v
-            {props.status.schemaVersion} · {props.projects.length} project
-            {props.projects.length === 1 ? "" : "s"}
+            {props.status.schemaVersion} · {footerCount(props)}
           </span>
         ) : (
           <span>Loading…</span>
         )}
       </footer>
     </main>
+  );
+}
+
+function footerCount(props: AppShellProps): string {
+  if (props.mode === "jobs") {
+    const count = props.jobs.state.jobs.length;
+    return `${count} job${count === 1 ? "" : "s"}`;
+  }
+  const count = props.projects.length;
+  return `${count} project${count === 1 ? "" : "s"}`;
+}
+
+interface ModeSwitchProps {
+  readonly mode: AppMode;
+  readonly onChange: (mode: AppMode) => void;
+}
+
+function ModeSwitch({ mode, onChange }: ModeSwitchProps) {
+  return (
+    <div className="mode-switch" role="tablist" aria-label="Workspace">
+      {(["projects", "jobs"] as const).map((value) => (
+        <button
+          key={value}
+          type="button"
+          role="tab"
+          aria-selected={mode === value}
+          className={mode === value ? "ghost active" : "ghost"}
+          onClick={() => onChange(value)}
+        >
+          {value === "projects" ? "Projects" : "Jobs"}
+        </button>
+      ))}
+    </div>
   );
 }
 

@@ -1,3 +1,4 @@
+mod cli;
 mod commands;
 mod domain;
 mod error;
@@ -8,19 +9,24 @@ mod tray;
 use std::sync::Arc;
 
 use tauri::Manager;
-use tracing::info;
+use tracing::{info, warn};
 
+pub use cli::run_cli;
 use commands::{
-    add_project, clear_project_logs, get_app_status, get_keep_awake_status, get_project_logs,
-    get_project_stack, get_settings, list_projects, open_project_in_cursor, open_project_in_finder,
-    peek_project_stack, remove_project, resolve_port_conflict, restart_project, scan_projects,
-    set_keep_awake_enabled, set_scan_roots, start_project, start_project_stack, stop_project,
-    stop_project_stack, update_project_commands,
+    add_project, clear_project_logs, create_job, delete_job, get_app_status,
+    get_job_run_log, get_job_system_status, get_keep_awake_status, get_project_logs,
+    get_project_stack, get_settings, install_wake_helper, list_foreign_agents, list_job_runs,
+    list_jobs, list_projects, open_project_in_cursor, open_project_in_finder, peek_project_stack,
+    remove_project, resolve_port_conflict, restart_project, run_job_now, scan_projects,
+    set_job_enabled, set_keep_awake_enabled, set_scan_roots, start_project, start_project_stack,
+    stop_project, stop_project_stack, uninstall_wake_helper, update_job, update_project_commands,
 };
-use repositories::{Database, ProjectRepository};
+use repositories::{Database, JobRepository, ProjectRepository};
+use services::job_paths::{launch_agents_dir, JobPaths};
+use services::launchd_service::{LaunchdService, SystemLaunchctl};
 use services::{
-    docker_bin, AppService, CatalogService, ComposeService, KeepAwakeService, LogService,
-    OpenService, PortOccupancyService, ProcessService, StackService,
+    docker_bin, AppService, CatalogService, ComposeService, JobService, KeepAwakeService,
+    LogService, OpenService, PortOccupancyService, ProcessService, StackService,
 };
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
@@ -67,6 +73,10 @@ pub fn run() {
             let keep_awake_service = Arc::new(KeepAwakeService::new(project_repository.clone()));
             keep_awake_service.rehydrate()?;
 
+            let job_service = Arc::new(build_job_service(&database, &app_data_dir)?);
+            reconcile_jobs_in_background(job_service.clone());
+            app.manage(job_service);
+
             let open_service = Arc::new(OpenService::new(catalog_service.clone()));
 
             let app_service = AppService::new(database, app_data_dir.display().to_string());
@@ -105,9 +115,42 @@ pub fn run() {
             start_project_stack,
             stop_project_stack,
             resolve_port_conflict,
+            list_jobs,
+            list_job_runs,
+            get_job_run_log,
+            create_job,
+            update_job,
+            set_job_enabled,
+            delete_job,
+            run_job_now,
+            get_job_system_status,
+            list_foreign_agents,
+            install_wake_helper,
+            uninstall_wake_helper,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
+}
+
+fn build_job_service(
+    database: &Arc<Database>,
+    app_data_dir: &std::path::Path,
+) -> Result<JobService, AppSetupError> {
+    let paths = JobPaths::new(app_data_dir);
+    let agents_dir = launch_agents_dir().map_err(|err| AppSetupError(err.to_string()))?;
+    let exe = std::env::current_exe().map_err(|err| AppSetupError(err.to_string()))?;
+    let launchd = LaunchdService::new(agents_dir, paths.clone(), Box::new(SystemLaunchctl));
+    let repository = Arc::new(JobRepository::new(database.clone()));
+    Ok(JobService::new(repository, paths, launchd, exe))
+}
+
+/// launchctl and process spawns stay off the setup path.
+fn reconcile_jobs_in_background(jobs: Arc<JobService>) {
+    std::thread::spawn(move || {
+        if let Err(err) = jobs.reconcile_system() {
+            warn!(error = %err, "job system reconcile failed");
+        }
+    });
 }
 
 #[derive(Debug)]

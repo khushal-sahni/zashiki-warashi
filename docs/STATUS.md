@@ -1,6 +1,6 @@
 # STATUS.md
 > Your weekend dashboard. Read this first. Update this last.
-> Last updated: `2026-09-14` | Session: `#15`
+> Last updated: `2026-10-07` | Session: `#16`
 
 ---
 
@@ -8,7 +8,7 @@
 
 - [x] Product vision and architecture locked in docs
 - [x] Tauri 2 + React + Vite + TypeScript scaffold
-- [x] SQLite app-data DB (schema v3 — port overrides)
+- [x] SQLite app-data DB (schema v4 — jobs + job runs; WAL so the app and job runner share it)
 - [x] Typed `AppError` + logging (+ `port_conflict` payload)
 - [x] **Project catalog** — add folder, scan roots, list/search, remove (catalog only)
 - [x] **Start command inference** — package.json / compose / Makefile / cargo / go
@@ -29,12 +29,14 @@
 - [x] **Public OSS path** — MIT, FUNDING.yml, stranger README, unsigned Release workflow, `site/` for zashiki.anireco.app
 - [x] **Landing redesign** — Noren Threshold world (PRODUCT.md + DESIGN.md); static `site/` ready to deploy
 - [x] **SEO rooms** — 12 intent pages + compare hub; markdown twins; `llms.txt` / `llms-full.txt`; sitemap; real 404; cache headers
+- [x] **Scheduled jobs** — Jobs mode; per-job launchd agents + supervisor; network wait, keep-awake hold, max runtime, run history + logs; optional wake helper for on-time wakes; socket API + MCP server (`<app> job mcp`)
 
 ---
 
 ## In Progress
 
-- Nothing in progress. Manual follow-ups: `cd site && npm run build && npx wrangler deploy` + DNS for `zashiki.anireco.app`, push a `v*` tag for the first Release draft.
+- Scheduled jobs: code complete, uncommitted. Needs a real-app check: launch the installed app, create a job, install the wake helper (admin prompt), and confirm a lid-closed wake on AC power.
+- Manual follow-ups: `cd site && npm run build && npx wrangler deploy` + DNS for `zashiki.anireco.app`, push a `v*` tag for the first Release draft.
 
 ---
 
@@ -44,12 +46,13 @@
 - Compose/stack needs Docker CLI on the login-shell PATH (resolved once at startup).
 - Occupant matching relies on compose `working_dir` labels; unnamed containers may show as `dockerOther`.
 - macOS Releases are **unsigned** — Gatekeeper needs right-click Open or `xattr -dr com.apple.quarantine`.
+- Exact-time jobs only wake a closed-lid Mac on AC power (macOS limit); on battery they run on the next wake.
 
 ---
 
 ## Where We Left Off
 
-Daily-driver install now targets `/Applications` (Spotlight-friendly) with Authorization Services when elevation is needed. Still need `wrangler deploy` + DNS when ready for the site.
+Scheduled jobs (M5) built end to end and verified in the browser against a mocked backend, plus a CLI smoke test (`job run`, wake request file, socket + MCP). Not yet exercised: wake helper install and real launchd/pmset wakes. Still need `wrangler deploy` + DNS when ready for the site.
 
 ---
 
@@ -102,6 +105,9 @@ cd site && npm run build && npx wrangler deploy
 - Unused intermediate plates under `site/assets/plates/` from the comp-led path
 - SEO room body links use root-absolute `/slug/` paths (fine in prod; python preview matches)
 - Generated HTML under `site/*/index.html` must be rebuilt after editing `site/content/`
+- `login_shell.rs` duplicates process-group helpers from `process_service`
+- Supervisor + job plists point at the current executable; `tauri:dev` repoints them at the dev binary until the installed app launches again
+- Job run logs are never pruned
 
 ---
 
@@ -115,8 +121,8 @@ cd site && npm run build && npx wrangler deploy
 
 | Metric | Value |
 |---|---|
-| Total sessions | 15 |
-| Modules complete | M0 + M1 + M2 + M3 (+ Coffee + logs + panes + snappy + OSS path + landing redesign + SEO rooms) |
-| Test coverage | 44 Rust unit tests |
+| Total sessions | 16 |
+| Modules complete | M0 + M1 + M2 + M3 + M5 scheduled jobs (+ Coffee + logs + panes + snappy + OSS path + landing redesign + SEO rooms) |
+| Test coverage | 76 Rust unit tests |
 | Last deployed | Local `/Applications` via `tauri:install`; site SEO not yet wrangler-deployed |
 | SEO rooms | 12 + compare hub |
