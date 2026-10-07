@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Zashiki Warashi vs cron and launchd — scheduling scripts on macOS</title>
+    <meta name="description" content="cron and raw launchd plists can schedule scripts on macOS. Zashiki Warashi writes calendar LaunchAgents for you and adds network wait, keep-awake, timeouts, logs, and run history." />
+    <link rel="canonical" href="https://zashiki.anireco.app/compare/cron/" />
+    <link
+      rel="alternate"
+      type="text/markdown"
+      href="https://zashiki.anireco.app/compare/cron/index.md"
+      title="Markdown"
+    />
+    <meta property="og:type" content="article" />
+    <meta property="og:url" content="https://zashiki.anireco.app/compare/cron/" />
+    <meta property="og:title" content="Zashiki Warashi vs cron and launchd — scheduling scripts on macOS" />
+    <meta property="og:description" content="cron and raw launchd plists can schedule scripts on macOS. Zashiki Warashi writes calendar LaunchAgents for you and adds network wait, keep-awake, timeouts, logs, and run history." />
+    <meta property="og:image" content="https://zashiki.anireco.app/assets/hero-comp.png" />
+    <meta property="og:site_name" content="Zashiki Warashi" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Zashiki Warashi vs cron and launchd — scheduling scripts on macOS" />
+    <meta name="twitter:description" content="cron and raw launchd plists can schedule scripts on macOS. Zashiki Warashi writes calendar LaunchAgents for you and adds network wait, keep-awake, timeouts, logs, and run history." />
+    <meta name="twitter:image" content="https://zashiki.anireco.app/assets/hero-comp.png" />
+    <link rel="stylesheet" href="../../fonts.css" />
+    <link rel="stylesheet" href="../../styles.css" />
+    <link
+      rel="icon"
+      href="../../favicon.svg"
+      type="image/svg+xml"
+    />
+    <script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position": 1,
+      "name": "Home",
+      "item": "https://zashiki.anireco.app/"
+    },
+    {
+      "@type": "ListItem",
+      "position": 2,
+      "name": "Compare",
+      "item": "https://zashiki.anireco.app/compare/"
+    },
+    {
+      "@type": "ListItem",
+      "position": 3,
+      "name": "vs cron and launchd",
+      "item": "https://zashiki.anireco.app/compare/cron/"
+    }
+  ]
+}
+    </script>
+    <script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "Does Zashiki replace crontab?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "No. It does not read or edit your crontab, and it does not accept arbitrary cron expressions. It creates its own launchd agents for jobs you define in the app."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Is Zashiki just a launchd GUI?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "It writes launchd agents, so launchd stays the clock. On top it adds network wait, a keep-awake hold, max runtime, logs, run history, and an MCP server."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Can I keep using my existing plists?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Yes. Other LaunchAgents are shown read-only. Zashiki never edits agents it did not create."
+      }
+    }
+  ]
+}
+    </script>
+  </head>
+  <body class="page-interior">
+    <header class="site-chrome">
+      <a class="chrome-brand" href="../../">Zashiki Warashi</a>
+      <nav class="chrome-actions" aria-label="Primary">
+        <a
+          class="ghost-inline chrome-github"
+          href="https://github.com/khushal-sahni/zashiki-warashi"
+          >GitHub</a
+        >
+        <a
+          class="download-inline"
+          href="https://github.com/khushal-sahni/zashiki-warashi/releases/latest"
+          >Download for macOS</a
+        >
+      </nav>
+    </header>
+
+    <main class="below interior-main">
+      <nav class="breadcrumb" aria-label="Breadcrumb">
+        <a href="../../">Home</a>
+         <span aria-hidden="true">/</span> <a href="../../compare/">Compare</a> <span aria-hidden="true">/</span> <span aria-current="page">vs cron and launchd</span>
+      </nav>
+
+      <article class="room">
+        <header class="room-head">
+          <h1>vs cron and launchd</h1>
+          <p class="lede">cron, launchd, and Zashiki all run a command at a time. The difference is what happens around the command: sleep, Wi-Fi, PATH, failure, and finding out what happened.</p>
+        </header>
+
+        <div class="prose"><h2>Short answer</h2>
+<p><strong>cron</strong> is a line in a file. It is everywhere, it is simple, and on macOS it runs with a thin environment, skips runs while the Mac sleeps, and mails failures to a local mailbox nobody reads.</p>
+<p><strong>launchd</strong> is what macOS actually uses. Calendar agents catch up after sleep and survive reboots, but you write XML plists by hand, load them with <code>launchctl</code>, and build your own logging.</p>
+<p><strong>Zashiki Warashi</strong> writes launchd calendar agents for you and keeps the operator view: run history, logs, and the readiness steps you would otherwise put at the top of every script.</p>
+<h2>Side-by-side</h2>
+<table>
+<thead>
+<tr>
+<th>Concern</th>
+<th>cron</th>
+<th>Raw launchd plist</th>
+<th>Zashiki Warashi</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Clock</td>
+<td>cron daemon</td>
+<td>launchd</td>
+<td>launchd</td>
+</tr>
+<tr>
+<td>Missed while asleep</td>
+<td>Skipped</td>
+<td>One catch-up run on wake</td>
+<td>One catch-up run on wake</td>
+</tr>
+<tr>
+<td>Wake the Mac on time</td>
+<td>No</td>
+<td>Separate <code>pmset</code> setup</td>
+<td>Optional helper, exact jobs only</td>
+</tr>
+<tr>
+<td>PATH (<code>fnm</code>, <code>nvm</code>, Homebrew)</td>
+<td>Minimal env</td>
+<td>Whatever you put in the plist</td>
+<td>Your login shell</td>
+</tr>
+<tr>
+<td>Wait for Wi-Fi</td>
+<td>Script it</td>
+<td>Script it</td>
+<td>Built in, per job</td>
+</tr>
+<tr>
+<td>Keep awake during run</td>
+<td>Script it</td>
+<td>Script it</td>
+<td>Built in, per run</td>
+</tr>
+<tr>
+<td>Timeout</td>
+<td>Script it</td>
+<td>Script it</td>
+<td>Max runtime per job</td>
+</tr>
+<tr>
+<td>Logs and history</td>
+<td>Mail / redirect</td>
+<td><code>StandardOutPath</code> file</td>
+<td>Per-run logs + history in the app</td>
+</tr>
+<tr>
+<td>Schedule syntax</td>
+<td>Any cron expression</td>
+<td>Calendar dictionaries</td>
+<td>Interval, daily, weekly</td>
+</tr>
+<tr>
+<td>Agent / script API</td>
+<td>—</td>
+<td><code>launchctl</code></td>
+<td>Local socket + MCP</td>
+</tr>
+</tbody></table>
+<h2>Who should pick Zashiki</h2>
+<ul>
+<li>You have a few scripts that must run on a laptop that sleeps</li>
+<li>You want to see the last run’s exit code and log without hunting for files</li>
+<li>You want a job to wait for Wi-Fi after wake instead of failing its first request</li>
+<li>You want an agent to schedule and inspect jobs through MCP — see <a href="/scheduled-jobs/">Scheduled jobs</a></li>
+</ul>
+<h2>Who should keep cron or plain launchd</h2>
+<ul>
+<li>Servers and always-on machines where sleep is not a concern</li>
+<li>Schedules that need full cron expressions (for example, the last weekday of the month)</li>
+<li>Jobs managed by config management, dotfiles, or another tool that already owns the plist</li>
+</ul>
+<p>Using both is fine. Zashiki only manages the agents it creates, and shows everything else read-only.</p>
+<p>Download Zashiki: <a href="https://github.com/khushal-sahni/zashiki-warashi/releases/latest">Releases</a>.</p>
+</div>
+
+        <section class="fold faq-fold" aria-labelledby="faq-heading">
+          <h2 id="faq-heading">FAQ</h2>
+          <details class="faq-item">
+            <summary>Does Zashiki replace crontab?</summary>
+            <p>No. It does not read or edit your crontab, and it does not accept arbitrary cron expressions. It creates its own launchd agents for jobs you define in the app.</p>
+          </details>
+          <details class="faq-item">
+            <summary>Is Zashiki just a launchd GUI?</summary>
+            <p>It writes launchd agents, so launchd stays the clock. On top it adds network wait, a keep-awake hold, max runtime, logs, run history, and an MCP server.</p>
+          </details>
+          <details class="faq-item">
+            <summary>Can I keep using my existing plists?</summary>
+            <p>Yes. Other LaunchAgents are shown read-only. Zashiki never edits agents it did not create.</p>
+          </details>
+        </section>
+
+        <section class="fold related-fold" aria-labelledby="related-heading">
+          <h2 id="related-heading">More rooms</h2>
+          <ul class="related-list">
+          <li><a href="../../scheduled-jobs/">Scheduled jobs</a></li>
+          <li><a href="../../wake-mac/">Run jobs while the Mac sleeps</a></li>
+          <li><a href="../../localhost-control-plane/">Localhost control plane</a></li>
+          </ul>
+        </section>
+      </article>
+
+      <p class="closing">
+        <a
+          class="download-inline"
+          href="https://github.com/khushal-sahni/zashiki-warashi/releases/latest"
+          >Download for macOS</a
+        >
+        <a
+          class="ghost-inline"
+          href="https://github.com/khushal-sahni/zashiki-warashi"
+          >GitHub</a
+        >
+      </p>
+
+      <footer class="site-footer">
+        <span>座敷童子 — a house spirit that looks after the place.</span>
+        <span>
+          <a href="https://github.com/sponsors/khushal-sahni">Sponsors</a>
+          · MIT ·
+          <a href="https://zashiki.anireco.app/compare/cron/index.md">Markdown</a>
+        </span>
+      </footer>
+    </main>
+  </body>
+</html>

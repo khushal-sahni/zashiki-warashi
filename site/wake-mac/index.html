@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Run a scheduled job while the Mac is asleep — Zashiki Warashi</title>
+    <meta name="description" content="How Zashiki Warashi runs scheduled jobs on a sleeping Mac: catch-up runs on wake by default, or an optional helper that arms a pmset wake about 90 seconds early. Closed-lid wakes need AC power." />
+    <link rel="canonical" href="https://zashiki.anireco.app/wake-mac/" />
+    <link
+      rel="alternate"
+      type="text/markdown"
+      href="https://zashiki.anireco.app/wake-mac/index.md"
+      title="Markdown"
+    />
+    <meta property="og:type" content="article" />
+    <meta property="og:url" content="https://zashiki.anireco.app/wake-mac/" />
+    <meta property="og:title" content="Run a scheduled job while the Mac is asleep — Zashiki Warashi" />
+    <meta property="og:description" content="How Zashiki Warashi runs scheduled jobs on a sleeping Mac: catch-up runs on wake by default, or an optional helper that arms a pmset wake about 90 seconds early. Closed-lid wakes need AC power." />
+    <meta property="og:image" content="https://zashiki.anireco.app/assets/hero-comp.png" />
+    <meta property="og:site_name" content="Zashiki Warashi" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Run a scheduled job while the Mac is asleep — Zashiki Warashi" />
+    <meta name="twitter:description" content="How Zashiki Warashi runs scheduled jobs on a sleeping Mac: catch-up runs on wake by default, or an optional helper that arms a pmset wake about 90 seconds early. Closed-lid wakes need AC power." />
+    <meta name="twitter:image" content="https://zashiki.anireco.app/assets/hero-comp.png" />
+    <link rel="stylesheet" href="../fonts.css" />
+    <link rel="stylesheet" href="../styles.css" />
+    <link
+      rel="icon"
+      href="../favicon.svg"
+      type="image/svg+xml"
+    />
+    <script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position": 1,
+      "name": "Home",
+      "item": "https://zashiki.anireco.app/"
+    },
+    {
+      "@type": "ListItem",
+      "position": 2,
+      "name": "Run jobs while the Mac sleeps",
+      "item": "https://zashiki.anireco.app/wake-mac/"
+    }
+  ]
+}
+    </script>
+    <script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "Can a MacBook with the lid closed wake up and run a job?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "On AC power, yes, with an exact job and the wake helper installed. On battery, macOS does not honor scheduled wakes with the lid closed, so the job runs on the next wake."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Does Zashiki disable sleep?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "No. Jobs never use pmset disablesleep. The Mac is held awake only while a run is in progress, and goes back to its normal sleep behavior afterwards."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Why does the wake helper need an admin password?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Scheduling a hardware wake with pmset requires root. The helper is copied into /Library/PrivilegedHelperTools so a user-writable app bundle cannot escalate, and it only touches wakes owned by Zashiki."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "What if I decline the helper?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Exact jobs fall back to catch-up behavior: on time when awake, once on the next wake otherwise. Nothing else changes."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "If the Mac slept through several slots, do I get several runs?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "No. launchd coalesces missed calendar slots into a single catch-up run."
+      }
+    }
+  ]
+}
+    </script>
+  </head>
+  <body class="page-interior">
+    <header class="site-chrome">
+      <a class="chrome-brand" href="../">Zashiki Warashi</a>
+      <nav class="chrome-actions" aria-label="Primary">
+        <a
+          class="ghost-inline chrome-github"
+          href="https://github.com/khushal-sahni/zashiki-warashi"
+          >GitHub</a
+        >
+        <a
+          class="download-inline"
+          href="https://github.com/khushal-sahni/zashiki-warashi/releases/latest"
+          >Download for macOS</a
+        >
+      </nav>
+    </header>
+
+    <main class="below interior-main">
+      <nav class="breadcrumb" aria-label="Breadcrumb">
+        <a href="../">Home</a>
+         <span aria-hidden="true">/</span> <span aria-current="page">Run jobs while the Mac sleeps</span>
+      </nav>
+
+      <article class="room">
+        <header class="room-head">
+          <h1>Run jobs while the Mac sleeps</h1>
+          <p class="lede">A schedule is only useful if it fires. Zashiki gives each job one of two policies — catch up on wake, or wake the Mac on time — and is plain about what macOS allows.</p>
+        </header>
+
+        <div class="prose"><p>Laptops sleep. A job scheduled for 03:00 on a MacBook that closed at midnight has three possible outcomes: it never runs, it runs when you open the lid, or something wakes the Mac first. Zashiki makes the choice explicit per job.</p>
+<h2>Two policies</h2>
+<table>
+<thead>
+<tr>
+<th>Policy</th>
+<th>Mac awake</th>
+<th>Mac asleep</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>Optimistic</strong> (default)</td>
+<td>Runs on time</td>
+<td>Runs once on the next wake</td>
+</tr>
+<tr>
+<td><strong>Exact</strong></td>
+<td>Runs on time</td>
+<td>Mac wakes about 90 s early, then runs on time</td>
+</tr>
+</tbody></table>
+<p>Optimistic needs nothing extra. It relies on launchd’s calendar behavior: missed slots collapse into <strong>one</strong> catch-up run when the Mac wakes, recorded as a catch-up trigger in run history.</p>
+<p>Exact adds a hardware wake before each slot. That needs the optional wake helper.</p>
+<h2>The wake helper</h2>
+<p>Exact jobs schedule a <code>pmset</code> wake roughly 90 seconds before the slot, so the Mac is awake and on the network when launchd fires.</p>
+<ul>
+<li>Installed from Jobs settings with one admin prompt</li>
+<li>Copied to <code>/Library/PrivilegedHelperTools</code> and run as a root launch daemon</li>
+<li>Reconciles <strong>only</strong> wakes owned by <code>com.zashiki.warashi</code>; your other scheduled wakes are left alone</li>
+<li>Declined or removed? Exact jobs degrade to optimistic</li>
+</ul>
+<h2>What macOS allows</h2>
+<p>Be clear on the hardware rules before you trust a 03:00 job:</p>
+<ul>
+<li><strong>Lid closed, on AC power</strong> — scheduled wakes work</li>
+<li><strong>Lid closed, on battery</strong> — macOS does not wake for them; the job runs on the next wake</li>
+</ul>
+<p>The job inspector shows wake and battery notes for exact jobs so this is visible where you configure it.</p>
+<h2>After it wakes</h2>
+<p>Waking is half the problem. Wi-Fi often reconnects a few seconds late. Each run can:</p>
+<ul>
+<li><strong>Wait for the network</strong> (with a grace period) and then run, or skip the run as “skipped offline” if the network is required</li>
+<li><strong>Hold the Mac awake</strong> with <code>caffeinate -w</code> for that run only, so a long job is not put back to sleep halfway through</li>
+<li><strong>Stop at a max runtime</strong> so a hung script does not keep the Mac awake all night</li>
+</ul>
+<p>Zashiki never calls <code>pmset disablesleep</code>, and it never leaves a keep-awake hold behind after a run ends.</p>
+<h2>Setting it up</h2>
+<ol>
+<li>Create a job in Jobs mode — see <a href="/scheduled-jobs/">Scheduled jobs</a></li>
+<li>Set its policy to <strong>Exact</strong></li>
+<li>Install the wake helper when prompted (Jobs settings)</li>
+<li>Leave the Mac on power for closed-lid runs</li>
+</ol>
+<p>Install notes (unsigned builds, Gatekeeper): <a href="/download/">Download</a>.</p>
+</div>
+
+        <section class="fold faq-fold" aria-labelledby="faq-heading">
+          <h2 id="faq-heading">FAQ</h2>
+          <details class="faq-item">
+            <summary>Can a MacBook with the lid closed wake up and run a job?</summary>
+            <p>On AC power, yes, with an exact job and the wake helper installed. On battery, macOS does not honor scheduled wakes with the lid closed, so the job runs on the next wake.</p>
+          </details>
+          <details class="faq-item">
+            <summary>Does Zashiki disable sleep?</summary>
+            <p>No. Jobs never use pmset disablesleep. The Mac is held awake only while a run is in progress, and goes back to its normal sleep behavior afterwards.</p>
+          </details>
+          <details class="faq-item">
+            <summary>Why does the wake helper need an admin password?</summary>
+            <p>Scheduling a hardware wake with pmset requires root. The helper is copied into /Library/PrivilegedHelperTools so a user-writable app bundle cannot escalate, and it only touches wakes owned by Zashiki.</p>
+          </details>
+          <details class="faq-item">
+            <summary>What if I decline the helper?</summary>
+            <p>Exact jobs fall back to catch-up behavior: on time when awake, once on the next wake otherwise. Nothing else changes.</p>
+          </details>
+          <details class="faq-item">
+            <summary>If the Mac slept through several slots, do I get several runs?</summary>
+            <p>No. launchd coalesces missed calendar slots into a single catch-up run.</p>
+          </details>
+        </section>
+
+        <section class="fold related-fold" aria-labelledby="related-heading">
+          <h2 id="related-heading">More rooms</h2>
+          <ul class="related-list">
+          <li><a href="../scheduled-jobs/">Scheduled jobs</a></li>
+          <li><a href="../compare/cron/">vs cron and launchd</a></li>
+          <li><a href="../download/">Download for macOS</a></li>
+          </ul>
+        </section>
+      </article>
+
+      <p class="closing">
+        <a
+          class="download-inline"
+          href="https://github.com/khushal-sahni/zashiki-warashi/releases/latest"
+          >Download for macOS</a
+        >
+        <a
+          class="ghost-inline"
+          href="https://github.com/khushal-sahni/zashiki-warashi"
+          >GitHub</a
+        >
+      </p>
+
+      <footer class="site-footer">
+        <span>座敷童子 — a house spirit that looks after the place.</span>
+        <span>
+          <a href="https://github.com/sponsors/khushal-sahni">Sponsors</a>
+          · MIT ·
+          <a href="https://zashiki.anireco.app/wake-mac/index.md">Markdown</a>
+        </span>
+      </footer>
+    </main>
+  </body>
+</html>

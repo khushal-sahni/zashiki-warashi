@@ -28,7 +28,7 @@
 - [x] **Menu-bar tray** — show window / quit
 - [x] **Public OSS path** — MIT, FUNDING.yml, stranger README, unsigned Release workflow, `site/` for zashiki.anireco.app
 - [x] **Landing redesign** — Noren Threshold world (PRODUCT.md + DESIGN.md); static `site/` ready to deploy
-- [x] **SEO rooms** — 12 intent pages + compare hub; markdown twins; `llms.txt` / `llms-full.txt`; sitemap; real 404; cache headers
+- [x] **SEO rooms** — 15 intent pages (incl. scheduled jobs, wake-mac, vs cron) + compare hub; markdown twins; `llms.txt` / `llms-full.txt`; sitemap; real 404; cache headers
 - [x] **Scheduled jobs** — Jobs mode; per-job launchd agents + supervisor; network wait, keep-awake hold, max runtime, run history + logs; optional wake helper for on-time wakes; socket API + MCP server (`<app> job mcp`)
 
 ---
@@ -36,7 +36,7 @@
 ## In Progress
 
 - Scheduled jobs: code complete, uncommitted. Needs a real-app check: launch the installed app, create a job, install the wake helper (admin prompt), and confirm a lid-closed wake on AC power.
-- Manual follow-ups: `cd site && npm run build && npx wrangler deploy` + DNS for `zashiki.anireco.app`, push a `v*` tag for the first Release draft.
+- Release with Jobs: commit + push, bump to `0.2.0` (`v0.1.0` already exists), push `v0.2.0`, publish the draft the Action creates, then `cd site && npm run build && npx wrangler deploy` (+ DNS for `zashiki.anireco.app` if not done).
 
 ---
 

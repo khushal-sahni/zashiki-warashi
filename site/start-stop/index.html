@@ -140,6 +140,8 @@
 <p>Closing the control plane must not kill your stack. Processes <strong>outlive the app</strong>. Next launch, Zashiki rehydrates running status from stored PIDs when they are still alive and match expectations, and can refresh Docker occupancy in the background.</p>
 <h2>Logs</h2>
 <p>Live process logs (and Compose log views) sit in a resizable pane so start/stop is not a black box. You still have Terminal; you should not <em>need</em> it for the happy path.</p>
+<h2>Scripts on a schedule</h2>
+<p>The same login-shell spawn runs <a href="/scheduled-jobs/">scheduled jobs</a>: commands launchd fires on a calendar, with the app closed, plus network wait, keep-awake, and run history.</p>
 <h2>What you need</h2>
 <ul>
 <li>macOS</li>
@@ -171,6 +173,7 @@
           <ul class="related-list">
           <li><a href="../for-ai-projects/">For AI-generated projects</a></li>
           <li><a href="../port-already-in-use/">Port already in use</a></li>
+          <li><a href="../scheduled-jobs/">Scheduled jobs</a></li>
           <li><a href="../download/">Download for macOS</a></li>
           </ul>
         </section>

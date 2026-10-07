@@ -30,6 +30,7 @@ faq:
 | Peek stacks | Compose DB services, host/port/user/db, copy URI |
 | Hand off | Open in Finder, Cursor, Compass for mongo |
 | Reduce collisions | Port occupant detection — catalog, docker, or native |
+| Run on a schedule | [Scheduled jobs](/scheduled-jobs/) on launchd — network wait, keep-awake, logs, history |
 
 It deliberately does **not** own: editing code, full Docker Engine UI, query GUIs, cloud sync, or required per-repo config.
 

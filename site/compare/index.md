@@ -2,6 +2,7 @@
 
 Disambiguation pages — what job each tool owns.
 
+- [vs cron and launchd](https://zashiki.anireco.app/compare/cron/): cron and raw launchd plists can schedule scripts on macOS. Zashiki Warashi writes calendar LaunchAgents for you and adds network wait, keep-awake, timeouts, logs, and run history.
 - [vs Docker Desktop](https://zashiki.anireco.app/compare/docker-desktop/): Docker Desktop is a container runtime and GUI. Zashiki Warashi is a macOS project catalog with start/stop and Compose DB peek. Not a Docker Desktop alternative — complementary glue.
 - [vs lpm](https://zashiki.anireco.app/compare/lpm/): lpm is a macOS local project manager with services YAML and agent terminals. Zashiki Warashi observes existing repos without required per-project config — catalog, start/stop, Compose DB peek.
 - [vs OrbStack](https://zashiki.anireco.app/compare/orbstack/): OrbStack replaces Docker Desktop as a fast macOS container runtime. Zashiki Warashi catalogs local projects and peeks Compose — it runs on top of OrbStack, not instead of it.

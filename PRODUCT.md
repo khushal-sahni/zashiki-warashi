@@ -30,7 +30,7 @@ macOS (primary). Docker Desktop or OrbStack for Compose stacks. Optional Cursor 
 
 ## Capabilities and Constraints
 
-Confirmed: project catalog (add/scan/list/remove), start command inference and overrides, lifecycle (start/stop/restart) with process groups and PID rehydrate, live logs, Compose DB stack peek (Up/Stop, copy URI, Compass for mongo), port conflict reconciliation, Open in Finder/Cursor, coffee keep-awake toggle, resizable panes.
+Confirmed: project catalog (add/scan/list/remove), start command inference and overrides, lifecycle (start/stop/restart) with process groups and PID rehydrate, live logs, Compose DB stack peek (Up/Stop, copy URI, Compass for mongo), port conflict reconciliation, Open in Finder/Cursor, coffee keep-awake toggle, resizable panes, scheduled jobs (per-job launchd agents that run with the app closed; network wait, keep-awake per run, max runtime, logs and run history; optional wake helper for exact jobs, closed-lid only on AC; local socket + MCP server).
 
 Not building: Docker GUI replacement, query editors, AI coding agent, cloud sync/auth, required per-repo config, DB provisioning in v1, writing into project repos by default, notarization yet (unsigned releases).
 

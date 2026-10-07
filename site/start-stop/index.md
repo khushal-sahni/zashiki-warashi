@@ -49,6 +49,10 @@ Closing the control plane must not kill your stack. Processes **outlive the app*
 
 Live process logs (and Compose log views) sit in a resizable pane so start/stop is not a black box. You still have Terminal; you should not *need* it for the happy path.
 
+## Scripts on a schedule
+
+The same login-shell spawn runs [scheduled jobs](/scheduled-jobs/): commands launchd fires on a calendar, with the app closed, plus network wait, keep-awake, and run history.
+
 ## What you need
 
 - macOS
@@ -77,6 +81,7 @@ Yes. Overrides live in app SQLite data, not in the project repo.
 
 - [For AI-generated projects](https://zashiki.anireco.app/for-ai-projects/)
 - [Port already in use](https://zashiki.anireco.app/port-already-in-use/)
+- [Scheduled jobs](https://zashiki.anireco.app/scheduled-jobs/)
 - [Download for macOS](https://zashiki.anireco.app/download/)
 
 ---

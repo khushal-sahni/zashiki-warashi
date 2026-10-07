@@ -1,6 +1,6 @@
 # Zashiki Warashi
 
-> macOS-first desktop control plane for localhost. Catalog local projects (especially AI-generated repos), one-button start/stop, Compose/DB peek, deep-links into Cursor, Finder, and Compass. Observe existing repos — no required per-repo YAML.
+> macOS-first desktop control plane for localhost. Catalog local projects (especially AI-generated repos), one-button start/stop, Compose/DB peek, scheduled jobs on launchd, deep-links into Cursor, Finder, and Compass. Observe existing repos — no required per-repo YAML.
 
 Home: https://zashiki.anireco.app/
 Download: https://github.com/khushal-sahni/zashiki-warashi/releases/latest
@@ -8,6 +8,8 @@ GitHub: https://github.com/khushal-sahni/zashiki-warashi
 
 ## Rooms
 
+- [vs cron and launchd](https://zashiki.anireco.app/compare/cron/): cron and raw launchd plists can schedule scripts on macOS. Zashiki Warashi writes calendar LaunchAgents for you and adds network wait, keep-awake, timeouts, logs, and run history.
+  - Markdown: https://zashiki.anireco.app/compare/cron/index.md
 - [vs Docker Desktop](https://zashiki.anireco.app/compare/docker-desktop/): Docker Desktop is a container runtime and GUI. Zashiki Warashi is a macOS project catalog with start/stop and Compose DB peek. Not a Docker Desktop alternative — complementary glue.
   - Markdown: https://zashiki.anireco.app/compare/docker-desktop/index.md
 - [vs lpm](https://zashiki.anireco.app/compare/lpm/): lpm is a macOS local project manager with services YAML and agent terminals. Zashiki Warashi observes existing repos without required per-project config — catalog, start/stop, Compose DB peek.
@@ -30,8 +32,12 @@ GitHub: https://github.com/khushal-sahni/zashiki-warashi
   - Markdown: https://zashiki.anireco.app/name/index.md
 - [Port already in use](https://zashiki.anireco.app/port-already-in-use/): EADDRINUSE and Docker ‘port is already allocated’ on macOS — how Zashiki Warashi detects catalog, Docker, or native occupants and lets you stop or remap.
   - Markdown: https://zashiki.anireco.app/port-already-in-use/index.md
+- [Scheduled jobs on your Mac](https://zashiki.anireco.app/scheduled-jobs/): Run scripts on a schedule on macOS: Zashiki Warashi writes per-job launchd agents, waits for the network, keeps the Mac awake for the run, and keeps logs and run history — even with the app closed.
+  - Markdown: https://zashiki.anireco.app/scheduled-jobs/index.md
 - [One-button start and stop](https://zashiki.anireco.app/start-stop/): How Zashiki Warashi starts and stops local projects via your login shell, process groups, and PID rehydration — so fnm/nvm PATH works from a GUI app.
   - Markdown: https://zashiki.anireco.app/start-stop/index.md
+- [Run jobs while the Mac sleeps](https://zashiki.anireco.app/wake-mac/): How Zashiki Warashi runs scheduled jobs on a sleeping Mac: catch-up runs on wake by default, or an optional helper that arms a pmset wake about 90 seconds early. Closed-lid wakes need AC power.
+  - Markdown: https://zashiki.anireco.app/wake-mac/index.md
 
 ## Notes
 

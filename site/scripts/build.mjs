@@ -23,12 +23,15 @@ const PAGE_TITLES = {
   "/compose-databases/": "Compose and databases",
   "/mongodb-compass/": "MongoDB Compass",
   "/port-already-in-use/": "Port already in use",
+  "/scheduled-jobs/": "Scheduled jobs",
+  "/wake-mac/": "Run jobs while the Mac sleeps",
   "/download/": "Download for macOS",
   "/name/": "The name 座敷童子",
   "/compare/docker-desktop/": "vs Docker Desktop",
   "/compare/orbstack/": "vs OrbStack",
   "/compare/lpm/": "vs lpm",
   "/compare/portainer/": "vs Portainer",
+  "/compare/cron/": "vs cron and launchd",
 };
 
 marked.setOptions({ gfm: true });
@@ -318,7 +321,7 @@ function writeCompareIndex(comparePages) {
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Honest comparisons — Zashiki Warashi</title>
-    <meta name="description" content="How Zashiki Warashi differs from Docker Desktop, OrbStack, Portainer, and lpm — disambiguation, not scorecards." />
+    <meta name="description" content="How Zashiki Warashi differs from Docker Desktop, OrbStack, Portainer, lpm, and cron — disambiguation, not scorecards." />
     <link rel="canonical" href="${ORIGIN}/compare/" />
     <link rel="stylesheet" href="${prefix}fonts.css" />
     <link rel="stylesheet" href="${prefix}styles.css" />
@@ -397,7 +400,7 @@ function writeLlms(pages) {
   const lines = [
     "# Zashiki Warashi",
     "",
-    "> macOS-first desktop control plane for localhost. Catalog local projects (especially AI-generated repos), one-button start/stop, Compose/DB peek, deep-links into Cursor, Finder, and Compass. Observe existing repos — no required per-repo YAML.",
+    "> macOS-first desktop control plane for localhost. Catalog local projects (especially AI-generated repos), one-button start/stop, Compose/DB peek, scheduled jobs on launchd, deep-links into Cursor, Finder, and Compass. Observe existing repos — no required per-repo YAML.",
     "",
     `Home: ${ORIGIN}/`,
     `Download: https://github.com/khushal-sahni/zashiki-warashi/releases/latest`,

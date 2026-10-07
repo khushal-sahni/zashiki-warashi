@@ -11,6 +11,11 @@
     <priority>0.6</priority>
   </url>
   <url>
+    <loc>https://zashiki.anireco.app/compare/cron/</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
     <loc>https://zashiki.anireco.app/compare/docker-desktop/</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
@@ -66,7 +71,17 @@
     <priority>0.8</priority>
   </url>
   <url>
+    <loc>https://zashiki.anireco.app/scheduled-jobs/</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
     <loc>https://zashiki.anireco.app/start-stop/</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://zashiki.anireco.app/wake-mac/</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>

@@ -29,6 +29,20 @@
 
 ## Sessions
 
+## Session #17 — 2026-10-07
+
+### Built
+- SEO rooms for scheduled jobs: `/scheduled-jobs/`, `/wake-mac/`, `/compare/cron/` (FAQ JSON-LD, markdown twins, sitemap, `llms.txt`, redirects via the existing build)
+
+### Changed
+- Home: one jobs sentence in "What it keeps" + three room links; `start-stop` and `localhost-control-plane` cross-link to jobs
+- `build.mjs`: new page titles; compare hub description and `llms.txt` summary mention cron / scheduled jobs
+- `PRODUCT.md` capabilities include scheduled jobs
+
+### Deferred / Not Done
+- Site not deployed — wait until the release containing Jobs is published
+- `v0.1.0` tag already exists on origin, so the Jobs release needs a version bump (`0.2.0` in `tauri.conf.json` + `Cargo.toml`) before tagging
+
 ## Session #16 — 2026-10-07
 
 ### Built
